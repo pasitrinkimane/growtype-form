@@ -1,0 +1,89 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Growtype - Form\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-11-18 10:57+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.5.3; wp-5.8\n"
+"X-Domain: growtype-form"
+
+#. Description of the plugin
+msgid "Advanced form functionality for \"Growtype\" theme."
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:58
+msgid "Form is not configured. Please contact site admin."
+msgstr ""
+
+#. Author of the plugin
+msgid "Growtype"
+msgstr ""
+
+#. Name of the plugin
+#: ../../../../../packages/growtype-form/admin/class-growtype-form-admin.php:116
+#: ../../../../../packages/growtype-form/admin/class-growtype-form-admin.php:117
+msgid "Growtype - Form"
+msgstr ""
+
+#. URI of the plugin
+#. Author URI of the plugin
+msgid "http://newcoolstudio.com/"
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:560
+msgid "Missing data. Please contact site admin."
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:386
+msgid "Missing required values"
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:393
+msgid "Passwords do not match"
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:566
+msgid "Please fill all required fields."
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/crud/wc.php:112
+msgid "Product created."
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:542
+msgid "Product uploaded."
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:419
+msgid "Profile already registered."
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:556
+msgid "Record created successfully."
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:424
+msgid "Registration successful."
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:190
+msgid "Save"
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:426
+msgid "Something went wrong."
+msgstr ""
+
+#: ../../../../../packages/growtype-form/includes/crud/wc.php:109
+#: ../../../../../packages/growtype-form/includes/crud/wp.php:52
+msgid "Something went wrong. Please contact administrator."
+msgstr ""

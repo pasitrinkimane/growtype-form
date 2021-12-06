@@ -1,0 +1,89 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Growtype - Form\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-09-08 14:01+0000\n"
+"PO-Revision-Date: 2021-11-18 13:30+0000\n"
+"Last-Translator: lvjc_user\n"
+"Language-Team: Lietuvių kalba\n"
+"Language: lt_LT\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10 >= 2 "
+"&&(n%100<10||n%100 >= 20)? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.5.5; wp-5.8.2\n"
+"X-Domain: growtype-form"
+
+#. Description of the plugin
+msgid "Advanced form functionality for \"Growtype\" theme."
+msgstr "Išplėstinė formos funkcija „Growtype“ temai."
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:58
+msgid "Form is not configured. Please contact site admin."
+msgstr "Forma nesukonfigūruota. Susisiekite su svetainės administratoriumi."
+
+#. Author of the plugin
+msgid "Growtype"
+msgstr "Augimo tipas"
+
+#. Name of the plugin
+#: ../../../../../packages/growtype-form/admin/class-growtype-form-admin.php:116
+#: ../../../../../packages/growtype-form/admin/class-growtype-form-admin.php:117
+msgid "Growtype - Form"
+msgstr "Growtype - Form"
+
+#. URI of the plugin
+#. Author URI of the plugin
+msgid "http://newcoolstudio.com/"
+msgstr "http://newcoolstudio.com/"
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:560
+msgid "Missing data. Please contact site admin."
+msgstr "Trūkstami duomenys. Susisiekite su svetainės administratoriumi."
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:386
+msgid "Missing required values"
+msgstr "Trūksta būtinų verčių"
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:393
+msgid "Passwords do not match"
+msgstr "Slaptažodžiai nesutampa!"
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:566
+msgid "Please fill all required fields."
+msgstr "Prašome užpildyti visus būtinus laukus."
+
+#: ../../../../../packages/growtype-form/includes/crud/wc.php:112
+msgid "Product created."
+msgstr "Sukurtas produktas."
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:542
+msgid "Product uploaded."
+msgstr "Produktas įkeltas."
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:419
+msgid "Profile already registered."
+msgstr "Toks profilis jau egzistuoja."
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:556
+msgid "Record created successfully."
+msgstr "Įrašas sėkmingai sukurtas."
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:424
+msgid "Registration successful."
+msgstr "Registracija sėkminga."
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:190
+msgid "Save"
+msgstr "Sutaupyti"
+
+#: ../../../../../packages/growtype-form/includes/methods/form-render.php:426
+msgid "Something went wrong."
+msgstr "Kažkas nutiko."
+
+#: ../../../../../packages/growtype-form/includes/crud/wc.php:109
+#: ../../../../../packages/growtype-form/includes/crud/wp.php:52
+msgid "Something went wrong. Please contact administrator."
+msgstr "Kažkas nutiko. Susisiekite su administratoriumi."

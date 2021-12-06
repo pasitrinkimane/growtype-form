@@ -1,0 +1,28 @@
+#growtype-form {
+  padding-top: 10px;
+}
+#growtype-form .col-auto {
+  width: 50%;
+}
+#growtype-form .fields-confirmation {
+  padding-top: 20px;
+}
+#growtype-form .fields-confirmation .col-auto {
+  width: 100%;
+  padding-top: 5px;
+}
+#growtype-form .row-submit {
+  padding-top: 25px;
+}
+#growtype-form .form-check-input[type=checkbox] {
+  margin-right: 7px;
+}
+#growtype-form .form-description {
+  margin-bottom: 14px;
+  font-size: 12px;
+  margin-top: -3px;
+}
+
+.growtype-form-wrapper .alert {
+  margin-bottom: 30px;
+}
