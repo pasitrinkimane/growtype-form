@@ -155,7 +155,9 @@ class Growtype_Form_Admin
                         })
 
                         let growtype_form_json_content = $(value).data('ace');
-                        growtype_form_json_content.editor.ace.setValue(JSON.stringify(JSON.parse($(value).text()), null, '\t'));
+                        if (growtype_form_json_content.length > 0) {
+                            growtype_form_json_content.editor.ace.setValue(JSON.stringify(JSON.parse($(value).text()), null, '\t'));
+                        }
                     }
                 });
 
