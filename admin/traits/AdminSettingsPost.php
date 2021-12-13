@@ -12,7 +12,7 @@
  * @subpackage Growtype_Form/admin/partials
  */
 
-trait AdminPost
+trait AdminSettingsPost
 {
     public function post_content()
     {

@@ -12,7 +12,7 @@
  * @subpackage Growtype_Form/admin/partials
  */
 
-trait AdminSignup
+trait AdminSettingsSignup
 {
     public function signup_content()
     {

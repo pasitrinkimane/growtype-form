@@ -12,7 +12,7 @@
  * @subpackage Growtype_Form/admin/partials
  */
 
-trait AdminLogin
+trait AdminSettingsLogin
 {
     public function login_content()
     {

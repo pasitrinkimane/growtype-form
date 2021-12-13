@@ -12,7 +12,7 @@
  * @subpackage Growtype_Form/admin/partials
  */
 
-trait AdminWoocommercePlugin
+trait AdminSettingsWoocommercePlugin
 {
     public function woocommerce_content()
     {

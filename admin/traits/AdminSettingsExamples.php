@@ -12,7 +12,7 @@
  * @subpackage Growtype_Form/admin/partials
  */
 
-trait AdminExamples
+trait AdminSettingsExamples
 {
     public function examples_content()
     {
