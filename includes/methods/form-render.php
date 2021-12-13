@@ -258,12 +258,15 @@ class Growtype_Form_Render
 
                 if ($submit_data['success']) {
                     $user_id = $submit_data['user_id'];
+                    $user = get_user_by( 'id', $user_id );
 
-                    wp_set_current_user($user_id, $user_id);
-                    wp_set_auth_cookie($user_id);
-                    do_action('wp_login', $user_id);
+                    if( $user ) {
+                        wp_set_current_user( $user_id, $user->user_login );
+                        wp_set_auth_cookie( $user_id );
+                        do_action( 'wp_login', $user->user_login, $user );
 
-                    return growtype_form_redirect_url_after_signup();
+                        return growtype_form_redirect_url_after_signup();
+                    }
                 }
             } elseif ($form_name === 'wc_product') {
 
