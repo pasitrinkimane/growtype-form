@@ -86,6 +86,13 @@ trait FrontendSignup
         $status['success'] = true;
 
         if (!empty($password)) {
+
+            $allow_simple_password = get_option('growtype_form_allow_simple_password');
+
+            if ($allow_simple_password) {
+                return $status;
+            }
+
             if (strlen($password) <= '8') {
                 $status['success'] = false;
                 $status['message'] = __("Your Password Must Contain At Least 8 Characters!", "growtype-registration");

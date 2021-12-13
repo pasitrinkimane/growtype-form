@@ -81,6 +81,23 @@ trait AdminSignup
             'growtype-form-settings',
             'growtype_form_settings_signup'
         );
+
+        /**
+         * Allow simple password
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_allow_simple_password', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_allow_simple_password',
+            'Allow simple password',
+            array ($this, 'growtype_form_allow_simple_password_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_signup'
+        );
     }
 
     /**
@@ -143,6 +160,17 @@ trait AdminSignup
                 <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>
             <?php } ?>
         </select>
+        <?php
+    }
+
+    /**
+     * Allow simple password for signup
+     */
+    function growtype_form_allow_simple_password_callback()
+    {
+        $enabled = get_option('growtype_form_allow_simple_password');
+        ?>
+        <input type="checkbox" name="growtype_form_allow_simple_password" value="1" <?php echo checked(1, $enabled, false) ?> />
         <?php
     }
 }
