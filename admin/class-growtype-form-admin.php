@@ -44,11 +44,12 @@ class Growtype_Form_Admin
     /**
      * Traits
      */
-    use AdminLogin;
-    use AdminSignup;
-    use AdminWoocommercePlugin;
-    use AdminPost;
-    use AdminExamples;
+    use AdminSettingsLogin;
+    use AdminSettingsSignup;
+    use AdminSettingsWoocommercePlugin;
+    use AdminSettingsPost;
+    use AdminSettingsExamples;
+    use AdminAppearanceMenu;
 
     /**
      * Initialize the class and set its properties.
@@ -63,13 +64,37 @@ class Growtype_Form_Admin
         $this->version = $version;
 
         if (is_admin()) {
-            add_action('admin_menu', array ($this, 'admin_menu'));
+            add_action('admin_menu', array ($this, 'add_custom_options_page'));
 
+            /**
+             * AdminSignup
+             */
             add_action('admin_init', array ($this, 'signup_content'));
+
+            /**
+             * AdminLogin
+             */
             add_action('admin_init', array ($this, 'login_content'));
+
+            /**
+             * AdminPost
+             */
             add_action('admin_init', array ($this, 'post_content'));
+
+            /**
+             * AdminWoocommercePlugin
+             */
             add_action('admin_init', array ($this, 'woocommerce_content'));
+
+            /**
+             * AdminExamples
+             */
             add_action('admin_init', array ($this, 'examples_content'));
+
+            /**
+             * AdminAppearanceMenu
+             */
+            add_action('load-nav-menus.php', array ($this, 'add_nav_menu_meta_box'));
         }
     }
 
@@ -124,7 +149,7 @@ class Growtype_Form_Admin
     /**
      * Register the options page with the Wordpress menu.
      */
-    function admin_menu()
+    function add_custom_options_page()
     {
         add_options_page(
             'Growtype - Form',
@@ -134,7 +159,6 @@ class Growtype_Form_Admin
             array ($this, 'growtype_form_settings_form'),
             1
         );
-
     }
 
     function growtype_form_settings_tabs($current = 'login')
