@@ -61,7 +61,7 @@ trait AdminAppearanceMenu
                 'object_id' => 1,
                 'type_label' => 'Logout',
                 'title' => 'Logout',
-                'url' => wp_logout_url(),
+                'url' => '#growtype_form_logout_url#',
                 'type' => 'custom',
                 'object' => 'plugin-slug-slug',
                 'db_id' => 0,
@@ -96,6 +96,20 @@ trait AdminAppearanceMenu
             </div>
         </div>
         <?php
+    }
+
+    /**
+     * @param $output
+     * @param $item
+     * @param $depth
+     * @param $args
+     * @return array|string|string[]
+     */
+    function update_growtype_form_frontend_menu_links($output, $item, $depth, $args)
+    {
+        $output = str_replace('#growtype_form_logout_url#', wp_logout_url(home_url()), $output);
+
+        return $output;
     }
 }
 

@@ -95,6 +95,11 @@ class Growtype_Form_Admin
              * AdminAppearanceMenu
              */
             add_action('load-nav-menus.php', array ($this, 'add_nav_menu_meta_box'));
+        } else {
+            /**
+             * Growtype form menu links update
+             */
+            add_filter('walker_nav_menu_start_el', array ($this, 'update_growtype_form_frontend_menu_links'), 10, 4);
         }
     }
 
