@@ -144,7 +144,11 @@ class Growtype_Form_Loader
     private function load_methods()
     {
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/methods/form-render.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/methods/login-render.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/methods/signup-render.php';
 
-        new Growtype_Form_Render();
+        $this->loader = new Growtype_Form_Render();
+        $this->loader = new Growtype_Login_Render();
+        $this->loader = new Growtype_Signup_Render();
     }
 }

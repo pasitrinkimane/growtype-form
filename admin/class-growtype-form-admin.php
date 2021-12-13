@@ -42,6 +42,15 @@ class Growtype_Form_Admin
     private $version;
 
     /**
+     * Traits
+     */
+    use AdminLogin;
+    use AdminSignup;
+    use AdminWoocommercePlugin;
+    use AdminPost;
+    use AdminExamples;
+
+    /**
      * Initialize the class and set its properties.
      *
      * @param string $Growtype_Form The name of this plugin.
@@ -53,9 +62,14 @@ class Growtype_Form_Admin
         $this->Growtype_Form = $Growtype_Form;
         $this->version = $version;
 
-        if (is_admin()) { // admin actions
+        if (is_admin()) {
             add_action('admin_menu', array ($this, 'admin_menu'));
-            add_action('admin_init', array ($this, 'growtype_form_settings_content'));
+
+            add_action('admin_init', array ($this, 'signup_content'));
+            add_action('admin_init', array ($this, 'login_content'));
+            add_action('admin_init', array ($this, 'post_content'));
+            add_action('admin_init', array ($this, 'woocommerce_content'));
+            add_action('admin_init', array ($this, 'examples_content'));
         }
     }
 
@@ -120,163 +134,154 @@ class Growtype_Form_Admin
             array ($this, 'growtype_form_settings_form'),
             1
         );
+
+    }
+
+    function growtype_form_settings_tabs($current = 'login')
+    {
+        $tabs = [
+            'login' => 'Login',
+            'signup' => 'Signup',
+            'woocommerce' => 'Woocommerce',
+            'post' => 'Post',
+            'examples' => 'Examples',
+        ];
+
+        echo '<div id="icon-themes" class="icon32"><br></div>';
+        echo '<h2 class="nav-tab-wrapper">';
+        foreach ($tabs as $tab => $name) {
+            $class = ($tab == $current) ? ' nav-tab-active' : '';
+            echo "<a class='nav-tab$class' href='?page=growtype-form-settings&tab=$tab'>$name</a>";
+
+        }
+        echo '</h2>';
     }
 
     function growtype_form_settings_form()
     {
-        ?>
+        if (isset($_GET['page']) && $_GET['page'] == 'growtype-form-settings') {
+            ?>
 
-        <div class="wrap">
+            <div class="wrap">
 
-            <h1>Growtype - Form settings</h1>
+                <h1>Growtype - Form settings</h1>
 
-            <form id="growtype_form_main_settings_form" method="post" action="options.php">
                 <?php
-                settings_fields('growtype_form_settings_id');
-                do_settings_sections('growtype-form-settings'); // just a page slug
-                submit_button();
-                ?>
-            </form>
-
-            <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/ace/ace.js"></script>
-            <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/ace/theme-twilight.js"></script>
-            <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/ace/mode-ruby.js"></script>
-            <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/jquery-ace.min.js"></script>
-
-            <script>
-                $ = jQuery;
-                let forms = $('#growtype_form_main_settings_form').find('.growtype_form_json_content');
-
-                forms.map(function (index, value) {
-                    if ($(value).length > 0) {
-                        let editor = $(value).ace({
-                            theme: 'twilight',
-                            lang: 'ruby'
-                        })
-
-                        let growtype_form_json_content = $(value).data('ace');
-                        if (growtype_form_json_content.length > 0) {
-                            growtype_form_json_content.editor.ace.setValue(JSON.stringify(JSON.parse($(value).text()), null, '\t'));
-                        }
-                    }
-                });
-
-                if ($('body').hasClass('settings_page_growtype-form-settings')) {
-                    $('#growtype_form_main_settings_form input[type="submit"]').click(function () {
-                        let forms = $(this).closest('#growtype_form_main_settings_form').find('.growtype_form_json_content');
-
-                        forms.map(function (index, value) {
-                            if ($(value).length > 0) {
-                                try {
-                                    JSON.parse($(value).data('ace').editor.ace.getValue())
-                                } catch (e) {
-                                    alert("Caught: " + e.message)
-                                    event.preventDefault();
-                                }
-                            }
-                        });
-                    });
+                if (isset($_GET['updated']) && 'true' == esc_attr($_GET['updated'])) {
+                    echo '<div class="updated" ><p>Theme Settings updated.</p></div>';
                 }
-            </script>
-        </div>
 
-        <?php
-    }
+                if (isset ($_GET['tab'])) {
+                    $this->growtype_form_settings_tabs($_GET['tab']);
+                } else {
+                    $this->growtype_form_settings_tabs();
+                }
+                ?>
 
-    /**
-     *
-     */
-    function growtype_form_settings_content()
-    {
-        add_settings_section(
-            'growtype_form_settings_id', // section ID
-            'Form settings', // title (if needed)
-            '', // callback function (if needed)
-            'growtype-form-settings' // page slug
-        );
+                <form id="growtype_form_main_settings_form" method="post" action="options.php">
+                    <?php
 
-        /**
-         * WooCommerce Product Upload Json Content
-         */
-        register_setting(
-            'growtype_form_settings_id', // settings group name
-            'wc_product_upload_form_json_content' // option name
-        );
+                    if (isset ($_GET['tab'])) {
+                        $tab = $_GET['tab'];
+                    } else {
+                        $tab = 'login';
+                    }
 
-        add_settings_field(
-            'wc_product_upload_form_json_content',
-            'WooCommerce Product Upload Json Content',
-            array ($this, 'wc_product_upload_form_json_content_callback'),
-            'growtype-form-settings',
-            'growtype_form_settings_id'
-        );
+                    switch ($tab) {
+                        case 'login':
+                            settings_fields('growtype_form_settings_login');
 
-        /**
-         * Upload post
-         */
-        register_setting(
-            'growtype_form_settings_id', // settings group name
-            'upload_post_form_json_content' // option name
-        );
+                            echo '<table class="form-table">';
+                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_login');
+                            echo '</table>';
 
-        add_settings_field(
-            'upload_post_form_json_content',
-            'Post Upload Json Content',
-            array ($this, 'upload_post_form_json_content_callback'),
-            'growtype-form-settings',
-            'growtype_form_settings_id'
-        );
+                            break;
+                        case 'signup':
+                            settings_fields('growtype_form_settings_signup');
 
-        /**
-         * growtype_form_json_content
-         */
-        register_setting(
-            'growtype_form_settings_id', // settings group name
-            'growtype_form_json_content' // option name
-        );
+                            echo '<table class="form-table">';
+                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_signup');
+                            echo '</table>';
 
-        add_settings_field(
-            'growtype_form_json_content',
-            'General Form Json Content',
-            array ($this, 'growtype_form_json_content_callback'),
-            'growtype-form-settings',
-            'growtype_form_settings_id'
-        );
-    }
+                            break;
+                        case 'woocommerce' :
+                            settings_fields('growtype_form_settings_woocommerce');
 
-    /**
-     * Wc upload product
-     */
-    function wc_product_upload_form_json_content_callback()
-    {
-        ?>
-        <textarea id="wc_product_upload_form_json_content" class="growtype_form_json_content" name="wc_product_upload_form_json_content" rows="40" cols="100" style="width: 100%;margin-bottom: 100px;">
-            <?= get_option('wc_product_upload_form_json_content') ?>
-        </textarea>
-        <?php
-    }
+                            echo '<table class="form-table">';
+                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_woocommerce');
+                            echo '</table>';
 
-    /**
-     * Upload post
-     */
-    function upload_post_form_json_content_callback()
-    {
-        ?>
-        <textarea id="upload_post_form_json_content" class="growtype_form_json_content" name="upload_post_form_json_content" rows="40" cols="100" style="width: 100%;margin-bottom: 100px;">
-            <?= get_option('upload_post_form_json_content') ?>
-        </textarea>
-        <?php
-    }
+                            break;
+                        case 'post' :
+                            settings_fields('growtype_form_settings_post');
 
-    /**
-     * General form
-     */
-    function growtype_form_json_content_callback()
-    {
-        ?>
-        <textarea id="growtype_form_json_content" class="growtype_form_json_content" name="growtype_form_json_content" rows="40" cols="100" style="width: 100%;">
-            <?= get_option('growtype_form_json_content') ?>
-        </textarea>
-        <?php
+                            echo '<table class="form-table">';
+                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_post');
+                            echo '</table>';
+
+                            break;
+                        case 'examples' :
+                            settings_fields('growtype_form_settings_examples');
+
+                            echo '</br></br>';
+                            echo 'Allowed input types:' . implode(',', Growtype_Form_Render::GROWTYPE_FORM_ALLOWED_FIELD_TYPES);
+
+                            echo '<table class="form-table">';
+                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_examples');
+                            echo '</table>';
+
+                            break;
+                    }
+
+                    if ($tab !== 'examples') {
+                        submit_button();
+                    }
+
+                    ?>
+                </form>
+
+                <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/ace/ace.js"></script>
+                <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/ace/theme-twilight.js"></script>
+                <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/ace/mode-ruby.js"></script>
+                <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/jquery-ace.min.js"></script>
+
+                <script>
+                    $ = jQuery;
+                    let forms = $('#growtype_form_main_settings_form').find('.growtype_form_json_content');
+
+                    forms.map(function (index, value) {
+                        if ($(value).length > 0) {
+                            let editor = $(value).ace({
+                                theme: 'twilight',
+                                lang: 'ruby'
+                            })
+
+                            let growtype_form_json_content = $(value).data('ace');
+                            if (growtype_form_json_content.length > 0) {
+                                growtype_form_json_content.editor.ace.setValue(JSON.stringify(JSON.parse($(value).text()), null, '\t'));
+                            }
+                        }
+                    });
+
+                    if ($('body').hasClass('settings_page_growtype-form-settings')) {
+                        $('#growtype_form_main_settings_form input[type="submit"]').click(function () {
+                            let forms = $(this).closest('form').find('.growtype_form_json_content');
+                            forms.map(function (index, value) {
+                                if ($(value).data('ace').editor.ace.getValue().length > 0) {
+                                    try {
+                                        JSON.parse($(value).data('ace').editor.ace.getValue())
+                                    } catch (e) {
+                                        alert("Caught: " + e.message)
+                                        event.preventDefault();
+                                    }
+                                }
+                            });
+                        });
+                    }
+                </script>
+            </div>
+
+            <?php
+        }
     }
 }

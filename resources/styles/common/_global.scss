@@ -1,0 +1,153 @@
+.growtype-form {
+  .s-content {
+    padding-top: 20px;
+    @include bp-phone-xl() {
+      padding-top: 0;
+    }
+  }
+}
+
+.growtype-form-wrapper {
+  .alert {
+    max-width: 430px;
+    margin-bottom: 30px;
+    font-size: 14px;
+  }
+
+  #growtype-form {
+    padding-top: 10px;
+
+    .col-auto {
+      width: 50%;
+      @include bp-phone-xl() {
+        width: 100%;
+      }
+    }
+
+    .fields-confirmation {
+      padding-top: 20px;
+
+      .col-auto {
+        width: 100%;
+        padding-top: 5px;
+      }
+    }
+
+    .row-submit {
+      padding-top: 5px;
+    }
+
+    .form-check-input[type=checkbox] {
+      margin-right: 7px;
+    }
+
+    .form-description {
+      margin-bottom: 14px;
+      font-size: 12px;
+      margin-top: -3px;
+    }
+  }
+}
+
+.login-template-default, .signup-template-default {
+  .growtype-form-wrapper {
+    .growtype-form-container {
+      margin: auto;
+    }
+
+    .alert {
+      max-width: 400px;
+      margin: auto;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    .form-wrapper {
+      .b-actions {
+        margin-top: 20px;
+
+        label {
+          position: relative;
+          bottom: -1px;
+        }
+      }
+
+      .login-username, .login-password {
+        margin-bottom: 15px;
+      }
+
+      .login-remember {
+        margin-top: 20px;
+
+        label {
+          display: flex;
+          align-items: center;
+
+          input {
+            margin-right: 5px;
+            top: -1px;
+          }
+        }
+      }
+    }
+
+    .logo-wrapper {
+      max-width: 240px;
+      margin: auto;
+      margin-bottom: 30px;
+      text-align: center;
+      @include bp-phone-xl() {
+        margin-bottom: 20px;
+      }
+    }
+
+    .form-wrapper .b-actions, .login #nav {
+      text-align: center;
+
+      a {
+        font-size: 14px;
+        text-decoration: none;
+        border: none;
+        color: #0d6efd;
+      }
+
+      .e-dot {
+        font-size: 16px;
+      }
+    }
+
+    form {
+      input[type="submit"], button[type="submit"] {
+        width: 100%;
+        margin-top: 20px;
+        padding-top: 15px !important;
+        padding-bottom: 15px !important;
+        min-height: initial !important;
+        line-height: initial !important;
+        text-transform: uppercase !important;
+        font-size: 14px !important;
+        background: #5561e2 !important;
+        border-radius: 5px !important;
+        max-width: 300px;
+        margin-left: auto;
+        display: block;
+        margin-right: auto;
+      }
+
+      &[name="lostpasswordform"] {
+        padding: 0 !important;
+        background: none !important;
+        box-shadow: none !important;
+        margin-top: 5px !important;
+        display: inline-block;
+      }
+    }
+
+    .lostpassword {
+      #lostpassword {
+        max-width: 430px;
+        padding-top: 50px;
+      }
+    }
+  }
+}

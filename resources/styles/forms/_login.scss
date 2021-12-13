@@ -1,0 +1,23 @@
+.login-template-default {
+  .growtype-form-container {
+    max-width: 350px;
+  }
+
+  .form-wrapper {
+    position: relative;
+  }
+
+  .btn-recover-password {
+    position: absolute;
+    top: 248px;
+    right: 0;
+    font-size: 14px;
+    text-decoration: none;
+    border: none;
+  }
+
+  .login-submit {
+    padding-top: 5px;
+  }
+}
+

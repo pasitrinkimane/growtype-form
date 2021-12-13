@@ -77,10 +77,47 @@ class Growtype_Form
 
         $this->Growtype_Form = 'growtype-form';
 
+        $this->load_frontend_traits();
+        $this->load_admin_traits();
+
         $this->load_dependencies();
         $this->set_locale();
         $this->define_admin_hooks();
         $this->define_public_hooks();
+    }
+
+    /**
+     * Load the required traits for this plugin.
+     */
+    private function load_frontend_traits()
+    {
+        /**
+         * Frontend traits
+         */
+        spl_autoload_register(function ($traitName) {
+            $fileName = plugin_dir_path(dirname(__FILE__)) . 'includes/traits/' . $traitName . '.php';
+
+            if (file_exists($fileName)) {
+                include $fileName;
+            }
+        });
+    }
+
+    /**
+     * Load the required traits for this plugin.
+     */
+    private function load_admin_traits()
+    {
+        /**
+         * Admin traits
+         */
+        spl_autoload_register(function ($traitName) {
+            $fileName = plugin_dir_path(dirname(__FILE__)) . 'admin/traits/' . $traitName . '.php';
+
+            if (file_exists($fileName)) {
+                include $fileName;
+            }
+        });
     }
 
     /**
@@ -124,6 +161,14 @@ class Growtype_Form
          * side of the site.
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-growtype-form-public.php';
+
+        /**
+         * Helper functions
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/login.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/signup.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/template.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/url.php';
 
         $this->loader = new Growtype_Form_Loader();
 

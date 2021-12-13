@@ -1,0 +1,286 @@
+{
+  "signup": {
+    "title": "Sign up",
+    "submit_label": "Submit",
+    "recaptcha": [],
+    "login_btn": true,
+    "main_fields": [
+      {
+        "type": "email",
+        "name": "email",
+        "label": "Email",
+        "placeholder": "Enter your email",
+        "required": "true"
+      },
+      {
+        "type": "password",
+        "name": "password",
+        "label": "Password",
+        "placeholder": "Enter your password",
+        "required": "true"
+      },
+      {
+        "type": "password",
+        "name": "repeat_password",
+        "label": "Confirm password",
+        "placeholder": "Confirm your password",
+        "required": "true"
+      }
+    ],
+    "confirmation_fields": [
+      {
+        "type": "checkbox",
+        "name": "terms",
+        "label": "I agree with terms & conditions",
+        "required": "true"
+      }
+    ]
+  },
+  "login": {
+    "title": "Sign in",
+    "logo": false,
+    "sign_up_btn": true,
+    "lost_password_btn": true,
+    "wp_login_form": [
+      {
+        "redirect": "",
+        "form_id": "loginform-custom",
+        "label_username": "Username",
+        "label_password": "Password",
+        "label_remember": "Remember Me",
+        "label_log_in": "Log In",
+        "remember": true
+      }
+    ]
+  },
+  "wc_product": {
+    "type": "upload",
+    "title": "Ikelkite pamokos planą",
+    "submit_label": "[:lt]Įkelti planą[:en]Upload[:]",
+    "main_fields": [
+      {
+        "type": "select",
+        "name": "categories[class]",
+        "label": "[:lt]Amžiaus grupė[:]",
+        "required": "true",
+        "placeholder": "[:lt]Pasirinkite amžiaus grupę[:]",
+        "options": [
+          {
+            "value": "1-4 klasės",
+            "label": "[:lt]1-4 klasės[:]"
+          },
+          {
+            "value": "5-8 klasės",
+            "label": "[:lt]5-8 klasės[:]"
+          },
+          {
+            "value": "9-12 klasės",
+            "label": "[:lt]9-12 klasės[:]"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "name": "categories[subject]",
+        "label": "[:lt]Dalykas[:]",
+        "required": "true",
+        "placeholder": "[:lt]Pasirinkite mokomajį dalyką[:]",
+        "options": [
+          {
+            "value": "Biologija",
+            "label": "[:lt]Biologija[:]"
+          },
+          {
+            "value": "Chemija",
+            "label": "[:lt]Chemija[:]"
+          },
+          {
+            "value": "Fizika",
+            "label": "[:lt]Fizika[:]"
+          },
+          {
+            "value": "Geografija",
+            "label": "[:lt]Geografija[:]"
+          },
+          {
+            "value": "Gimtoji kalba",
+            "label": "[:lt]Gimtoji kalba[:]"
+          },
+          {
+            "value": "Informacinės technologijos",
+            "label": "[:lt]Informacinės technologijos[:]"
+          },
+          {
+            "value": "Istorija",
+            "label": "[:lt]Istorija[:]"
+          },
+          {
+            "value": "Lietuvių kalba ir literatūra",
+            "label": "[:lt]Lietuvių kalba ir literatūra[:]"
+          },
+          {
+            "value": "Matematika",
+            "label": "[:lt]Matematika[:]"
+          },
+          {
+            "value": "Menai",
+            "label": "[:lt]Menai[:]"
+          },
+          {
+            "value": "Technologijos",
+            "label": "[:lt]Technologijos[:]"
+          },
+          {
+            "value": "Užsienio kalbos",
+            "label": "[:lt]Užsienio kalbos[:]"
+          }
+        ]
+      },
+      {
+        "type": "input",
+        "name": "title",
+        "label": "[:lt]Pavadinimas[:]",
+        "placeholder": "[:lt]Įrašykite pavadinimą[:]",
+        "required": "true"
+      },
+      {
+        "type": "file",
+        "name": "featured_image",
+        "label": "[:lt]Viršelis (pasirinktinai)[:]",
+        "required": "false",
+        "accept": "image/*"
+      },
+      {
+        "type": "file",
+        "name": "downloadable_file",
+        "label": "[:lt]Prisegamas PDF’as[:]",
+        "required": "true",
+        "accept": ".pdf"
+      },
+      {
+        "type": "textarea",
+        "col_class": "col-12",
+        "name": "long_description[description]",
+        "label": "[:lt]Aprašymas[:]",
+        "description": "[:lt]Bendrai aprašykite pamokos turinį, uždavinius, siekinius ir kitą svarbią informaciją.[:]",
+        "placeholder": "",
+        "required": "true"
+      },
+      {
+        "type": "textarea",
+        "col_class": "col-12",
+        "name": "long_description[class]",
+        "label": "[:lt]Klasė[:]",
+        "description": "[:lt]Patikslinkite kuriai klasei metodinė medžiaga labiausiai pritaikyta.[:]",
+        "placeholder": "",
+        "required": "true"
+      },
+      {
+        "type": "textarea",
+        "col_class": "col-12",
+        "name": "long_description[subject]",
+        "label": "[:lt]Pamokos tema[:]",
+        "description": "[:lt]Trumpai apibūdinkite pamokos temą.[:]",
+        "placeholder": "",
+        "required": "true"
+      },
+      {
+        "type": "textarea",
+        "col_class": "col-12",
+        "name": "long_description[goal]",
+        "label": "[:lt]Pamokos tikslas ir uždaviniai[:]",
+        "description": "[:lt]Formuojant tikslą aprašykite, kokius vaikų gebėjimus bus siekiama ugdyti ir kuo jiems jie bus naudingi.[:]",
+        "placeholder": "",
+        "required": "true"
+      },
+      {
+        "type": "textarea",
+        "col_class": "col-12",
+        "name": "long_description[extra]",
+        "label": "[:lt]Priedas[:]",
+        "description": "[:lt]Aprašykite detalų veiksmų planą, kaip bus organizuojamas užsiėmimas, kokios bus aptariamos temos, kokios vyks veiklos ir pan. Taip pat aprašykite, kokie metodai bus naudojami dirbant su vaikais (pvz.: grupinis darbas, diskusija, viktorina, vaidmenų žaidimas ir kt.), reikalinga įranga, priemonės, ar vaikams bus užduodami namų darbai ar projektai, kaip bus įvertinta, ar pamokos tikslas yra įgyvendintas bei ar vaikai įgijo reikalingas kompetencijas, gebėjimus.[:]",
+        "placeholder": "",
+        "required": "true"
+      },
+      {
+        "type": "hidden",
+        "name": "tags[identificator]",
+        "value": "User uploaded product"
+      }
+    ],
+    "confirmation_fields": [],
+    "recaptcha": {
+      "type": "recaptchav3",
+      "api_key": ""
+    }
+  },
+  "post": {
+    "type": "upload",
+    "post_type": "projects",
+    "title": "Dalintis iniciatyva",
+    "submit_label": "[:lt]Pateikti iniciatyvą[:en]Upload[:]",
+    "success_message": "[:lt]Iniciatyva sėkmingai pasidalinta[:]",
+    "main_fields": [
+      {
+        "type": "input",
+        "name": "title",
+        "label": "[:lt]Iniciatyvos pavadinimas[:]",
+        "placeholder": "[:lt]Įrašykite pavadinimą[:]",
+        "required": "true"
+      },
+      {
+        "type": "input",
+        "name": "school",
+        "label": "[:lt]Dalyvaujančios mokyklos ar grupės pavadinimas[:]",
+        "placeholder": "[:lt]Įrašykite pavadinimą[:]",
+        "required": "true"
+      },
+      {
+        "type": "input",
+        "name": "contact_person",
+        "label": "[:lt]Kontaktinis asmuo[:]",
+        "placeholder": "[:lt]Įrašykite pavadinimą[:]",
+        "required": "true"
+      },
+      {
+        "type": "number",
+        "min": "1",
+        "name": "participants_amount",
+        "label": "[:lt]Iniciatyvos dalyvių skaičius[:]",
+        "placeholder": "[:lt]Įrašykite skaičių[:]",
+        "required": "false"
+      },
+      {
+        "type": "textarea",
+        "name": "short_description",
+        "label": "[:lt]Aprašymas[:]",
+        "placeholder": "[:lt]Trumpai aprašykite iniciatyvą[:]",
+        "required": "true"
+      },
+      {
+        "type": "file",
+        "name": "featured_image",
+        "label": "[:lt]Iniciatyvos įvaizdinė nuotrauka[:]",
+        "required": "true",
+        "accept": "image/*"
+      },
+      {
+        "type": "hidden",
+        "name": "tags[identificator]",
+        "value": "User uploaded post"
+      }
+    ],
+    "confirmation_fields": [
+      {
+        "type": "checkbox",
+        "name": "terms_and_conditions",
+        "label": "[:lt]Sutinku su taisyklėmis[:]",
+        "required": "true"
+      }
+    ],
+    "recaptcha": {
+      "type": "recaptchav3",
+      "api_key": ""
+    }
+  }
+}
