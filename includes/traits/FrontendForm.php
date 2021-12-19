@@ -67,7 +67,7 @@ trait FrontendForm
 
             <?php $this->render_growtype_form_response_status(); ?>
 
-            <div class="container growtype-form-container">
+            <div class="growtype-form-container">
                 <div class="form-wrapper">
                     <?php if (!empty($form_title)) { ?>
                         <h2 class="e-title-intro"><?= $form_title ?></h2>
