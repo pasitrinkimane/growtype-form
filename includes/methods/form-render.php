@@ -127,7 +127,7 @@ class Growtype_Form_Render
             /**
              * Render form
              */
-            return $this->render_growtype_general_form($form_data);
+            return $this->render_growtype_general_form($form_data, $form_name);
         }
     }
 

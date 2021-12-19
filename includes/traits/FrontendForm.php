@@ -18,7 +18,7 @@ trait FrontendForm
      * @param $form
      * @return false|string|null
      */
-    function render_growtype_general_form($form)
+    function render_growtype_general_form($form, $form_name)
     {
         /**
          * Form main fields
@@ -72,7 +72,7 @@ trait FrontendForm
                     <?php if (!empty($form_title)) { ?>
                         <h2 class="e-title-intro"><?= $form_title ?></h2>
                     <?php } ?>
-                    <form id="growtype-form" <?= $form_type === 'upload' ? 'enctype="multipart/form-data"' : '' ?> class="form" action="<?php the_permalink(); ?>" method="post">
+                    <form id="growtype-form" <?= $form_type === 'upload' ? 'enctype="multipart/form-data"' : '' ?> class="form" action="<?php the_permalink(); ?>" method="post" data-name="<?= $form_name ?>">
                         <div class="row g-3 fields-main">
                             <?php
                             foreach ($main_fields as $field) {
