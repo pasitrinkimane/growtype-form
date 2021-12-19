@@ -42,6 +42,7 @@ class Growtype_Form_Render
             ];
 
             $response = $this->process_form_submitted_values($form_name, $submitted_values);
+
             wp_redirect($response);
             exit();
         }
@@ -229,7 +230,15 @@ class Growtype_Form_Render
      */
     function form_submitted_values_are_valid($form_data, $submitted_values)
     {
-        $available_fields = array_merge($form_data['main_fields'], $form_data['confirmation_fields']);
+        $available_fields = $form_data['main_fields'] ?? null;
+
+        if (empty($available_fields)) {
+            return false;
+        }
+
+        if (isset($form_data['confirmation_fields']) && !empty($form_data['confirmation_fields'])) {
+            $available_fields = array_merge($form_data['main_fields'], $form_data['confirmation_fields']);
+        }
 
         $available_fields_names = [];
         foreach ($available_fields as $field) {
