@@ -253,7 +253,8 @@ class Growtype_Form_Admin
                             settings_fields('growtype_form_settings_examples');
 
                             echo '</br></br>';
-                            echo 'Allowed input types:' . implode(',', Growtype_Form_Render::GROWTYPE_FORM_ALLOWED_FIELD_TYPES);
+                            echo '<b>Shortcode:</b> [growtype_form name="signup"] ' . "</br>";
+                            echo '<b>Allowed input types:</b> ' . implode(',', Growtype_Form_Render::GROWTYPE_FORM_ALLOWED_FIELD_TYPES);
 
                             echo '<table class="form-table">';
                             do_settings_fields('growtype-form-settings', 'growtype_form_settings_examples');
