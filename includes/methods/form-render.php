@@ -9,11 +9,13 @@ class Growtype_Form_Render
     use FrontendSignup;
 
     const GROWTYPE_FORM_SHORTCODE_NAME = 'growtype_form';
+
     const GROWTYPE_FORM_SUBMITTED_INPUT = 'growtype_form_submitted';
-    const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
     const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
+    const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
+
     const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['input', 'textarea', 'file', 'email', 'select', 'checkbox', 'hidden', 'number', 'password'];
-    const EXCLUDED_VALUES_FROM_VALIDATION = [self::GROWTYPE_FORM_SUBMITTED_INPUT, self::GROWTYPE_FORM_SUBMITTER_ID];
+    const EXCLUDED_VALUES_FROM_VALIDATION = [self::GROWTYPE_FORM_SUBMITTED_INPUT, self::GROWTYPE_FORM_SUBMITTER_ID, self::GROWTYPE_FORM_NAME_IDENTIFICATOR];
 
     public function __construct()
     {
