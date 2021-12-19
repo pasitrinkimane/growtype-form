@@ -97,6 +97,7 @@ trait FrontendForm
 
                                 <input type="text" hidden name='<?= self::GROWTYPE_FORM_SUBMITTED_INPUT ?>' value="true"/>
                                 <input type="text" hidden name='<?= self::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
+                                <input type="text" hidden name='<?= self::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
 
                                 <?php if (!empty($recaptchav3)) { ?>
                                     <div class="g-recaptcha"

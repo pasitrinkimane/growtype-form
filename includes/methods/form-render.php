@@ -10,6 +10,7 @@ class Growtype_Form_Render
 
     const GROWTYPE_FORM_SHORTCODE_NAME = 'growtype_form';
     const GROWTYPE_FORM_SUBMITTED_INPUT = 'growtype_form_submitted';
+    const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
     const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
     const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['input', 'textarea', 'file', 'email', 'select', 'checkbox', 'hidden', 'number', 'password'];
     const EXCLUDED_VALUES_FROM_VALIDATION = [self::GROWTYPE_FORM_SUBMITTED_INPUT, self::GROWTYPE_FORM_SUBMITTER_ID];
@@ -17,8 +18,32 @@ class Growtype_Form_Render
     public function __construct()
     {
         if (!is_admin()) {
+            add_filter('wp_loaded', array ($this, 'growtype_form_process_posted_data'));
             add_shortcode(self::GROWTYPE_FORM_SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
             add_filter('body_class', array ($this, 'growtype_form_body_class'));
+        }
+    }
+
+    /**
+     * @return void
+     */
+    function growtype_form_process_posted_data()
+    {
+        /**
+         * Process posted values
+         */
+        if (isset($_POST[self::GROWTYPE_FORM_SUBMITTED_INPUT]) && sanitize_text_field($_POST[self::GROWTYPE_FORM_SUBMITTED_INPUT]) === 'true') {
+
+            $form_name = sanitize_text_field($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]);
+
+            $submitted_values = [
+                'files' => $_FILES,
+                'data' => $_POST,
+            ];
+
+            $response = $this->process_form_submitted_values($form_name, $submitted_values);
+            wp_redirect($response);
+            exit();
         }
     }
 
@@ -258,12 +283,12 @@ class Growtype_Form_Render
 
                 if ($submit_data['success']) {
                     $user_id = $submit_data['user_id'];
-                    $user = get_user_by( 'id', $user_id );
+                    $user = get_user_by('id', $user_id);
 
-                    if( $user ) {
-                        wp_set_current_user( $user_id, $user->user_login );
-                        wp_set_auth_cookie( $user_id );
-                        do_action( 'wp_login', $user->user_login, $user );
+                    if ($user) {
+                        wp_set_current_user($user_id, $user->user_login);
+                        wp_set_auth_cookie($user_id);
+                        do_action('wp_login', $user->user_login, $user);
 
                         return growtype_form_redirect_url_after_signup();
                     }
