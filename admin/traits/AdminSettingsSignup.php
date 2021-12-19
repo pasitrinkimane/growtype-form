@@ -59,7 +59,7 @@ trait AdminSettingsSignup
 
         add_settings_field(
             'growtype_form_signup_page_template',
-            'Signup Form Template',
+            'Signup Page Template',
             array ($this, 'growtype_form_signup_page_template_callback'),
             'growtype-form-settings',
             'growtype_form_settings_signup'
