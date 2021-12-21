@@ -101,20 +101,6 @@ class Growtype_Form_Render
         $form_name = $args['name'];
 
         /**
-         * Process posted values and redirect
-         */
-        if (isset($_POST[self::GROWTYPE_FORM_SUBMITTED_INPUT]) && sanitize_text_field($_POST[self::GROWTYPE_FORM_SUBMITTED_INPUT]) === 'true') {
-            $submitted_values = [
-                'files' => $_FILES,
-                'data' => $_POST,
-            ];
-
-            $response = $this->process_form_submitted_values($form_name, $submitted_values);
-            wp_redirect($response);
-            exit();
-        }
-
-        /**
          * Get form data
          */
         $form_data = $this->get_growtype_form_data($form_name);
