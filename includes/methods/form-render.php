@@ -328,6 +328,12 @@ class Growtype_Form_Render
                     $submit_data['product_id'] = $product_id;
                     $submit_data['success'] = true;
                     $submit_data['message'] = $success_message ?? __('Product uploaded.', 'growtype-form');
+
+                    $redirect_url = growtype_form_redirect_url_after_product_creation();
+
+                    if (empty($redirect_url)) {
+                        return $redirect_url;
+                    }
                 }
             } elseif ($form_name === 'post') {
 

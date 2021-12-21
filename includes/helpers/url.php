@@ -73,3 +73,12 @@ function growtype_form_redirect_url_after_signup()
 
     return $redirect_url;
 }
+
+/**
+ * @return false|string|WP_Error|null
+ * Custom lost password url
+ */
+function growtype_form_redirect_url_after_product_creation()
+{
+    return get_option('growtype_form_redirect_after_product_creation');
+}

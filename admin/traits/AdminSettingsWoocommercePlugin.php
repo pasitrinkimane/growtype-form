@@ -31,6 +31,23 @@ trait AdminSettingsWoocommercePlugin
             'growtype-form-settings',
             'growtype_form_settings_woocommerce'
         );
+
+        /**
+         * Redirect after product creation
+         */
+        register_setting(
+            'growtype_form_settings_woocommerce', // settings group name
+            'growtype_form_redirect_after_product_creation', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_redirect_after_product_creation',
+            'Redirect Url After Product Creation',
+            array ($this, 'growtype_form_redirect_after_product_creation_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_woocommerce'
+        );
     }
 
     /**
@@ -42,7 +59,15 @@ trait AdminSettingsWoocommercePlugin
         <textarea id="growtype_form_wc_product_json_content" class="growtype_form_json_content" name="growtype_form_wc_product_json_content" rows="40" cols="100" style="width: 100%;margin-bottom: 100px;"><?= get_option('growtype_form_wc_product_json_content') ?></textarea>
         <?php
     }
+
+    /**
+     * Wc upload product
+     */
+    function growtype_form_redirect_after_product_creation_callback()
+    {
+        $input_val = get_option('growtype_form_redirect_after_product_creation');
+        ?>
+        <input id="growtype_form_redirect_after_product_creation" class="input" name="growtype_form_redirect_after_product_creation" style="width: 100%;" value="<?= $input_val ?>">
+        <?php
+    }
 }
-
-
-
