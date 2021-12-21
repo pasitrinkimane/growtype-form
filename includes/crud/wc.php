@@ -34,6 +34,21 @@ class Growtype_Form_Wc_Crud
         $tag_ids = $this->get_terms_ids($tags, 'product_tag');
 
         /**
+         * Status
+         */
+        $status = $product_data['data']['status'] ?? 'pending';
+
+        /**
+         * Price
+         */
+        $price = $product_data['data']['price'] ?? '';
+
+        /**
+         * Regular price
+         */
+        $regular_price = $product_data['data']['regular_price'] ?? '';
+
+        /**
          * Get descriptions
          */
         $short_description = $product_data['data']['short_description'] ?? '';
@@ -43,29 +58,34 @@ class Growtype_Form_Wc_Crud
          * Save files
          */
         $featured_image_data = $product_data['files']['featured_image'] ?? null;
-        $featured_image = $wp_crud->upload_file_to_media_library($featured_image_data);
+
+        if (!empty($featured_image_data)) {
+            $featured_image = $wp_crud->upload_file_to_media_library($featured_image_data);
+        }
 
         $downloadable_file_data = $product_data['files']['downloadable_file'] ?? null;
-        $downloadable_file = $wp_crud->upload_file_to_media_library($downloadable_file_data);
+
+        if (!empty($downloadable_file_data)) {
+            $downloadable_file = $wp_crud->upload_file_to_media_library($downloadable_file_data);
+        }
 
         /**
          * Create product
          */
         $product = new WC_Product_Simple();
         $product->set_name($product_title);
-        $product->set_status('pending');
+        $product->set_status($status);
         $product->set_catalog_visibility('visible');
-        $product->set_price('');
-        $product->set_regular_price('');
+        $product->set_price($price);
+        $product->set_regular_price($regular_price);
         $product->set_sold_individually(true);
 
-        if (!empty($featured_image)) {
+        /**
+         * Set featured image
+         */
+        if (isset($featured_image) && !empty($featured_image)) {
             $product->set_image_id($featured_image['attachment_id']);
         }
-
-        $product->set_downloadable(true);
-
-        $product->set_virtual(true);
 
         if (!empty($category_ids)) {
             $product->set_category_ids($category_ids);
@@ -81,11 +101,10 @@ class Growtype_Form_Wc_Crud
             $product->set_tag_ids($tag_ids);
         }
 
-        if (!empty($featured_image)) {
-            $src_img = wp_get_attachment_image_src($featured_image['attachment_id'], 'full');
-        }
+        if (isset($downloadable_file) && !empty($downloadable_file)) {
+            $product->set_virtual(true);
+            $product->set_downloadable(true);
 
-        if (!empty($downloadable_file)) {
             $attachment_url = wp_get_attachment_url($downloadable_file['attachment_id']);
             $file_md5 = md5($attachment_url);
 
@@ -96,6 +115,13 @@ class Growtype_Form_Wc_Crud
             $downloads[$file_md5] = $download;
 
             $product->set_downloads($downloads);
+        }
+
+        /**
+         * Src image
+         */
+        if (isset($featured_image) && !empty($featured_image)) {
+            $src_img = wp_get_attachment_image_src($featured_image['attachment_id'], 'full');
         }
 
         /**
