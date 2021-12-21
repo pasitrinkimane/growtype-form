@@ -331,7 +331,7 @@ class Growtype_Form_Render
 
                     $redirect_url = growtype_form_redirect_url_after_product_creation();
 
-                    if (empty($redirect_url)) {
+                    if (!empty($redirect_url)) {
                         return $redirect_url;
                     }
                 }

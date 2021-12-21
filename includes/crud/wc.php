@@ -42,10 +42,10 @@ class Growtype_Form_Wc_Crud
         /**
          * Save files
          */
-        $featured_image_data = $product_data['files']['featured_image'];
+        $featured_image_data = $product_data['files']['featured_image'] ?? null;
         $featured_image = $wp_crud->upload_file_to_media_library($featured_image_data);
 
-        $downloadable_file_data = $product_data['files']['downloadable_file'];
+        $downloadable_file_data = $product_data['files']['downloadable_file'] ?? null;
         $downloadable_file = $wp_crud->upload_file_to_media_library($downloadable_file_data);
 
         /**
@@ -58,37 +58,63 @@ class Growtype_Form_Wc_Crud
         $product->set_price('');
         $product->set_regular_price('');
         $product->set_sold_individually(true);
-        $product->set_image_id($featured_image['attachment_id']);
+
+        if (!empty($featured_image)) {
+            $product->set_image_id($featured_image['attachment_id']);
+        }
+
         $product->set_downloadable(true);
+
         $product->set_virtual(true);
-        $product->set_category_ids($category_ids);
-        $product->set_description($long_description);
+
+        if (!empty($category_ids)) {
+            $product->set_category_ids($category_ids);
+        }
+
+        if (!empty($long_description)) {
+            $product->set_description($long_description);
+        }
+
         $product->set_short_description($short_description);
-        $product->set_tag_ids($tag_ids);
 
-        $src_img = wp_get_attachment_image_src($featured_image['attachment_id'], 'full');
-        $attachment_url = wp_get_attachment_url($downloadable_file['attachment_id']);
+        if (!empty($tag_ids)) {
+            $product->set_tag_ids($tag_ids);
+        }
 
-        $file_md5 = md5($attachment_url);
+        if (!empty($featured_image)) {
+            $src_img = wp_get_attachment_image_src($featured_image['attachment_id'], 'full');
+        }
 
-        $download = new WC_Product_Download();
-        $download->set_name(get_the_title($downloadable_file['attachment_id']));
-        $download->set_id($file_md5);
-        $download->set_file($attachment_url);
-        $downloads[$file_md5] = $download;
-        $product->set_downloads($downloads);
+        if (!empty($downloadable_file)) {
+            $attachment_url = wp_get_attachment_url($downloadable_file['attachment_id']);
+            $file_md5 = md5($attachment_url);
+
+            $download = new WC_Product_Download();
+            $download->set_name(get_the_title($downloadable_file['attachment_id']));
+            $download->set_id($file_md5);
+            $download->set_file($attachment_url);
+            $downloads[$file_md5] = $download;
+
+            $product->set_downloads($downloads);
+        }
 
         /**
          * Add product creator id
          */
         $creator_id = $product_data['data'][Growtype_Form_Render::GROWTYPE_FORM_SUBMITTER_ID] ?? null;
-        $product->update_meta_data('_product_creator_id', $creator_id);
+
+        if (!empty($creator_id)) {
+            $product->update_meta_data('_product_creator_id', $creator_id);
+        }
 
         /**
          * Add product
          */
         $extra_details = $product_data['data']['extra_details'] ?? null;
-        $product->update_meta_data('_extra_details', implode(',', $extra_details));
+
+        if (!empty($extra_details)) {
+            $product->update_meta_data('_extra_details', implode(',', $extra_details));
+        }
 
         /**
          * Save product
@@ -117,6 +143,9 @@ class Growtype_Form_Wc_Crud
      */
     function get_terms_ids($terms, $taxonomy)
     {
+        if (empty($terms)) {
+            return null;
+        }
 
         if (!empty($terms) && !is_array($terms)) {
             $terms = [$terms];
