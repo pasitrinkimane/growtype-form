@@ -20,8 +20,8 @@ class Growtype_Form_Render
     public function __construct()
     {
         if (!is_admin()) {
-            add_filter('wp_loaded', array ($this, 'growtype_form_process_posted_data'));
             add_shortcode(self::GROWTYPE_FORM_SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
+            add_filter('wp_loaded', array ($this, 'growtype_form_process_posted_data'));
             add_filter('body_class', array ($this, 'growtype_form_body_class'));
         }
     }
