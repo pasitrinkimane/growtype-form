@@ -36,7 +36,12 @@ class Growtype_Form_Wc_Crud
         /**
          * Status
          */
-        $status = $product_data['data']['status'] ?? 'pending';
+        $status = $product_data['data']['status'] ?? growtype_form_default_product_status();
+
+        /**
+         * Visibility
+         */
+        $visibility = growtype_form_default_product_catalog_visibility();
 
         /**
          * Price
@@ -75,7 +80,7 @@ class Growtype_Form_Wc_Crud
         $product = new WC_Product_Simple();
         $product->set_name($product_title);
         $product->set_status($status);
-        $product->set_catalog_visibility('visible');
+        $product->set_catalog_visibility($visibility);
         $product->set_price($price);
         $product->set_regular_price($regular_price);
         $product->set_sold_individually(true);

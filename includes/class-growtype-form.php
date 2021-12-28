@@ -169,6 +169,7 @@ class Growtype_Form
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/signup.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/template.php';
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/url.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/wc.php';
 
         $this->loader = new Growtype_Form_Loader();
 
