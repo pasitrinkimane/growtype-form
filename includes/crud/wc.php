@@ -10,7 +10,7 @@ class Growtype_Form_Wc_Crud
      * @param $data
      * @return array
      */
-    function create_product($product_data)
+    function create_or_update_product($product_data, $existing_product = null)
     {
         $product_title = $product_data['data']['title'] ?? 'Demo';
 
@@ -57,7 +57,7 @@ class Growtype_Form_Wc_Crud
          * Get descriptions
          */
         $short_description = $product_data['data']['short_description'] ?? '';
-        $long_description = $product_data['data']['long_description'] ?? '';
+        $description = $product_data['data']['description'] ?? '';
 
         /**
          * Save files
@@ -77,7 +77,12 @@ class Growtype_Form_Wc_Crud
         /**
          * Create product
          */
-        $product = new WC_Product_Simple();
+        if (!empty($existing_product)) {
+            $product = $existing_product;
+        } else {
+            $product = new WC_Product_Simple();
+        }
+
         $product->set_name($product_title);
         $product->set_status($status);
         $product->set_catalog_visibility($visibility);
@@ -96,8 +101,8 @@ class Growtype_Form_Wc_Crud
             $product->set_category_ids($category_ids);
         }
 
-        if (!empty($long_description)) {
-            $product->set_description($long_description);
+        if (!empty($description)) {
+            $product->set_description($description);
         }
 
         $product->set_short_description($short_description);
@@ -160,7 +165,13 @@ class Growtype_Form_Wc_Crud
             $response['message'] = __("Something went wrong. Please contact administrator.", "growtype-form");
         } else {
             $response['product_id'] = $product->get_id();
-            $response['message'] = __("Product created.", "growtype-form");
+
+            if (!empty($existing_product)) {
+                $response['message'] = __("Product updated.", "growtype-form");
+            } else {
+                $response['message'] = __("Product created.", "growtype-form");
+            }
+
             $response['success'] = true;
         }
 

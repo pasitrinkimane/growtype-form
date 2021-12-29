@@ -30,6 +30,17 @@ trait FrontendForm
         }
 
         /**
+         * Check if product form add fill input with existing values
+         */
+        if (class_exists('woocommerce') && isset($_REQUEST['customize']) && $_REQUEST['customize'] === 'edit' && str_contains($form_name, 'wc_product')) {
+            $product = wc_get_product(get_the_ID());
+
+            $_REQUEST['title'] = $product->get_title();
+            $_REQUEST['description'] = $product->get_description();
+            $_REQUEST['short_description'] = $product->get_short_description();
+        }
+
+        /**
          * Recaptcha setup
          */
         $recaptcha = $form['recaptcha'] ?? null;
@@ -61,8 +72,14 @@ trait FrontendForm
          */
         $login_btn = $form['login_btn'] ?? null;
 
+        /**
+         * Post data
+         */
+        $post = get_post();
+
         ob_start();
         ?>
+
         <div class="growtype-form-wrapper">
 
             <?php $this->render_growtype_form_response_status(); ?>
@@ -72,7 +89,8 @@ trait FrontendForm
                     <?php if (!empty($form_title)) { ?>
                         <h2 class="e-title-intro"><?= $form_title ?></h2>
                     <?php } ?>
-                    <form id="growtype-form" <?= $form_type === 'upload' ? 'enctype="multipart/form-data"' : '' ?> class="form" action="<?php the_permalink(); ?>" method="post" data-name="<?= $form_name ?>">
+
+                    <form id="growtype-form" enctype="multipart/form-data" class="form" action="<?php the_permalink(); ?>" method="post" data-name="<?= $form_name ?>">
                         <div class="row g-3 fields-main">
                             <?php
                             foreach ($main_fields as $field) {
@@ -98,6 +116,10 @@ trait FrontendForm
                                 <input type="text" hidden name='<?= self::GROWTYPE_FORM_SUBMITTED_INPUT ?>' value="true"/>
                                 <input type="text" hidden name='<?= self::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
                                 <input type="text" hidden name='<?= self::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
+
+                                <?php if (!empty($post)) { ?>
+                                    <input type="text" hidden name='<?= self::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?= $post->ID ?>"/>
+                                <?php } ?>
 
                                 <?php if (!empty($recaptchav3)) { ?>
                                     <div class="g-recaptcha"
@@ -144,7 +166,15 @@ trait FrontendForm
             $field_hidden = true;
         }
 
-        $field_value = $field['value'] ?? sanitize_text_field(filter_input(INPUT_GET, $field_name));
+        $field_value = isset($field['value']) ? sanitize_text_field($field['value']) : null;
+
+        if (empty($field_value)) {
+            $field_value = isset($_REQUEST[$field_name]) ? sanitize_text_field($_REQUEST[$field_name]) : null;
+        }
+
+        if (str_contains($field_name, 'password')) {
+            $field_value = null;
+        }
 
         $field_options = $field['options'] ?? null;
         $field_label = $field['label'] ?? null;
@@ -195,7 +225,7 @@ trait FrontendForm
                            id="<?= $field_name ?>"
                            placeholder="<?= $placeholder ?>"
                         <?= $field_required ? 'required' : '' ?>
-                           value="<?= !str_contains($field_name, 'password') ? $field_value : null ?>"
+                           value="<?= $field_value ?>"
                     >
                     <?php
                     if (!empty($field_label)) { ?>
@@ -216,7 +246,7 @@ trait FrontendForm
                 <?php if (!empty($field_description)) { ?>
                     <p class="form-description"><?= $field_description ?></p>
                 <?php } ?>
-                <textarea id="<?= $field_name ?>" name="<?= $field_name ?>" rows="4" cols="50" placeholder="<?= $placeholder ?>" <?= $field_required ? 'required' : '' ?>></textarea>
+                <textarea id="<?= $field_name ?>" name="<?= $field_name ?>" rows="4" cols="50" placeholder="<?= $placeholder ?>" <?= $field_required ? 'required' : '' ?>><?= $field_value ?></textarea>
             <?php } elseif ($field_type === 'file') { ?>
                 <?php if (!empty($field_label)) { ?>
                     <label for="<?= $field_name ?>" class="form-label">
@@ -241,7 +271,7 @@ trait FrontendForm
                        id="<?= $field_name ?>"
                        placeholder="<?= $placeholder ?? null ?>"
                     <?= $field_required ? 'required' : '' ?>
-                       value="<?= !str_contains($field_name, 'password') ? $field_value : null ?>"
+                       value="<?= $field_value ?>"
                     <?= $field_min_value ? 'min="' . $field_min_value . '"' : '' ?>
                     <?= $field_max_value ? 'max="' . $field_max_value . '"' : '' ?>
                 >
@@ -374,5 +404,3 @@ trait FrontendForm
         <?php
     }
 }
-
-

@@ -13,9 +13,10 @@ class Growtype_Form_Render
     const GROWTYPE_FORM_SUBMITTED_INPUT = 'growtype_form_submitted';
     const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
     const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
+    const GROWTYPE_FORM_POST_IDENTIFICATOR = 'growtype_form_post_id';
 
     const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['input', 'textarea', 'file', 'email', 'select', 'checkbox', 'hidden', 'number', 'password'];
-    const EXCLUDED_VALUES_FROM_VALIDATION = [self::GROWTYPE_FORM_SUBMITTED_INPUT, self::GROWTYPE_FORM_SUBMITTER_ID, self::GROWTYPE_FORM_NAME_IDENTIFICATOR];
+    const EXCLUDED_VALUES_FROM_VALIDATION = [self::GROWTYPE_FORM_SUBMITTED_INPUT, self::GROWTYPE_FORM_SUBMITTER_ID, self::GROWTYPE_FORM_NAME_IDENTIFICATOR, self::GROWTYPE_FORM_POST_IDENTIFICATOR];
 
     public function __construct()
     {
@@ -170,6 +171,15 @@ class Growtype_Form_Render
 
         $available_forms = json_decode($form_json_content, true);
 
+        if (str_contains($form_name, 'edit') && !isset($available_forms[$form_name]['main_fields'])) {
+
+            $form_parent = str_replace('_edit', '', $form_name);
+
+            if (isset($available_forms[$form_parent]['main_fields'])) {
+                $available_forms[$form_name]['main_fields'] = $available_forms[$form_parent]['main_fields'];
+            }
+        }
+
         return $available_forms[$form_name] ?? null;
     }
 
@@ -290,7 +300,7 @@ class Growtype_Form_Render
                         return growtype_form_redirect_url_after_signup();
                     }
                 }
-            } elseif ($form_name === 'wc_product') {
+            } elseif (str_contains($form_name, 'wc_product')) {
 
                 require_once plugin_dir_path(dirname(__FILE__)) . 'crud/wc.php';
 
@@ -299,29 +309,50 @@ class Growtype_Form_Render
                 /**
                  * Format long description if contains multiple descriptions
                  */
-                if (isset($product_data['data']['long_description']) && is_array($product_data['data']['long_description'])) {
+                if (isset($product_data['data']['description']) && is_array($product_data['data']['description'])) {
 
-                    $long_description_fields = [];
+                    $description_fields = [];
                     foreach ($form_data['main_fields'] as $field) {
-                        if (str_contains($field['name'], 'long_description')) {
-                            $field_key = str_replace('long_description[', '', $field['name']);
+                        if (str_contains($field['name'], 'description')) {
+                            $field_key = str_replace('description[', '', $field['name']);
                             $field_key = str_replace(']', '', $field_key);
-                            $long_description_fields[$field_key] = $field;
+                            $description_fields[$field_key] = $field;
                         }
                     }
 
-                    $long_description_formatted = '';
-                    foreach ($product_data['data']['long_description'] as $key => $description) {
-                        $label = $long_description_fields[$key]['label'];
-                        $long_description_formatted .= '<b>' . $label . '</b>' . "\n" . $description . "\n" . "\n";
+                    $description_formatted = '';
+                    foreach ($product_data['data']['description'] as $key => $description) {
+                        $label = $description_formatted[$key]['label'];
+                        $description_formatted .= '<b>' . $label . '</b>' . "\n" . $description . "\n" . "\n";
                     }
 
-                    $product_data['data']['long_description'] = $long_description_formatted;
+                    $product_data['data']['description'] = $description_formatted;
                 }
 
                 $wc_crud = new Growtype_Form_Wc_Crud();
-                $submit_data = $wc_crud->create_product($product_data);
 
+                /**
+                 * Check if product is set
+                 */
+                $product = null;
+
+                if (isset($product_data['data'][self::GROWTYPE_FORM_POST_IDENTIFICATOR])) {
+                    $product = wc_get_product($product_data['data'][self::GROWTYPE_FORM_POST_IDENTIFICATOR]);
+
+                    if ($product && !user_has_uploaded_wc_product($product->get_id())) {
+                        $product = null;
+                    }
+                }
+
+                if (!empty($product)) {
+                    $submit_data = $wc_crud->create_or_update_product($product_data, $product);
+                } else {
+                    $submit_data = $wc_crud->create_or_update_product($product_data);
+                }
+
+                /**
+                 * Status
+                 */
                 if ($submit_data['success']) {
                     $product_id = $submit_data['product_id'];
 
@@ -362,7 +393,7 @@ class Growtype_Form_Render
                 }
             } else {
                 $submit_data['success'] = false;
-                $submit_data['message'] = __('Missing data. Please contact site admin.', 'growtype-form');
+                $submit_data['message'] = __('Wrong data submitted. Please contact site admin.', 'growtype-form');
             }
         } else {
             $fields_values_args = $submitted_data;
