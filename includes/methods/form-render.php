@@ -297,6 +297,11 @@ class Growtype_Form_Render
                         wp_set_auth_cookie($user_id);
                         do_action('wp_login', $user->user_login, $user);
 
+                        if (!growtype_form_redirect_url_after_signup()) {
+                            error_log('Redirect url is missing. growtype-form');
+                            return __("Something went wrong. Please contact administrator.", "growtype-form");
+                        }
+
                         return growtype_form_redirect_url_after_signup();
                     }
                 }
