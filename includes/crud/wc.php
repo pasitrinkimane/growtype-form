@@ -153,6 +153,11 @@ class Growtype_Form_Wc_Crud
         }
 
         /**
+         * Enable image placeholder
+         */
+        $product->update_meta_data('_img_placeholder_enabled', true);
+
+        /**
          * Save product
          */
         $product->save();
