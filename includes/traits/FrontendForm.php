@@ -173,6 +173,10 @@ trait FrontendForm
             $field_value = isset($_REQUEST[$field_name]) ? sanitize_text_field($_REQUEST[$field_name]) : null;
         }
 
+        if ($field_name === 'name') {
+            $field_value = $_REQUEST[self::ALTERNATIVE_SUBMITTED_DATA_KEYS[$field_name]] ?? null;
+        }
+
         if (str_contains($field_name, 'password')) {
             $field_value = null;
         }
@@ -211,8 +215,8 @@ trait FrontendForm
                     <?php } ?>
                 </select>
             <?php } elseif ($field_type === 'radio') { ?>
-            <?php
-            foreach ($field_options
+
+            <?php foreach ($field_options
 
             as $field_option) { ?>
                 <div class="radio-wrapper">
@@ -220,6 +224,7 @@ trait FrontendForm
                     <label for="<?= str_replace(' ', '_', strtolower($field_option)) ?>"><?= str_replace('_', ' ', $field_option) ?></label>
                 </div>
             <?php } ?>
+
             <?php } elseif ($field_type === 'checkbox') { ?>
                 <div class="form-check">
                     <input type="<?= $field_type ?>"

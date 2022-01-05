@@ -17,6 +17,11 @@ class Growtype_Form_Render
 
     const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['input', 'textarea', 'file', 'email', 'select', 'checkbox', 'hidden', 'number', 'password'];
     const EXCLUDED_VALUES_FROM_VALIDATION = [self::GROWTYPE_FORM_SUBMITTED_INPUT, self::GROWTYPE_FORM_SUBMITTER_ID, self::GROWTYPE_FORM_NAME_IDENTIFICATOR, self::GROWTYPE_FORM_POST_IDENTIFICATOR];
+    const EXCLUDED_VALUES_FROM_SAVING = ['username', 'password', 'repeat_password', 'email', 'submit', 'growtype_form_submitted'];
+
+    const ALTERNATIVE_SUBMITTED_DATA_KEYS = [
+        'name' => 'name_s'
+    ];
 
     public function __construct()
     {
@@ -192,7 +197,7 @@ class Growtype_Form_Render
         /**
          * Skip values
          */
-        $skipped_values = ['username', 'password', 'repeat_password', 'email', 'submit', 'growtype_form_submitted'];
+        $skipped_values = self::EXCLUDED_VALUES_FROM_SAVING;
 
         /**
          * Save extra values
@@ -226,12 +231,12 @@ class Growtype_Form_Render
      * @return array
      * Map post fields with shortcode fields
      */
-    function form_submitted_values_are_valid($form_data, $submitted_values)
+    function sanitize_form_submitted_values($form_data, $submitted_values)
     {
         $available_fields = $form_data['main_fields'] ?? null;
 
         if (empty($available_fields)) {
-            return false;
+            return null;
         }
 
         if (isset($form_data['confirmation_fields']) && !empty($form_data['confirmation_fields'])) {
@@ -246,16 +251,26 @@ class Growtype_Form_Render
 
         $submitted_data = array_merge($submitted_values['data'], $submitted_values['files']);
 
+        $submitted_values_sanitized = [];
         foreach ($submitted_data as $key => $value) {
             if (in_array($key, self::EXCLUDED_VALUES_FROM_VALIDATION)) {
                 continue;
             }
             if (!in_array($key, $available_fields_names)) {
-                return false;
+                return null;
             }
+
+            /**
+             * Prepare keys for return
+             */
+            if ($key === 'name') {
+                $key = self::ALTERNATIVE_SUBMITTED_DATA_KEYS[$key];
+            }
+
+            $submitted_values_sanitized[$key] = $value;
         }
 
-        return true;
+        return $submitted_values_sanitized;
     }
 
     /**
@@ -277,11 +292,10 @@ class Growtype_Form_Render
         /**
          * Validate if submitted values match available values
          */
-        $submitted_data_are_valid = $this->form_submitted_values_are_valid($form_data, $submitted_values);
-
+        $submitted_values_sanitized = $this->sanitize_form_submitted_values($form_data, $submitted_values);
         $submitted_data = $submitted_values['data'];
 
-        if ($submitted_data_are_valid) {
+        if (!empty($submitted_values_sanitized)) {
 
             $success_message = $form_data['success_message'] ?? null;
 
@@ -401,8 +415,6 @@ class Growtype_Form_Render
                 $submit_data['message'] = __('Wrong data submitted. Please contact site admin.', 'growtype-form');
             }
         } else {
-            $fields_values_args = $submitted_data;
-
             $submit_data['success'] = false;
             $submit_data['message'] = __('Please fill all required fields.', 'growtype-form');
         }
@@ -415,7 +427,7 @@ class Growtype_Form_Render
             'message' => $submit_data['message'],
         );
 
-        $query_args = array_merge($status_args, $fields_values_args ?? []);
+        $query_args = array_merge($status_args, $submitted_values_sanitized ?? []);
 
         return add_query_arg($query_args, get_permalink());
     }
