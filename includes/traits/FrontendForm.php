@@ -295,10 +295,10 @@ trait FrontendForm
                 </script>
             <?php
             /**
-             * Custom
+             * Custom, skip sanitization
              */
             } elseif($field_type === 'custom') {
-                echo $field_value;
+                echo $field['value'];
             /**
              * Input
              */
