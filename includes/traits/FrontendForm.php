@@ -195,7 +195,6 @@ trait FrontendForm
         if (!in_array($field_type, self::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {
             return null;
         }
-
         ?>
 
         <div class="<?= $field_col_class ?>" style="<?= $field_hidden ? 'display:none;' : '' ?>" data-name="<?= $field_name ?>">
@@ -211,16 +210,27 @@ trait FrontendForm
             <?php } ?>
                 <select name="<?= $field_name ?>" id="<?= $field_name ?>">
                     <?php
-                    foreach ($field_options as $field_option) { ?>
-                        <option value="<?= sanitize_text_field($field_option['value']) ?>"><?= sanitize_text_field($field_option['label']) ?></option>
-                    <?php } ?>
+                    /**
+                     * Use woocommerce country select
+                     */
+                    if (class_exists('woocommerce') && $field_value === 'wc_country' && $field_type === 'select') {
+                        $field_options = array ('' => __('Select a country / region&hellip;', 'woocommerce')) + WC()->countries->get_allowed_countries();
+
+                        foreach ($field_options as $key => $field_option) { ?>
+                            <option value="<?= $key ?>"><?= $field_option ?></option>
+                        <?php }
+                    } else {
+                        foreach ($field_options as $field_option) { ?>
+                            <option value="<?= sanitize_text_field($field_option['value']) ?>"><?= sanitize_text_field($field_option['label']) ?></option>
+                        <?php }
+                    } ?>
                 </select>
             <?php
             /**
              * Radio
              */
             } elseif ($field_type === 'radio') {
-                foreach ($field_options as $field_option) { ?>
+            foreach ($field_options as $field_option) { ?>
                 <div class="radio-wrapper">
                     <input type="radio" id="<?= str_replace(' ', '_', strtolower($field_option)) ?>" name="<?= $field_name ?>" value="<?= strtolower($field_option) ?>" <?= $field_required ? 'required' : '' ?>>
                     <label for="<?= str_replace(' ', '_', strtolower($field_option)) ?>"><?= str_replace('_', ' ', $field_option) ?></label>
@@ -297,12 +307,13 @@ trait FrontendForm
             /**
              * Custom, skip sanitization
              */
-            } elseif($field_type === 'custom') {
+            } elseif ($field_type === 'custom') {
                 echo $field['value'];
-            /**
-             * Input
-             */
-            } else { ?>
+                /**
+                 * Input
+                 */
+            }
+            else { ?>
             <?php
             if (!empty($field_label)) { ?>
                 <label for="<?= $field_name ?>" class="form-label">
