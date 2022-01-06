@@ -200,32 +200,36 @@ trait FrontendForm
 
         <div class="<?= $field_col_class ?>" style="<?= $field_hidden ? 'display:none;' : '' ?>" data-name="<?= $field_name ?>">
             <?php
-            if ($field_type === 'select') { ?>
-                <?php
+            /**
+             * Select
+             */
+            if ($field_type === 'select') {
             if (!empty($field_label)) { ?>
                 <label for="<?= $field_name ?>" class="form-label">
                     <?= $field_label ?>
                 </label>
-            <?php }
-                ?>
+            <?php } ?>
                 <select name="<?= $field_name ?>" id="<?= $field_name ?>">
                     <?php
                     foreach ($field_options as $field_option) { ?>
                         <option value="<?= sanitize_text_field($field_option['value']) ?>"><?= sanitize_text_field($field_option['label']) ?></option>
                     <?php } ?>
                 </select>
-            <?php } elseif ($field_type === 'radio') { ?>
-
-            <?php foreach ($field_options
-
-            as $field_option) { ?>
+            <?php
+            /**
+             * Radio
+             */
+            } elseif ($field_type === 'radio') {
+                foreach ($field_options as $field_option) { ?>
                 <div class="radio-wrapper">
                     <input type="radio" id="<?= str_replace(' ', '_', strtolower($field_option)) ?>" name="<?= $field_name ?>" value="<?= strtolower($field_option) ?>" <?= $field_required ? 'required' : '' ?>>
                     <label for="<?= str_replace(' ', '_', strtolower($field_option)) ?>"><?= str_replace('_', ' ', $field_option) ?></label>
                 </div>
-            <?php } ?>
-
-            <?php } elseif ($field_type === 'checkbox') { ?>
+            <?php }
+            /**
+             * Checkbox
+             */
+            } elseif ($field_type === 'checkbox') { ?>
                 <div class="form-check">
                     <input type="<?= $field_type ?>"
                            class="form-check-input"
@@ -243,7 +247,11 @@ trait FrontendForm
                     <?php }
                     ?>
                 </div>
-            <?php } elseif ($field_type === 'textarea') { ?>
+            <?php
+            /**
+             * Textarea
+             */
+            } elseif ($field_type === 'textarea') { ?>
             <?php
             if (!empty($field_label)) { ?>
                 <label for="<?= $field_name ?>" class="form-label">
@@ -255,13 +263,16 @@ trait FrontendForm
                 <p class="form-description"><?= $field_description ?></p>
             <?php } ?>
                 <textarea id="<?= $field_name ?>" name="<?= $field_name ?>" rows="4" cols="50" placeholder="<?= $placeholder ?>" <?= $field_required ? 'required' : '' ?>><?= $field_value ?></textarea>
-            <?php } elseif ($field_type === 'file') { ?>
+            <?php
+            /**
+             * File
+             */
+            } elseif ($field_type === 'file') { ?>
             <?php if (!empty($field_label)) { ?>
                 <label for="<?= $field_name ?>" class="form-label">
                     <?= $field_label ?>
                 </label>
             <?php } ?>
-
                 <div class="img-wrapper">
                     <?php
                     if (!empty($field_value)) { ?>
@@ -271,7 +282,6 @@ trait FrontendForm
                         <input type="<?= $field_type ?>" id="<?= $field_name ?>" name="<?= $field_name ?>" accept="<?= $field_accept ?>" <?= $field_required ? 'required' : '' ?>>
                     <?php } ?>
                 </div>
-
                 <script>
                     $('.btn-img-remove').click(function () {
                         let type = $(this).attr('data-type');
@@ -283,8 +293,16 @@ trait FrontendForm
                         $(this).closest('.col-auto').append('<input type="' + type + '" id="' + id + '" name="' + name + '"  accept="' + accept + '"  ' + required + '>');
                     });
                 </script>
-
-            <?php } else { ?>
+            <?php
+            /**
+             * Custom
+             */
+            } elseif($field_type === 'custom') {
+                echo $field_value;
+            /**
+             * Input
+             */
+            } else { ?>
             <?php
             if (!empty($field_label)) { ?>
                 <label for="<?= $field_name ?>" class="form-label">

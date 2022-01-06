@@ -15,7 +15,7 @@ class Growtype_Form_Render
     const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
     const GROWTYPE_FORM_POST_IDENTIFICATOR = 'growtype_form_post_id';
 
-    const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['input', 'textarea', 'file', 'email', 'select', 'checkbox', 'hidden', 'number', 'password'];
+    const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['input', 'textarea', 'file', 'email', 'select', 'checkbox', 'hidden', 'number', 'password', 'custom'];
     const EXCLUDED_VALUES_FROM_VALIDATION = [self::GROWTYPE_FORM_SUBMITTED_INPUT, self::GROWTYPE_FORM_SUBMITTER_ID, self::GROWTYPE_FORM_NAME_IDENTIFICATOR, self::GROWTYPE_FORM_POST_IDENTIFICATOR];
     const EXCLUDED_VALUES_FROM_SAVING = ['username', 'password', 'repeat_password', 'email', 'submit', 'growtype_form_submitted'];
 

@@ -10,7 +10,8 @@
         "name": "email",
         "label": "Email",
         "placeholder": "Enter your email",
-        "required": "true"
+        "required": "true",
+        "col_class": "col-12"
       },
       {
         "type": "password",
