@@ -208,7 +208,7 @@ trait FrontendForm
                     <?= $field_label ?>
                 </label>
             <?php } ?>
-                <select name="<?= $field_name ?>" id="<?= $field_name ?>">
+                <select name="<?= $field_name ?>" id="<?= $field_name ?>" <?= $field_required ? 'required' : '' ?>>
                     <?php
                     /**
                      * Use woocommerce country select

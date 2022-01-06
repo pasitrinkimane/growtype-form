@@ -1,12 +1,3 @@
-.growtype-form {
-  .s-content {
-    padding-top: 20px;
-    @include bp-phone-xl() {
-      padding-top: 0;
-    }
-  }
-}
-
 .growtype-form-wrapper {
   .alert {
     max-width: 430px;
