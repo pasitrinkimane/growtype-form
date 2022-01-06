@@ -138,7 +138,7 @@ trait FrontendForm
                     <?php
                     if ($login_btn) { ?>
                         <div class="b-actions">
-                            <label for=""><?= __("You already have an account?", "growtype-registration") ?></label>
+                            <label for=""><?= __("Do you already have an account?", "growtype-registration") ?></label>
                             <a class="btn btn-link" href="<?= growtype_form_login_url() ?>"><?= __("Sign in", "growtype-registration") ?></a>
                         </div>
                     <?php } ?>
