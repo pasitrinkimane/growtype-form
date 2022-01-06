@@ -296,7 +296,7 @@ trait FrontendForm
                 <p class="form-description"><?= $field_description ?></p>
             <?php } ?>
             <input type="<?= $field_type ?>"
-                   class="form-control"
+                   class="form-control <?= !empty($field_value) ? 'has-value' : '' ?>"
                    name="<?= $field_name ?>"
                    id="<?= $field_name ?>"
                    placeholder="<?= $placeholder ?? null ?>"
