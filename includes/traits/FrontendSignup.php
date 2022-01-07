@@ -61,14 +61,6 @@ trait FrontendSignup
         $user_id = wp_create_user($username, $password, $email);
 
         /**
-         * Set default user role
-         */
-        if (!empty(get_option('growtype_form_default_user_role'))) {
-            $user_id_role = new WP_User($user_id);
-            $user_id_role->set_role(get_option('growtype_form_default_user_role'));
-        }
-
-        /**
          * Return response
          */
         if (is_wp_error($user_id)) {

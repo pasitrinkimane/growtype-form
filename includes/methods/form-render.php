@@ -219,6 +219,26 @@ class Growtype_Form_Render
             }
         }
 
+        /**
+         * Hide admin bar
+         */
+        update_user_meta($user_id, 'show_admin_bar_front', 'false');
+
+        /**
+         * Get user
+         */
+        $user = new WP_User($user_id);
+
+        /**
+         * Set default user role
+         */
+        if (!empty(get_option('growtype_form_default_user_role'))) {
+            $user->set_role(get_option('growtype_form_default_user_role'));
+        }
+
+        /**
+         * Return response
+         */
         $response['user_id'] = $user_id;
         $response['success'] = true;
 
@@ -245,8 +265,10 @@ class Growtype_Form_Render
 
         $available_fields_names = [];
         foreach ($available_fields as $field) {
-            $field_name = strtok($field['name'], '[');
-            array_push($available_fields_names, $field_name);
+            if(isset($field['name'])){
+                $field_name = strtok($field['name'], '[');
+                array_push($available_fields_names, $field_name);
+            }
         }
 
         $submitted_data = array_merge($submitted_values['data'], $submitted_values['files']);
