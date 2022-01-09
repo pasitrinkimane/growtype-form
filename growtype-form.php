@@ -38,6 +38,21 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'Growtype_Form_VERSION', '1.0.0' );
 
 /**
+ * Plugin dir path
+ */
+define( 'Growtype_Form_Path', plugin_dir_path( __FILE__ ) );
+
+/**
+ * Plugin url
+ */
+define( 'Growtype_Form_Url', plugin_dir_url( __FILE__ ) );
+
+/**
+ * Plugin url public
+ */
+define( 'Growtype_Form_Url_Public', plugin_dir_url( __FILE__ ) . 'public/');
+
+/**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-growtype-form-activator.php
  */

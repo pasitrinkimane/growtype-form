@@ -17,7 +17,7 @@ class Growtype_Form_Wc_Crud
         /**
          * Get wordpress crud methods
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'crud/wp.php';
+        require_once Growtype_Form_Path . 'includes/methods/crud/class-growtype-form-wp-crud.php';
 
         $wp_crud = new Growtype_Form_Wp_Crud();
 

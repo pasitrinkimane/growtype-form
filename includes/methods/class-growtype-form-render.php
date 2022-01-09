@@ -1,19 +1,142 @@
 <?php
 
 /**
- * Provide a admin area view for the plugin
- *
- * This file is used to markup the admin-facing aspects of the plugin.
- *
- * @link       http://example.com
- * @since      1.0.0
- *
- * @package    Growtype_Form
- * @subpackage Growtype_Form/admin/partials
+ * Class Growtype_Form_Upload_Data
  */
-
-trait FrontendForm
+class Growtype_Form_Render
 {
+    const GROWTYPE_FORM_SHORTCODE_NAME = 'growtype_form';
+
+    const GROWTYPE_FORM_SUBMITTED_INPUT = 'growtype_form_submitted';
+    const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
+
+    const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
+    const GROWTYPE_FORM_POST_IDENTIFICATOR = 'growtype_form_post_id';
+
+    const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['input', 'textarea', 'file', 'email', 'select', 'checkbox', 'hidden', 'number', 'password', 'custom'];
+
+    const ALTERNATIVE_SUBMITTED_DATA_KEYS = [
+        'name' => 'name_s'
+    ];
+
+    protected $Growtype_Form_Login;
+    protected $Growtype_Form_Crud;
+
+    public function __construct()
+    {
+        if (!is_admin()) {
+            add_shortcode(self::GROWTYPE_FORM_SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
+            add_filter('body_class', array ($this, 'growtype_form_body_class'));
+
+            $this->load_methods();
+        }
+    }
+
+    /**
+     * @return void
+     */
+    function load_methods()
+    {
+        require_once Growtype_Form_Path . 'includes/methods/login/class-growtype-form-login.php';
+        $this->Growtype_Form_Login = new Growtype_Form_Login();
+
+        require_once Growtype_Form_Path . 'includes/methods/crud/class-growtype-form-crud.php';
+        $this->Growtype_Form_Crud = new Growtype_Form_Crud();
+    }
+
+    /**
+     * Add login class to body
+     */
+    function growtype_form_body_class($classes)
+    {
+        global $post;
+
+        if (!empty($post) && has_shortcode($post->post_content, self::GROWTYPE_FORM_SHORTCODE_NAME)) {
+            $classes[] = 'growtype-form';
+        }
+
+        if (growtype_form_login_page_is_active()) {
+            $classes[] = 'login-' . growtype_form_get_login_page_template();
+        }
+
+        if (growtype_form_signup_page_is_active()) {
+            $classes[] = 'signup-' . growtype_form_get_signup_page_template();
+        }
+
+        return $classes;
+    }
+
+    /**
+     * Required scripts
+     */
+    function growtype_form_enqueue_general_styles()
+    {
+        wp_enqueue_style('growtype-form.css', plugin_dir_url(dirname(dirname(__FILE__))) . 'public/styles/growtype-form.css', array (), '1.0', 'all');
+    }
+
+    /**
+     * Upload form shortcode
+     * [growtype_form name="{form_name}"]
+     */
+    function growtype_form_shortcode_function($args)
+    {
+        global $wp_session;
+
+        /**
+         * If empty shortcode arguments, return empty
+         */
+        if (empty($args)) {
+            return null;
+        }
+
+        /**
+         * Form name
+         */
+        $form_name = $args['name'];
+
+        /**
+         * Get form data
+         */
+        $form_data = Growtype_Form_Crud::get_growtype_form_data($form_name);
+
+        if (empty($form_data)) {
+            return __('Form is not configured. Please contact site admin.', 'growtype-form');
+        }
+
+        /**
+         * Enqueue general scripts
+         */
+        $this->growtype_form_enqueue_general_styles();
+
+        /**
+         * Render forms
+         */
+        if (str_contains($form_name, 'login')) {
+            /**
+             * Render login form
+             */
+            return Growtype_Form_Login::render_growtype_login_form($form_data);
+        } else {
+            /**
+             * Enqueue scripts
+             */
+            $this->growtype_form_enqueue_validation_scripts();
+
+            /**
+             * Initiate scripts
+             */
+            add_action('wp_footer', function () {
+                $this->growtype_form_url_scripts_init();
+                $this->growtype_form_validation_scripts_init();
+            }, 99);
+
+            /**
+             * Render form
+             */
+            return $this->render_growtype_general_form($form_data, $form_name);
+        }
+    }
+
     /**
      * @param $form
      * @return false|string|null
@@ -230,7 +353,9 @@ trait FrontendForm
              * Radio
              */
             } elseif ($field_type === 'radio') {
-            foreach ($field_options as $field_option) { ?>
+            foreach ($field_options
+
+            as $field_option) { ?>
                 <div class="radio-wrapper">
                     <input type="radio" id="<?= str_replace(' ', '_', strtolower($field_option)) ?>" name="<?= $field_name ?>" value="<?= strtolower($field_option) ?>" <?= $field_required ? 'required' : '' ?>>
                     <label for="<?= str_replace(' ', '_', strtolower($field_option)) ?>"><?= str_replace('_', ' ', $field_option) ?></label>
@@ -341,7 +466,7 @@ trait FrontendForm
     }
 
     /**
-     *
+     * Response status
      */
     function render_growtype_form_response_status()
     {

@@ -15,7 +15,7 @@
 trait AdminAppearanceMenu
 {
     /**
-     * Adds the meta box container.
+     * Adds the meta box container in appearance menus
      */
     public function add_nav_menu_meta_box($post_type)
     {

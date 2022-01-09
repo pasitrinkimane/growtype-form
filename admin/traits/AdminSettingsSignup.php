@@ -100,6 +100,23 @@ trait AdminSettingsSignup
         );
 
         /**
+         * Active user role
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_active_user_role', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_active_user_role',
+            'Active User Role',
+            array ($this, 'growtype_form_active_user_role_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_signup'
+        );
+
+        /**
          * Allow simple password
          */
         register_setting(
@@ -191,6 +208,25 @@ trait AdminSettingsSignup
         $roles = $wp_roles->roles;
         ?>
         <select name='growtype_form_default_user_role'>
+            <?php
+            foreach ($roles as $role => $role_details) { ?>
+                <option value='<?= $role ?>' <?php selected($selected, $role); ?>><?= __($role_details['name'], "growtype-form") ?></option>
+            <?php } ?>
+        </select>
+        <?php
+    }
+
+    /**
+     * User role
+     */
+    function growtype_form_active_user_role_callback()
+    {
+        global $wp_roles;
+
+        $selected = get_option('growtype_form_active_user_role');
+        $roles = $wp_roles->roles;
+        ?>
+        <select name='growtype_form_active_user_role'>
             <?php
             foreach ($roles as $role => $role_details) { ?>
                 <option value='<?= $role ?>' <?php selected($selected, $role); ?>><?= __($role_details['name'], "growtype-form") ?></option>

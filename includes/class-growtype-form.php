@@ -218,7 +218,6 @@ class Growtype_Form
      */
     private function define_public_hooks()
     {
-
         $plugin_public = new Growtype_Form_Public($this->get_Growtype_Form(), $this->get_version());
 
         if (str_contains($_SERVER['REQUEST_URI'], 'signup') || str_contains($_SERVER['REQUEST_URI'], 'login') || str_contains($_SERVER['REQUEST_URI'], 'lostpassword')) {
@@ -270,5 +269,4 @@ class Growtype_Form
     {
         return $this->version;
     }
-
 }

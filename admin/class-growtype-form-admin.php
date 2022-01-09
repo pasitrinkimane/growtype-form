@@ -92,9 +92,14 @@ class Growtype_Form_Admin
             add_action('admin_init', array ($this, 'examples_content'));
 
             /**
-             * AdminAppearanceMenu
+             * Admin menu in appearance menus
              */
             add_action('load-nav-menus.php', array ($this, 'add_nav_menu_meta_box'));
+
+            /**
+             * Load methods
+             */
+            $this->load_methods();
         } else {
             /**
              * Growtype form menu links update
@@ -166,6 +171,10 @@ class Growtype_Form_Admin
         );
     }
 
+    /**
+     * @param $current
+     * @return void
+     */
     function growtype_form_settings_tabs($current = 'login')
     {
         $tabs = [
@@ -186,6 +195,9 @@ class Growtype_Form_Admin
         echo '</h2>';
     }
 
+    /**
+     * @return void
+     */
     function growtype_form_settings_form()
     {
         if (isset($_GET['page']) && $_GET['page'] == 'growtype-form-settings') {
@@ -313,5 +325,24 @@ class Growtype_Form_Admin
 
             <?php
         }
+    }
+
+    /**
+     * Load the required methods for this plugin.
+     *
+     */
+    private function load_methods()
+    {
+        /**
+         * Load members
+         */
+
+        if ( !class_exists( 'WP_List_Table' ) ) require( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+        require_once( ABSPATH . 'wp-admin/includes/class-wp-users-list-table.php' );
+
+        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/users/class-growtype-form-members.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/users/class-growtype-form-members-list-table.php';
+
+        $this->loader = new Growtype_Form_Members();
     }
 }
