@@ -97,19 +97,5 @@ trait AdminAppearanceMenu
         </div>
         <?php
     }
-
-    /**
-     * @param $output
-     * @param $item
-     * @param $depth
-     * @param $args
-     * @return array|string|string[]
-     */
-    function update_growtype_form_frontend_menu_links($output, $item, $depth, $args)
-    {
-        $output = str_replace('#growtype_form_logout_url#', wp_logout_url(home_url()), $output);
-
-        return $output;
-    }
 }
 

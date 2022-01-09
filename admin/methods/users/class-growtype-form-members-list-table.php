@@ -1,13 +1,9 @@
 <?php
 /**
- * BuddyPress Members List Table class.
+ * Members List Table class.
  *
- * @package BuddyPress
- * @subpackage MembersAdminClasses
- * @since 2.3.0
  */
 
-// Exit if accessed directly.
 defined('ABSPATH') || exit;
 
 /**
@@ -17,7 +13,6 @@ defined('ABSPATH') || exit;
  */
 class Growtype_Form_Members_List_Table extends WP_Users_List_Table
 {
-
     /**
      * Signup counts.
      *
@@ -64,7 +59,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
             'offset' => ($paged - 1) * $signups_per_page,
             'number' => $signups_per_page,
             'usersearch' => $usersearch,
-            'orderby' => 'signup_id',
+            'orderby' => 'registered',
             'order' => 'DESC',
             'role__in' => $user_roles
         );
@@ -155,12 +150,12 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
          */
         return apply_filters('bp_members_signup_columns', array (
             'cb' => '<input type="checkbox" />',
-            'username' => __('Username', 'buddypress'),
-            'name' => __('Name', 'buddypress'),
-            'email' => __('Email', 'buddypress'),
-            'registered' => __('Registered', 'buddypress'),
-            'date_sent' => __('Last Sent', 'buddypress'),
-            'count_sent' => __('Emails Sent', 'buddypress')
+            'username' => __('Username', 'growtype-form'),
+            'name' => __('Name', 'growtype-form'),
+            'email' => __('Email', 'growtype-form'),
+            'registered' => __('Registered', 'growtype-form'),
+            'date_sent' => __('Last Sent', 'growtype-form'),
+            'count_sent' => __('Emails Sent', 'growtype-form')
         ));
     }
 
@@ -172,12 +167,12 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
     public function get_bulk_actions()
     {
         $actions = array (
-            'activate' => _x('Activate', 'Pending signup action', 'buddypress'),
-            'resend' => _x('Email', 'Pending signup action', 'buddypress'),
+            'activate' => _x('Activate', 'Pending signup action', 'growtype-form'),
+            'resend' => _x('Email', 'Pending signup action', 'growtype-form'),
         );
 
         if (current_user_can('delete_users')) {
-            $actions['delete'] = __('Delete', 'buddypress');
+            $actions['delete'] = __('Delete', 'growtype-form');
         }
 
         return $actions;
@@ -192,23 +187,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
      */
     public function no_items()
     {
-
-        if (bp_get_signup_allowed()) {
-            esc_html_e('No pending accounts found.', 'buddypress');
-        } else {
-            $link = false;
-
-            // Specific case when BuddyPress is not network activated.
-            if (is_multisite() && current_user_can('manage_network_users')) {
-                $link = sprintf('<a href="%1$s">%2$s</a>', esc_url(growtype_form_admin_url('settings.php')), esc_html__('Edit settings', 'buddypress'));
-            } elseif (current_user_can('manage_options')) {
-                $link = sprintf('<a href="%1$s">%2$s</a>', esc_url(growtype_form_admin_url('options-general.php')), esc_html__('Edit settings', 'buddypress'));
-            }
-
-            /* translators: %s: url to site settings */
-            printf(__('Registration is disabled. %s', 'buddypress'), $link);
-        }
-
+        esc_html_e('No pending accounts found.', 'growtype-form');
     }
 
     /**
@@ -221,7 +200,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
         return array (
             'username' => 'login',
             'email' => 'email',
-            'registered' => 'signup_id',
+            'registered' => 'registered',
         );
     }
 
@@ -271,7 +250,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
         ?>
         <label class="screen-reader-text" for="signup_<?php echo intval($signup_object->ID); ?>"><?php
             /* translators: accessibility text */
-            printf(esc_html__('Select user: %s', 'buddypress'), $signup_object->user_login);
+            printf(esc_html__('Select user: %s', 'growtype-form'), $signup_object->user_login);
             ?></label>
         <input type="checkbox" id="signup_<?php echo intval($signup_object->ID) ?>" name="allsignups[]" value="<?php echo esc_attr($signup_object->ID) ?>"/>
         <?php
@@ -322,11 +301,11 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
 
         $actions = array ();
 
-        $actions['activate'] = sprintf('<a href="%1$s">%2$s</a>', esc_url($activate_link), __('Activate', 'buddypress'));
-        $actions['resend'] = sprintf('<a href="%1$s">%2$s</a>', esc_url($email_link), __('Email', 'buddypress'));
+        $actions['activate'] = sprintf('<a href="%1$s">%2$s</a>', esc_url($activate_link), __('Activate', 'growtype-form'));
+        $actions['resend'] = sprintf('<a href="%1$s">%2$s</a>', esc_url($email_link), __('Email', 'growtype-form'));
 
         if (current_user_can('delete_users')) {
-            $actions['delete'] = sprintf('<a href="%1$s" class="delete">%2$s</a>', esc_url($delete_link), __('Delete', 'buddypress'));
+            $actions['delete'] = sprintf('<a href="%1$s" class="delete">%2$s</a>', esc_url($delete_link), __('Delete', 'growtype-form'));
         }
 
         /**
@@ -375,7 +354,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
      */
     public function column_registered($signup_object = null)
     {
-        echo mysql2date('Y/m/d', $signup_object->user_registered);
+        echo mysql2date('Y-m-d H:m:s', $signup_object->user_registered);
     }
 
     /**

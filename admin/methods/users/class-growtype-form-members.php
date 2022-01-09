@@ -16,6 +16,8 @@ if ( !class_exists( 'BP_Members_Admin' ) ) :
  */
 class Growtype_Form_Members {
 
+     use AdminSettingsSignup;
+     
 	/**
 	 * URL to the BP Members Admin directory.
 	 *
@@ -83,8 +85,8 @@ class Growtype_Form_Members {
 
 		// Manage signups.
 			$hooks['signups'] = $this->signups_page = add_users_page(
-				__( 'Manage Signups',  'buddypress' ),
-				__( 'Manage Signups',  'buddypress' ),
+				__( 'Manage Signups',  'growtype-form' ),
+				__( 'Manage Signups',  'growtype-form' ),
 				$this->capability,
 				'bp-signups',
 				array( $this, 'signups_admin' )
@@ -149,7 +151,7 @@ class Growtype_Form_Members {
 
 			// Add query args and setup the Extended link.
 			$edit_profile      = add_query_arg( $args, $this->edit_profile_url );
-			$edit_profile_link = sprintf( '<a href="%1$s">%2$s</a>',  esc_url( $edit_profile ), esc_html__( 'Extended', 'buddypress' ) );
+			$edit_profile_link = sprintf( '<a href="%1$s">%2$s</a>',  esc_url( $edit_profile ), esc_html__( 'Extended', 'growtype-form' ) );
 
 			/**
 			 * Check the edit action is available
@@ -251,43 +253,43 @@ class Growtype_Form_Members {
 			$bp_members_signup_list_table = self::get_list_table_class( 'Growtype_Form_Members_List_Table', 'users' );
 
 			// The per_page screen option.
-			add_screen_option( 'per_page', array( 'label' => _x( 'Pending Accounts', 'Pending Accounts per page (screen options)', 'buddypress' ) ) );
+			add_screen_option( 'per_page', array( 'label' => _x( 'Pending Accounts', 'Pending Accounts per page (screen options)', 'growtype-form' ) ) );
 
 			get_current_screen()->add_help_tab( array(
 				'id'      => 'bp-signups-overview',
-				'title'   => __( 'Overview', 'buddypress' ),
+				'title'   => __( 'Overview', 'growtype-form' ),
 				'content' =>
-				'<p>' . __( 'This is the administration screen for pending accounts on your site.', 'buddypress' ) . '</p>' .
-				'<p>' . __( 'From the screen options, you can customize the displayed columns and the pagination of this screen.', 'buddypress' ) . '</p>' .
-				'<p>' . __( 'You can reorder the list of your pending accounts by clicking on the Username, Email or Registered column headers.', 'buddypress' ) . '</p>' .
-				'<p>' . __( 'Using the search form, you can find pending accounts more easily. The Username and Email fields will be included in the search.', 'buddypress' ) . '</p>'
+				'<p>' . __( 'This is the administration screen for pending accounts on your site.', 'growtype-form' ) . '</p>' .
+				'<p>' . __( 'From the screen options, you can customize the displayed columns and the pagination of this screen.', 'growtype-form' ) . '</p>' .
+				'<p>' . __( 'You can reorder the list of your pending accounts by clicking on the Username, Email or Registered column headers.', 'growtype-form' ) . '</p>' .
+				'<p>' . __( 'Using the search form, you can find pending accounts more easily. The Username and Email fields will be included in the search.', 'growtype-form' ) . '</p>'
 			) );
 
 			get_current_screen()->add_help_tab( array(
 				'id'      => 'bp-signups-actions',
-				'title'   => __( 'Actions', 'buddypress' ),
+				'title'   => __( 'Actions', 'growtype-form' ),
 				'content' =>
-				'<p>' . __( 'Hovering over a row in the pending accounts list will display action links that allow you to manage pending accounts. You can perform the following actions:', 'buddypress' ) . '</p>' .
-				'<ul><li>' . __( '"Email" takes you to the confirmation screen before being able to send the activation link to the desired pending account. You can only send the activation email once per day.', 'buddypress' ) . '</li>' .
-				'<li>' . __( '"Delete" allows you to delete a pending account from your site. You will be asked to confirm this deletion.', 'buddypress' ) . '</li></ul>' .
-				'<p>' . __( 'By clicking on a Username you will be able to activate a pending account from the confirmation screen.', 'buddypress' ) . '</p>' .
-				'<p>' . __( 'Bulk actions allow you to perform these 3 actions for the selected rows.', 'buddypress' ) . '</p>'
+				'<p>' . __( 'Hovering over a row in the pending accounts list will display action links that allow you to manage pending accounts. You can perform the following actions:', 'growtype-form' ) . '</p>' .
+				'<ul><li>' . __( '"Email" takes you to the confirmation screen before being able to send the activation link to the desired pending account. You can only send the activation email once per day.', 'growtype-form' ) . '</li>' .
+				'<li>' . __( '"Delete" allows you to delete a pending account from your site. You will be asked to confirm this deletion.', 'growtype-form' ) . '</li></ul>' .
+				'<p>' . __( 'By clicking on a Username you will be able to activate a pending account from the confirmation screen.', 'growtype-form' ) . '</p>' .
+				'<p>' . __( 'Bulk actions allow you to perform these 3 actions for the selected rows.', 'growtype-form' ) . '</p>'
 			) );
 
 			// Help panel - sidebar links.
 			get_current_screen()->set_help_sidebar(
-				'<p><strong>' . __( 'For more information:', 'buddypress' ) . '</strong></p>' .
-				'<p>' . __( '<a href="https://buddypress.org/support/">Support Forums</a>', 'buddypress' ) . '</p>'
+				'<p><strong>' . __( 'For more information:', 'growtype-form' ) . '</strong></p>' .
+				'<p>' . __( '<a href="https://buddypress.org/support/">Support Forums</a>', 'growtype-form' ) . '</p>'
 			);
 
 			// Add accessible hidden headings and text for the Pending Users screen.
 			get_current_screen()->set_screen_reader_content( array(
 				/* translators: accessibility text */
-				'heading_views'      => __( 'Filter users list', 'buddypress' ),
+				'heading_views'      => __( 'Filter users list', 'growtype-form' ),
 				/* translators: accessibility text */
-				'heading_pagination' => __( 'Pending users list navigation', 'buddypress' ),
+				'heading_pagination' => __( 'Pending users list navigation', 'growtype-form' ),
 				/* translators: accessibility text */
-				'heading_list'       => __( 'Pending users list', 'buddypress' ),
+				'heading_list'       => __( 'Pending users list', 'growtype-form' ),
 			) );
 
 		} else {
@@ -435,7 +437,7 @@ class Growtype_Form_Members {
 							_nx( '%s activation email successfully sent! ', '%s activation emails successfully sent! ',
 							 absint( $_REQUEST['resent'] ),
 							 'signup resent',
-							 'buddypress'
+							 'growtype-form'
 							),
 							number_format_i18n( absint( $_REQUEST['resent'] ) )
 						);
@@ -447,7 +449,7 @@ class Growtype_Form_Members {
 							_nx( '%s activation email was not sent.', '%s activation emails were not sent.',
 							 absint( $_REQUEST['notsent'] ),
 							 'signup notsent',
-							 'buddypress'
+							 'growtype-form'
 							),
 							number_format_i18n( absint( $_REQUEST['notsent'] ) )
 						);
@@ -471,7 +473,7 @@ class Growtype_Form_Members {
 							_nx( '%s account successfully activated! ', '%s accounts successfully activated! ',
 							 absint( $_REQUEST['activated'] ),
 							 'signup resent',
-							 'buddypress'
+							 'growtype-form'
 							),
 							number_format_i18n( absint( $_REQUEST['activated'] ) )
 						);
@@ -483,7 +485,7 @@ class Growtype_Form_Members {
 							_nx( '%s account was not activated.', '%s accounts were not activated.',
 							 absint( $_REQUEST['notactivated'] ),
 							 'signup notsent',
-							 'buddypress'
+							 'growtype-form'
 							),
 							number_format_i18n( absint( $_REQUEST['notactivated'] ) )
 						);
@@ -507,7 +509,7 @@ class Growtype_Form_Members {
 							_nx( '%s sign-up successfully deleted!', '%s sign-ups successfully deleted!',
 							 absint( $_REQUEST['deleted'] ),
 							 'signup deleted',
-							 'buddypress'
+							 'growtype-form'
 							),
 							number_format_i18n( absint( $_REQUEST['deleted'] ) )
 						);
@@ -521,7 +523,7 @@ class Growtype_Form_Members {
 								'%s sign-up was not deleted.', '%s sign-ups were not deleted.',
 								$notdeleted,
 								'signup notdeleted',
-								'buddypress'
+								'growtype-form'
 							),
 							number_format_i18n( $notdeleted )
 						);
@@ -541,21 +543,21 @@ class Growtype_Form_Members {
 				case 'do_resend':
 					$notice = array(
 						'class'   => 'error',
-						'message' => esc_html__( 'There was a problem sending the activation emails. Please try again.', 'buddypress' ),
+						'message' => esc_html__( 'There was a problem sending the activation emails. Please try again.', 'growtype-form' ),
 					);
 					break;
 
 				case 'do_activate':
 					$notice = array(
 						'class'   => 'error',
-						'message' => esc_html__( 'There was a problem activating accounts. Please try again.', 'buddypress' ),
+						'message' => esc_html__( 'There was a problem activating accounts. Please try again.', 'growtype-form' ),
 					);
 					break;
 
 				case 'do_delete':
 					$notice = array(
 						'class'   => 'error',
-						'message' => esc_html__( 'There was a problem deleting sign-ups. Please try again.', 'buddypress' ),
+						'message' => esc_html__( 'There was a problem deleting sign-ups. Please try again.', 'growtype-form' ),
 					);
 					break;
 			}
@@ -673,20 +675,20 @@ class Growtype_Form_Members {
 		?>
 
 		<div class="wrap">
-			<h1 class="wp-heading-inline"><?php _e( 'Users', 'buddypress' ); ?></h1>
+			<h1 class="wp-heading-inline"><?php _e( 'Users', 'growtype-form' ); ?></h1>
 
 			<?php if ( current_user_can( 'create_users' ) ) : ?>
 
-				<a href="user-new.php" class="page-title-action"><?php echo esc_html_x( 'Add New', 'user', 'buddypress' ); ?></a>
+				<a href="user-new.php" class="page-title-action"><?php echo esc_html_x( 'Add New', 'user', 'growtype-form' ); ?></a>
 
 			<?php elseif ( is_multisite() && current_user_can( 'promote_users' ) ) : ?>
 
-				<a href="user-new.php" class="page-title-action"><?php echo esc_html_x( 'Add Existing', 'user', 'buddypress' ); ?></a>
+				<a href="user-new.php" class="page-title-action"><?php echo esc_html_x( 'Add Existing', 'user', 'growtype-form' ); ?></a>
 
 			<?php endif;
 
 			if ( $usersearch ) {
-				printf( '<span class="subtitle">' . __( 'Search results for &#8220;%s&#8221;', 'buddypress' ) . '</span>', esc_html( $usersearch ) );
+				printf( '<span class="subtitle">' . __( 'Search results for &#8220;%s&#8221;', 'growtype-form' ) . '</span>', esc_html( $usersearch ) );
 			}
 			?>
 
@@ -697,7 +699,7 @@ class Growtype_Form_Members {
 
 			<form id="bp-signups-search-form" action="<?php echo esc_url( $search_form_url ) ;?>">
 				<input type="hidden" name="page" value="<?php echo esc_attr( $plugin_page ); ?>" />
-				<?php $bp_members_signup_list_table->search_box( __( 'Search Pending Users', 'buddypress' ), 'bp-signups' ); ?>
+				<?php $bp_members_signup_list_table->search_box( __( 'Search Pending Users', 'growtype-form' ), 'bp-signups' ); ?>
 			</form>
 
 			<form id="bp-signups-form" action="<?php echo esc_url( $form_url );?>" method="post">
@@ -733,10 +735,26 @@ class Growtype_Form_Members {
 			return false;
 		}
 
-		// Query for signups, and filter out those IDs that don't
-		// correspond to an actual signup.
+         $orderby = 'registered';
+         $order = 'order';
+
+        if(isset($_POST['_wp_http_referer'])){
+         $url_parameters = parse_url($_POST['_wp_http_referer'])['query'];
+         $url_parameters = explode('&', $url_parameters);
+
+         foreach ($url_parameters as $param){
+             if(str_contains($param, 'orderby=')){
+                 $orderby = str_replace('orderby=','', $param);
+             } elseif(str_contains($param, 'order=')){
+                 $order = str_replace('order=','', $param);
+             }
+         }
+        }
+
 		$signups_query = get_users( array(
 			'include' => $ids,
+			'orderby' => $orderby,
+            'order' => $order
 		));
 
 		$signups    = $signups_query;
@@ -745,29 +763,29 @@ class Growtype_Form_Members {
 		// Set up strings.
 		switch ( $action ) {
 			case 'delete' :
-				$header_text = __( 'Delete Pending Accounts', 'buddypress' );
+				$header_text = __( 'Delete Pending Accounts', 'growtype-form' );
 				if ( 1 == count( $signup_ids ) ) {
-					$helper_text = __( 'You are about to delete the following account:', 'buddypress' );
+					$helper_text = __( 'You are about to delete the following account:', 'growtype-form' );
 				} else {
-					$helper_text = __( 'You are about to delete the following accounts:', 'buddypress' );
+					$helper_text = __( 'You are about to delete the following accounts:', 'growtype-form' );
 				}
 				break;
 
 			case 'activate' :
-				$header_text = __( 'Activate Pending Accounts', 'buddypress' );
+				$header_text = __( 'Activate Pending Accounts', 'growtype-form' );
 				if ( 1 == count( $signup_ids ) ) {
-					$helper_text = __( 'You are about to activate the following account:', 'buddypress' );
+					$helper_text = __( 'You are about to activate the following account:', 'growtype-form' );
 				} else {
-					$helper_text = __( 'You are about to activate the following accounts:', 'buddypress' );
+					$helper_text = __( 'You are about to activate the following accounts:', 'growtype-form' );
 				}
 				break;
 
 			case 'resend' :
-				$header_text = __( 'Resend Activation Emails', 'buddypress' );
+				$header_text = __( 'Resend Activation Emails', 'growtype-form' );
 				if ( 1 == count( $signup_ids ) ) {
-					$helper_text = __( 'You are about to resend an activation email to the following account:', 'buddypress' );
+					$helper_text = __( 'You are about to resend an activation email to the following account:', 'growtype-form' );
 				} else {
-					$helper_text = __( 'You are about to resend an activation email to the following accounts:', 'buddypress' );
+					$helper_text = __( 'You are about to resend an activation email to the following accounts:', 'growtype-form' );
 				}
 				break;
 		}
@@ -781,14 +799,11 @@ class Growtype_Form_Members {
 			'signup_ids' => implode( ',', $signup_ids )
 		);
 
-		if ( is_network_admin() ) {
-			$base_url = network_admin_url( 'users.php' );
-		} else {
-			$base_url = growtype_form_admin_url( 'users.php' );
-		}
+		$base_url = growtype_form_admin_url( 'users.php' );
 
 		$cancel_url = add_query_arg( $url_args, $base_url );
-		$action_url = wp_nonce_url(
+
+        $action_url = wp_nonce_url(
 			add_query_arg(
 				array_merge( $url_args, $action_args ),
 				$base_url
@@ -796,8 +811,6 @@ class Growtype_Form_Members {
 			'signups_' . $action
 		);
 
-		// Prefetch registration field data.
-		$fdata = array();
 		?>
 
 		<div class="wrap">
@@ -809,31 +822,40 @@ class Growtype_Form_Members {
 			<ol class="bp-signups-list">
 			<?php foreach ( $signups as $signup ) :
 				$last_notified = mysql2date( 'Y/m/d g:i:s a', $signup->date_sent );
-				$profile_field_ids = array();
 
-				// Get all xprofile field IDs except field 1.
-				if ( ! empty( $signup->meta['profile_field_ids'] ) ) {
-					$profile_field_ids = array_flip( explode( ',', $signup->meta['profile_field_ids'] ) );
-					unset( $profile_field_ids[1] );
-				} ?>
+                $signup_data = $this->growtype_form_get_user_signup_data($signup);
+
+                ?>
 
 				<li>
-					<strong><?php echo esc_html( $signup->user_login ) ?></strong>
-
 					<?php if ( 'activate' == $action ) : ?>
 						<table class="wp-list-table widefat fixed striped">
 							<tbody>
+
 								<tr>
-									<td class="column-fields"><?php esc_html_e( 'Display Name', 'buddypress' ); ?></td>
-									<td><?php echo esc_html( $signup->user_name ); ?></td>
+									<td class="column-fields"><?php esc_html_e( 'Display Name', 'growtype-form' ); ?></td>
+									<td><?php echo esc_html( $signup->display_name ); ?></td>
 								</tr>
 
 								<tr>
-									<td class="column-fields"><?php esc_html_e( 'Email', 'buddypress' ); ?></td>
+									<td class="column-fields"><?php esc_html_e( 'Email', 'growtype-form' ); ?></td>
 									<td><?php echo sanitize_email( $signup->user_email ); ?></td>
 								</tr>
 
+								<tr>
+									<td class="column-fields"><?php esc_html_e( 'Registration Date', 'growtype-form' ); ?></td>
+									<td><?php echo esc_html( $signup->user_registered ); ?></td>
+								</tr>
+
 								<?php
+
+								foreach ($signup_data as $data){ ?>
+                                    <tr>
+									<td class="column-fields"><?= $data['label'] ?></td>
+									<td><?= $data['value'] ?></td>
+								</tr>
+								<?php }
+
 								/**
 								 * Fires inside the table listing the activate action confirmation details.
 								 *
@@ -865,15 +887,38 @@ class Growtype_Form_Members {
 						<p class="description">
 							<?php
 							/* translators: %s: notification date */
-							printf( esc_html__( 'Last notified: %s', 'buddypress'), $last_notified );
+							printf( esc_html__( 'Last notified: %s', 'growtype-form'), $last_notified );
 							?>
 
 							<?php if ( ! empty( $signup->recently_sent ) ) : ?>
 
-								<span class="attention wp-ui-text-notification"> <?php esc_html_e( '(less than 24 hours ago)', 'buddypress' ); ?></span>
+								<span class="attention wp-ui-text-notification"> <?php esc_html_e( '(less than 24 hours ago)', 'growtype-form' ); ?></span>
 
 							<?php endif; ?>
 						</p>
+
+					<?php endif; ?>
+
+					<?php if ( 'delete' == $action ) : ?>
+
+						<table class="wp-list-table widefat fixed striped">
+							<tbody>
+								<tr>
+									<td class="column-fields"><?php esc_html_e( 'Display Name', 'growtype-form' ); ?></td>
+									<td><?php echo esc_html( $signup->display_name ); ?></td>
+								</tr>
+
+								<tr>
+									<td class="column-fields"><?php esc_html_e( 'Email', 'growtype-form' ); ?></td>
+									<td><?php echo sanitize_email( $signup->user_email ); ?></td>
+								</tr>
+
+								<tr>
+									<td class="column-fields"><?php esc_html_e( 'Registration Date', 'growtype-form' ); ?></td>
+									<td><?php echo esc_html( $signup->user_registered ); ?></td>
+								</tr>
+							</tbody>
+						</table>
 
 					<?php endif; ?>
 
@@ -884,12 +929,12 @@ class Growtype_Form_Members {
 
 			<?php if ( 'delete' === $action ) : ?>
 
-				<p><strong><?php esc_html_e( 'This action cannot be undone.', 'buddypress' ) ?></strong></p>
+				<p><strong><?php esc_html_e( 'This action cannot be undone.', 'growtype-form' ) ?></strong></p>
 
 			<?php endif ; ?>
 
-			<a class="button-primary" href="<?php echo esc_url( $action_url ); ?>"><?php esc_html_e( 'Confirm', 'buddypress' ); ?></a>
-			<a class="button" href="<?php echo esc_url( $cancel_url ); ?>"><?php esc_html_e( 'Cancel', 'buddypress' ) ?></a>
+			<a class="button-primary" href="<?php echo esc_url( $action_url ); ?>"><?php esc_html_e( 'Confirm', 'growtype-form' ); ?></a>
+			<a class="button" href="<?php echo esc_url( $cancel_url ); ?>"><?php esc_html_e( 'Cancel', 'growtype-form' ) ?></a>
 		</div>
 
 		<?php

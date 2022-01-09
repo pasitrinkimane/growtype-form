@@ -109,6 +109,20 @@ class Growtype_Form_Admin
     }
 
     /**
+     * @param $output
+     * @param $item
+     * @param $depth
+     * @param $args
+     * @return array|string|string[]
+     */
+    function update_growtype_form_frontend_menu_links($output, $item, $depth, $args)
+    {
+        $output = str_replace('#growtype_form_logout_url#', wp_logout_url(home_url()), $output);
+
+        return $output;
+    }
+
+    /**
      * Register the stylesheets for the admin area.
      *
      * @since    1.0.0
@@ -336,12 +350,11 @@ class Growtype_Form_Admin
         /**
          * Load members
          */
-
         if ( !class_exists( 'WP_List_Table' ) ) require( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
         require_once( ABSPATH . 'wp-admin/includes/class-wp-users-list-table.php' );
 
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/users/class-growtype-form-members.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/users/class-growtype-form-members-list-table.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/methods/users/class-growtype-form-members.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/methods/users/class-growtype-form-members-list-table.php';
 
         $this->loader = new Growtype_Form_Members();
     }

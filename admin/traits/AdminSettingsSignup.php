@@ -14,6 +14,9 @@
 
 trait AdminSettingsSignup
 {
+    /**
+     * @return void
+     */
     public function signup_content()
     {
         /**
@@ -244,5 +247,32 @@ trait AdminSettingsSignup
         ?>
         <input type="checkbox" name="growtype_form_allow_simple_password" value="1" <?php echo checked(1, $enabled, false) ?> />
         <?php
+    }
+
+    /**
+     * @param $user
+     * @return array
+     */
+    public function growtype_form_get_user_signup_data($user)
+    {
+        $user_meta = get_user_meta($user->ID);
+        $form_name = isset($user_meta['growtype_form_name']) ? $user_meta['growtype_form_name'][0] : null;
+        $json_form_encoded = get_option('growtype_form_signup_json_content');
+        $json_form = json_decode($json_form_encoded, true);
+        $form_data = isset($json_form[$form_name]) ? $json_form[$form_name] : $json_form['signup'];
+        $main_fields = $form_data['main_fields'];
+
+        $user_data = [];
+        foreach ($main_fields as $field) {
+            $meta_value = isset($field['name']) && isset($user_meta[$field['name']]) ? $user_meta[$field['name']][0] : null;
+            if (!empty($meta_value)) {
+                $user_data[$field['name']] = [
+                    'label' => $field['label'],
+                    'value' => $meta_value
+                ];
+            }
+        }
+
+        return $user_data;
     }
 }
