@@ -164,7 +164,7 @@ trait AdminSettingsWoocommercePlugin
         $selected = growtype_form_default_product_type();
         $options = wc_get_product_types();
         ?>
-        <select name='growtype_form_default_product_catalog_visibility'>
+        <select name='growtype_form_default_product_type'>
             <?php
             foreach ($options as $value => $option) { ?>
                 <option value='<?= $value ?>' <?php selected($selected, $value); ?>><?= $option ?></option>
