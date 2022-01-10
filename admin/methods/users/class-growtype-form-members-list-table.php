@@ -167,7 +167,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
     public function get_bulk_actions()
     {
         $actions = array (
-            'activate' => _x('Activate', 'Pending signup action', 'growtype-form'),
+            'activate' => _x('Evaluate', 'Pending signup action', 'growtype-form'),
             'resend' => _x('Email', 'Pending signup action', 'growtype-form'),
         );
 
@@ -301,7 +301,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
 
         $actions = array ();
 
-        $actions['activate'] = sprintf('<a href="%1$s">%2$s</a>', esc_url($activate_link), __('Activate', 'growtype-form'));
+        $actions['activate'] = sprintf('<a href="%1$s">%2$s</a>', esc_url($activate_link), __('Evaluate', 'growtype-form'));
         $actions['resend'] = sprintf('<a href="%1$s">%2$s</a>', esc_url($email_link), __('Email', 'growtype-form'));
 
         if (current_user_can('delete_users')) {

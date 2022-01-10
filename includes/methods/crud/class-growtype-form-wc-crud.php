@@ -80,7 +80,17 @@ class Growtype_Form_Wc_Crud
         if (!empty($existing_product)) {
             $product = $existing_product;
         } else {
-            $product = new WC_Product_Simple();
+            if (growtype_form_default_product_type() === 'grouped') {
+                $product = new WC_Product_Grouped();
+            } elseif (growtype_form_default_product_type() === 'external') {
+                $product = new WC_Product_External();
+            } elseif (growtype_form_default_product_type() === 'variable') {
+                $product = new WC_Product_Variable();
+            } elseif (class_exists('WC_Product_Auction') && growtype_form_default_product_type() === 'auction') {
+                $product = new WC_Product_Auction();
+            } else {
+                $product = new WC_Product_Simple();
+            }
         }
 
         $product->set_name($product_title);

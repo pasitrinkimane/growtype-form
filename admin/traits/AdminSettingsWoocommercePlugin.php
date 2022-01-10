@@ -82,6 +82,23 @@ trait AdminSettingsWoocommercePlugin
             'growtype-form-settings',
             'growtype_form_settings_woocommerce'
         );
+
+        /**
+         * Default product type
+         */
+        register_setting(
+            'growtype_form_settings_woocommerce', // settings group name
+            'growtype_form_default_product_type', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_default_product_type',
+            'Default Product Type',
+            array ($this, 'growtype_form_default_product_type_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_woocommerce'
+        );
     }
 
     /**
@@ -129,6 +146,23 @@ trait AdminSettingsWoocommercePlugin
     {
         $selected = growtype_form_default_product_catalog_visibility();
         $options = wc_get_product_visibility_options();
+        ?>
+        <select name='growtype_form_default_product_catalog_visibility'>
+            <?php
+            foreach ($options as $value => $option) { ?>
+                <option value='<?= $value ?>' <?php selected($selected, $value); ?>><?= $option ?></option>
+            <?php } ?>
+        </select>
+        <?php
+    }
+
+    /**
+     * Catalog visibility
+     */
+    function growtype_form_default_product_type_callback()
+    {
+        $selected = growtype_form_default_product_type();
+        $options = wc_get_product_types();
         ?>
         <select name='growtype_form_default_product_catalog_visibility'>
             <?php

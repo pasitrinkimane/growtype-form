@@ -772,7 +772,7 @@ class Growtype_Form_Members {
 				break;
 
 			case 'activate' :
-				$header_text = __( 'Activate Pending Accounts', 'growtype-form' );
+				$header_text = __( 'Evaluate Pending Accounts', 'growtype-form' );
 				if ( 1 == count( $signup_ids ) ) {
 					$helper_text = __( 'You are about to activate the following account:', 'growtype-form' );
 				} else {
