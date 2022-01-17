@@ -81,6 +81,23 @@ trait AdminSettingsLogin
             'growtype-form-settings',
             'growtype_form_settings_login'
         );
+
+        /**
+         * Redirect after login
+         */
+        register_setting(
+            'growtype_form_settings_login', // settings group name
+            'growtype_form_login_show_footer', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_login_show_footer',
+            'Show Footer',
+            array ($this, 'growtype_form_login_show_footer_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_login'
+        );
     }
 
     /**
@@ -144,6 +161,17 @@ trait AdminSettingsLogin
                 <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>
             <?php } ?>
         </select>
+        <?php
+    }
+
+    /**
+     * Login show footer
+     */
+    function growtype_form_login_show_footer_callback()
+    {
+        $enabled = get_option('growtype_form_login_show_footer');
+        ?>
+        <input type="checkbox" name="growtype_form_login_show_footer" value="1" <?php echo checked(1, $enabled, false) ?> />
         <?php
     }
 }

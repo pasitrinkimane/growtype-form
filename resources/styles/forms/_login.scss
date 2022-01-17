@@ -1,6 +1,31 @@
 .login-template-default {
   .growtype-form-container {
-    max-width: 350px;
+    max-width: 558px;
+  }
+
+  .alert {
+    max-width: 90% !important;
+  }
+
+  .form-wrapper {
+    box-shadow: 0px 0px 16px 0px #e3e3e3;
+    border-radius: 10px;
+  }
+
+  .e-title-intro {
+    padding: 25px;
+    font-size: 18px;
+    margin: 0;
+    text-align: center;
+
+    &:before {
+      content: none;
+    }
+  }
+
+  form {
+    padding: 30px;
+    border-top: 2px solid #efefef;
   }
 
   .form-wrapper {
@@ -9,8 +34,8 @@
 
   .btn-recover-password {
     position: absolute;
-    top: 248px;
-    right: 0;
+    bottom: 205px;
+    right: 30px;
     font-size: 14px;
     text-decoration: none;
     border: none;
@@ -18,6 +43,29 @@
 
   .login-submit {
     padding-top: 5px;
+  }
+
+  input[type=submit] {
+    max-width: initial !important;
+  }
+
+  .btn-link {
+    font-weight: bold;
+  }
+
+  .b-actions {
+    margin: 0;
+    background: #F5F6F7;
+    color: #9A9EA7;
+    padding: 20px;
+
+    a {
+      font-weight: bold;
+    }
+
+    .btn-link {
+      color: #9A9EA7;
+    }
   }
 }
 

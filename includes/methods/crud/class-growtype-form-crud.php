@@ -315,33 +315,40 @@ class Growtype_Form_Crud
      */
     function sanitize_form_submitted_values($form_data, $submitted_values)
     {
-        $available_fields = $form_data['main_fields'] ?? null;
+        $available_fields = [];
 
-        if (empty($available_fields)) {
-            return null;
-        }
-
-        if (isset($form_data['confirmation_fields']) && !empty($form_data['confirmation_fields'])) {
-            $available_fields = array_merge($form_data['main_fields'], $form_data['confirmation_fields']);
-        }
-
-        $available_fields_names = [];
-        foreach ($available_fields as $field) {
-            if (isset($field['name'])) {
-                $field_name = strtok($field['name'], '[');
-                array_push($available_fields_names, $field_name);
+        foreach ($form_data as $key => $field_group) {
+            if (str_contains('main_fields', $key) || str_contains('repeater_fields', $key) || str_contains('confirmation_fields', $key)) {
+                if (str_contains('repeater_fields', $key)) {
+                    array_push($available_fields, array_column($field_group[0]['fields'], 'name'));
+                } else {
+                    array_push($available_fields, array_column($field_group, 'name'));
+                }
             }
         }
 
+        /**
+         * Flatten array
+         */
+        array_walk_recursive($available_fields, function ($v) use (&$required_fields_names) {
+            $required_fields_names[] = $v;
+        });
+
+        /**
+         * Submitted values
+         */
         $submitted_data = array_merge($submitted_values['data'], $submitted_values['files']);
 
         $submitted_values_sanitized = [];
+        $submitted_values_notsanitized = [];
         foreach ($submitted_data as $key => $value) {
             if (in_array($key, self::EXCLUDED_VALUES_FROM_VALIDATION)) {
                 continue;
             }
-            if (!in_array($key, $available_fields_names)) {
-                return null;
+
+            if (!in_array($key, $required_fields_names)) {
+                array_push($submitted_values_notsanitized, $key);
+                continue;
             }
 
             /**
@@ -352,6 +359,25 @@ class Growtype_Form_Crud
             }
 
             $submitted_values_sanitized[$key] = $value;
+        }
+
+        /**
+         * Recheck values which did not passed initial validation
+         */
+        if (!empty($submitted_values_notsanitized)) {
+            $passed_values = [];
+            foreach ($submitted_values_notsanitized as $value) {
+                $match = array_filter($required_fields_names, function ($key) use ($value) {
+                    return str_contains($value, $key);
+                });
+
+                if ($match) {
+                    array_push($passed_values, $value);
+                }
+            }
+            if ($passed_values !== $submitted_values_notsanitized) {
+                return null;
+            }
         }
 
         return $submitted_values_sanitized;

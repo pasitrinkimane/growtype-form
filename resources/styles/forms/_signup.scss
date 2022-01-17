@@ -1,6 +1,64 @@
 .signup-template-default {
   .growtype-form-container {
-    max-width: 450px;
+    max-width: 1100px;
+    box-shadow: 0px 0px 17px 0px #e1e1e1;
+    padding: 40px;
+    border-radius: 12px;
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+    @include bp-phone-xl() {
+      max-width: 100%;
+    }
+  }
+
+  .b-intro {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    border-bottom: 2px solid #ebebeb;
+    margin-bottom: 35px;
+    padding-left: 40px;
+    padding-right: 40px;
+    @include bp-phone-xl() {
+      margin-bottom: 10px;
+    }
+  }
+
+  #growtype-form {
+    padding-left: 40px;
+    padding-right: 40px;
+    @include bp-phone-xl() {
+      padding-right: 20px;
+      padding-left: 20px;
+    }
+  }
+
+  .e-title-intro {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 0;
+
+    &:before {
+      content: none;
+    }
+  }
+
+  h3 {
+    font-size: 18px;
+    position: relative;
+
+    &:before {
+      content: "";
+      height: 3px;
+      width: 30px;
+      background: #7963F0;
+      display: inline-block;
+      position: absolute;
+      bottom: -12px;
+    }
   }
 
   .fields-confirmation {
@@ -11,6 +69,22 @@
     margin-right: auto;
     position: relative;
     bottom: -5px;
+  }
+
+  .form-label {
+    font-weight: bold;
+  }
+
+  .woocommerce form .form-row input.input-text, .woocommerce form .form-row textarea, input:not([type=checkbox]):not([type=radio]):not([type=submit]):not(.qty), textarea {
+    border-radius: 5px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 14px;
+
+    &::placeholder {
+      font-weight: bold;
+      font-size: 14px;
+    }
   }
 }
 
