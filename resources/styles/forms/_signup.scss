@@ -12,6 +12,33 @@
     }
   }
 
+  .btn-secondary {
+    @include bp-phone-xl() {
+      width: 100%;
+    }
+  }
+
+  .growtype-form-wrapper form button[type=submit] {
+    width: initial;
+    min-width: 250px;
+    @include bp-phone-xl() {
+      width: 100%;
+      min-width: initial;
+    }
+  }
+
+  .fields-confirmation {
+    .col-auto {
+      padding-left: 0;
+    }
+
+    .form-label {
+      color: #9A9EA7;
+      margin: 0;
+      position: relative;
+    }
+  }
+
   .b-intro {
     position: relative;
     display: flex;
@@ -22,8 +49,27 @@
     margin-bottom: 35px;
     padding-left: 40px;
     padding-right: 40px;
+    align-items: center;
     @include bp-phone-xl() {
       margin-bottom: 10px;
+      padding-left: 25px;
+      padding-right: 25px;
+    }
+
+    .e-title-intro {
+      text-align: center;
+      font-size: 18px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+      height: 22px;
+
+      &:before {
+        content: none;
+      }
     }
   }
 
@@ -33,16 +79,6 @@
     @include bp-phone-xl() {
       padding-right: 20px;
       padding-left: 20px;
-    }
-  }
-
-  .e-title-intro {
-    text-align: center;
-    font-size: 18px;
-    margin-bottom: 0;
-
-    &:before {
-      content: none;
     }
   }
 
@@ -64,27 +100,12 @@
   .fields-confirmation {
     margin-top: 5px;
     max-width: 320px;
-    margin-left: auto;
     display: block;
     margin-right: auto;
     position: relative;
     bottom: -5px;
-  }
-
-  .form-label {
-    font-weight: bold;
-  }
-
-  .woocommerce form .form-row input.input-text, .woocommerce form .form-row textarea, input:not([type=checkbox]):not([type=radio]):not([type=submit]):not(.qty), textarea {
-    border-radius: 5px;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    font-size: 14px;
-
-    &::placeholder {
-      font-weight: bold;
-      font-size: 14px;
-    }
+    margin-left: 0;
+    margin-bottom: 10px;
   }
 }
 

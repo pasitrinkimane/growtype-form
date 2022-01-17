@@ -26,6 +26,9 @@
   form {
     padding: 30px;
     border-top: 2px solid #efefef;
+    @include bp-phone-xl() {
+      padding: 30px 20px;
+    }
   }
 
   .form-wrapper {
@@ -39,6 +42,9 @@
     font-size: 14px;
     text-decoration: none;
     border: none;
+    @include bp-phone-xl() {
+      bottom: 207px;
+    }
   }
 
   .login-submit {
@@ -61,10 +67,6 @@
 
     a {
       font-weight: bold;
-    }
-
-    .btn-link {
-      color: #9A9EA7;
     }
   }
 }

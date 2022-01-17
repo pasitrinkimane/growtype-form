@@ -36,7 +36,7 @@ trait AdminSettingsSignup
         );
 
         /**
-         * Register page
+         * Signup page
          */
         register_setting(
             'growtype_form_settings_signup', // settings group name
@@ -135,6 +135,39 @@ trait AdminSettingsSignup
             'growtype-form-settings',
             'growtype_form_settings_signup'
         );
+
+        /**
+         * Terms page
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_signup_terms_page'
+        );
+
+        add_settings_field(
+            'growtype_form_signup_terms_page',
+            '"Terms And Conditions" Page',
+            array ($this, 'growtype_form_signup_terms_page_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_signup'
+        );
+
+        /**
+         * Show footer
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_signup_show_footer', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_signup_show_footer',
+            'Show Footer',
+            array ($this, 'growtype_form_signup_show_footer_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_signup'
+        );
     }
 
     /**
@@ -156,6 +189,24 @@ trait AdminSettingsSignup
         $pages = get_pages();
         ?>
         <select name='growtype_form_signup_page'>
+            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <?php
+            foreach ($pages as $page) { ?>
+                <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>
+            <?php } ?>
+        </select>
+        <?php
+    }
+
+    /**
+     * Terms page
+     */
+    function growtype_form_signup_terms_page_callback()
+    {
+        $selected = get_option('growtype_form_signup_terms_page');
+        $pages = get_pages();
+        ?>
+        <select name='growtype_form_signup_terms_page'>
             <option value='none' <?php selected($selected, 'none'); ?>>none</option>
             <?php
             foreach ($pages as $page) { ?>
@@ -274,5 +325,16 @@ trait AdminSettingsSignup
         }
 
         return $user_data;
+    }
+
+    /**
+     * Show footer
+     */
+    function growtype_form_signup_show_footer_callback()
+    {
+        $enabled = get_option('growtype_form_signup_show_footer');
+        ?>
+        <input type="checkbox" name="growtype_form_signup_show_footer" value="1" <?php echo checked(1, $enabled, false) ?> />
+        <?php
     }
 }

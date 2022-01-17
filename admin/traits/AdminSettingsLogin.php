@@ -83,7 +83,7 @@ trait AdminSettingsLogin
         );
 
         /**
-         * Redirect after login
+         * Show footer
          */
         register_setting(
             'growtype_form_settings_login', // settings group name

@@ -13,7 +13,7 @@ function growtype_form_user_profile_url()
  * @return false|string|WP_Error|null
  * Custom login url
  */
-function growtype_form_login_url()
+function growtype_form_login_page_url()
 {
     return !empty(growtype_form_login_page()) ? get_permalink(growtype_form_login_page()) : null;
 }
@@ -22,7 +22,7 @@ function growtype_form_login_url()
  * @return false|string|WP_Error|null
  * Custom signup url
  */
-function growtype_form_signup_url()
+function growtype_form_signup_page_url()
 {
     return !empty(growtype_form_signup_page()) ? get_permalink(growtype_form_signup_page()) : null;
 }
@@ -31,7 +31,7 @@ function growtype_form_signup_url()
  * @return false|string|WP_Error|null
  * Custom lost password url
  */
-function growtype_form_lostpassword_url()
+function growtype_form_lost_password_page_url()
 {
     return wp_lostpassword_url();
 }

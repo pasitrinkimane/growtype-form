@@ -4,7 +4,7 @@ use function App\sage;
 
 function growtype_form_include_view($path, $data = null)
 {
-    $plugin_root = plugin_dir_path(__DIR__);
+    $plugin_root = plugin_dir_path(dirname(__DIR__));
     $full_path = $plugin_root . 'resources/views/' . str_replace('.', '/', $path) . '.blade.php';
 
     if (empty($data)) {

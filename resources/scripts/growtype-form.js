@@ -62,7 +62,6 @@ function cloneReapeaterForm($duplicateBtn) {
  * @param newFormNr
  */
 function renameClonedForm(initialRepeaterForm, repeaterFormClone, newFormNr) {
-    console.log('renameClonedForm')
     initialRepeaterForm.find('div').map(function (index, element) {
         let groupName = $(element).attr('data-name');
         if (typeof groupName !== 'undefined' && groupName.length > 0) {
@@ -85,23 +84,27 @@ function renameClonedForm(initialRepeaterForm, repeaterFormClone, newFormNr) {
  *
  */
 function removeRepeaterForm(removeBtn) {
-    console.log('removeRepeaterForm')
     removeBtn.click(function () {
         let repeaterForm = $(this).closest('.repeater-fields');
         if (repeaterForm.find('.btn-wrapper:visible').length > 0) {
-            repeaterForm.prev('.repeater-fields').find('.btn-wrapper').fadeIn();
-            repeaterForm.remove();
+            repeaterForm.fadeOut().promise().done(function () {
+                repeaterForm.prev('.repeater-fields').find('.btn-wrapper').fadeIn();
+                $(this).remove();
+            })
         } else {
-            repeaterForm.remove();
-            $('.repeater-fields').not('[data-form-nr="1"]').map(function (index, element) {
-                let formNr = index + 2;
-                $(element).attr('data-form-nr', formNr)
-                    .find('.e-counter')
-                    .text(formNr);
-                renameClonedForm($('.repeater-fields[data-form-nr="1"]'), $(element), formNr);
+            repeaterForm.fadeOut().promise().done(function () {
+                $(this).remove();
+                $('.repeater-fields').not('[data-form-nr="1"]').map(function (index, element) {
+                    let formNr = index + 2;
+                    $(element).attr('data-form-nr', formNr)
+                        .find('.e-counter')
+                        .hide()
+                        .text(formNr)
+                        .fadeIn();
+                    renameClonedForm($('.repeater-fields[data-form-nr="1"]'), $(element), formNr);
+                });
             });
         }
-
     });
 }
 

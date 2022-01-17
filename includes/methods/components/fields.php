@@ -57,11 +57,11 @@ if (!in_array($field_type, self::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {
                 $field_options = array ('' => __('Select a country / region&hellip;', 'woocommerce')) + WC()->countries->get_allowed_countries();
 
                 foreach ($field_options as $key => $field_option) { ?>
-                    <option value="<?= $key ?>"><?= $field_option ?></option>
+                    <option value="<?= $key ?>" <?= isset($_REQUEST[$field_name]) && $_REQUEST[$field_name] === $key ? 'selected' : '' ?>><?= $field_option ?></option>
                 <?php }
             } else {
                 foreach ($field_options as $field_option) { ?>
-                    <option value="<?= sanitize_text_field($field_option['value']) ?>"><?= sanitize_text_field($field_option['label']) ?></option>
+                    <option value="<?= sanitize_text_field($field_option['value']) ?>" <?= isset($_REQUEST[$field_name]) && $_REQUEST[$field_name] === $field_option['value'] ? 'selected' : '' ?>><?= sanitize_text_field($field_option['label']) ?></option>
                 <?php }
             } ?>
         </select>

@@ -21,7 +21,7 @@ class Growtype_Form_Login
     function custom_login_url($login_url = '', $redirect = '')
     {
         if (isset($_GET["action"]) && $_GET["action"] === 'lostpassword') {
-            $login_url = growtype_form_login_url();
+            $login_url = growtype_form_login_page_url();
         }
 
         return $login_url;
@@ -56,9 +56,9 @@ class Growtype_Form_Login
 
         if (!empty($referrer) && !empty(growtype_form_login_page())) {
             if (!empty($_GET['loggedout'])) {
-                return wp_redirect(add_query_arg('action', 'loggedout', growtype_form_login_url()));
+                return wp_redirect(add_query_arg('action', 'loggedout', growtype_form_login_page_url()));
             } else {
-                return wp_redirect(add_query_arg('action', 'failed', growtype_form_login_url()));
+                return wp_redirect(add_query_arg('action', 'failed', growtype_form_login_page_url()));
             }
         }
     }
@@ -119,14 +119,14 @@ class Growtype_Form_Login
 
                     <?php
                     if ($args['lost_password_btn']) { ?>
-                        <a class="btn btn-link btn-recover-password" href="<?= growtype_form_lostpassword_url() ?>"><?= __("Lost your password?", "growtype-registration") ?></a>
+                        <a class="btn btn-link btn-recover-password" href="<?= growtype_form_lost_password_page_url() ?>"><?= __("Lost your password?", "growtype-registration") ?></a>
                     <?php } ?>
 
                     <div class="b-actions">
                         <?php
                         if ($args['sign_up_btn']) { ?>
                             <label for=""><?= __("You don’t have an account?", "growtype-registration") ?></label>
-                            <a class="btn btn-link" href="<?= growtype_form_signup_url() ?>"><?= __("Sign up", "growtype-registration") ?></a>
+                            <a class="btn btn-link" href="<?= growtype_form_signup_page_url() ?>"><?= __("Sign up", "growtype-registration") ?></a>
                         <?php } ?>
                     </div>
                 </div>

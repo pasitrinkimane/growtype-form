@@ -65,6 +65,10 @@ class Growtype_Form_Render
 
         if (growtype_form_signup_page_is_active()) {
             $classes[] = 'signup-' . growtype_form_get_signup_page_template();
+
+            if (empty(get_option('growtype_form_signup_show_footer')) || !get_option('growtype_form_signup_show_footer')) {
+                $classes[] = 'footer-disabled';
+            }
         }
 
         return $classes;
@@ -215,17 +219,15 @@ class Growtype_Form_Render
 
             <div class="growtype-form-container">
                 <div class="form-wrapper">
+
                     <div class="b-intro">
-                        <div class="btn-back">
-                            <span class="dashicons dashicons-arrow-left-alt"></span>
-                        </div>
+                        <a href="<?= growtype_form_login_page_url() ?>" class="btn-back"></a>
+
                         <?php if (!empty($form_title)) { ?>
                             <h2 class="e-title-intro"><?= $form_title ?></h2>
                         <?php } ?>
-                        <div class="btn-close-wp">
-                            <span class="dashicons dashicons-no-alt"></span>
-                        </div>
                     </div>
+
                     <form id="growtype-form" enctype="multipart/form-data" class="form" action="<?php the_permalink(); ?>" method="post" data-name="<?= $form_name ?>">
                         <?php
                         $repeater_nr = 1;
@@ -304,7 +306,7 @@ class Growtype_Form_Render
                     if ($login_btn) { ?>
                         <div class="b-actions">
                             <label for=""><?= __("Do you already have an account?", "growtype-registration") ?></label>
-                            <a class="btn btn-link" href="<?= growtype_form_login_url() ?>"><?= __("Sign in", "growtype-registration") ?></a>
+                            <a class="btn btn-link" href="<?= growtype_form_login_page_url() ?>"><?= __("Sign in", "growtype-registration") ?></a>
                         </div>
                     <?php } ?>
 
@@ -313,6 +315,8 @@ class Growtype_Form_Render
         </div>
 
         <?php
+
+        echo growtype_form_include_view('modals/terms');
 
         return ob_get_clean();
     }
