@@ -69,8 +69,8 @@ class Growtype_Form_Login
      */
     public static function render_growtype_login_form($form_data)
     {
-        $args = self::get_growtype_login_form_args($form_data);
-        $wp_login_form_args = $args['wp_login_form'];
+        $login_form_args = self::get_growtype_login_form_args($form_data);
+        $wp_login_form_args = $login_form_args['wp_login_form'];
 
         $message = "";
 
@@ -89,7 +89,7 @@ class Growtype_Form_Login
         <div class="growtype-form-wrapper">
             <div class="growtype-form-container">
                 <?php
-                if ($args['logo'] === true) { ?>
+                if ($login_form_args['logo'] === true) { ?>
                     <div class="logo-wrapper">
                         <a href="<?= get_home_url() ?>" class="e-logo">
                             <img src="<?= get_login_logo()['url'] ?>" class="img-fluid"/>
@@ -111,20 +111,20 @@ class Growtype_Form_Login
 
                 <div class="form-wrapper">
                     <?php
-                    if (!empty($args['title'])) { ?>
-                        <h2 class="e-title-intro"><?= $args['title'] ?></h2>
+                    if (!empty($login_form_args['title'])) { ?>
+                        <h2 class="e-title-intro"><?= $login_form_args['title'] ?></h2>
                     <?php } ?>
 
                     <?= wp_login_form($wp_login_form_args) ?>
 
                     <?php
-                    if ($args['lost_password_btn']) { ?>
+                    if ($login_form_args['lost_password_btn']) { ?>
                         <a class="btn btn-link btn-recover-password" href="<?= growtype_form_lost_password_page_url() ?>"><?= __("Lost your password?", "growtype-registration") ?></a>
                     <?php } ?>
 
                     <div class="b-actions">
                         <?php
-                        if ($args['sign_up_btn']) { ?>
+                        if ($login_form_args['sign_up_btn']) { ?>
                             <label for=""><?= __("You don’t have an account?", "growtype-registration") ?></label>
                             <a class="btn btn-link" href="<?= growtype_form_signup_page_url() ?>"><?= __("Sign up", "growtype-registration") ?></a>
                         <?php } ?>
@@ -132,6 +132,22 @@ class Growtype_Form_Login
                 </div>
             </div>
         </div>
+
+        <?php
+        if (isset($login_form_args['username_placeholder'])) { ?>
+            <script>
+                var userLogin = document.getElementById("user_login");
+                userLogin.setAttribute("placeholder", "<?= $login_form_args['username_placeholder'] ?>");
+            </script>
+        <?php } ?>
+
+        <?php
+        if (isset($login_form_args['password_placeholder'])) { ?>
+            <script>
+                var userPass = document.getElementById("user_pass");
+                userPass.setAttribute("placeholder", "<?= $login_form_args['password_placeholder'] ?>");
+            </script>
+        <?php } ?>
 
         <?php
 
@@ -148,27 +164,35 @@ class Growtype_Form_Login
         $logo = $form['logo'] ?? null;
         $sign_up_btn = $form['sign_up_btn'] ?? null;
         $lost_password_btn = $form['lost_password_btn'] ?? null;
-        $redirect = isset($form['redirect']) && !empty($form['redirect']) ? $form['redirect'] : admin_url();
-        $form_id = isset($form['form_id']) && !empty($form['form_id']) ? $form['form_id'] : 'loginform-custom';
-        $label_username = isset($form['label_username']) && !empty($form['label_username']) ? $form['label_username'] : __('Username', "growtype-form");
-        $label_password = isset($form['label_password']) && !empty($form['label_password']) ? $form['label_password'] : __('Password', "growtype-form");
-        $label_remember = isset($form['label_remember']) && !empty($form['label_remember']) ? $form['label_remember'] : __('Remember Me', "growtype-form");
-        $label_log_in = isset($form['label_log_in']) && !empty($form['label_log_in']) ? $form['label_log_in'] : __('Log In', "growtype-form");
-        $remember = isset($form['remember']) && !empty($form['remember']) ? $form['remember'] : true;
+        $username_placeholder = $form['username_placeholder'] ?? null;
+        $password_placeholder = $form['password_placeholder'] ?? null;
+
+        $wp_login_form = $form['wp_login_form'][0] ?? null;
+        $redirect = isset($wp_login_form['redirect']) && !empty($wp_login_form['redirect']) ? $wp_login_form['redirect'] : admin_url();
+        $wp_login_form_id = isset($wp_login_form['form_id']) && !empty($wp_login_form['form_id']) ? $wp_login_form['form_id'] : 'loginform-custom';
+        $label_username = isset($wp_login_form['label_username']) && !empty($wp_login_form['label_username']) ? $wp_login_form['label_username'] : __('Username', "growtype-form");
+        $label_password = isset($wp_login_form['label_password']) && !empty($wp_login_form['label_password']) ? $wp_login_form['label_password'] : __('Password', "growtype-form");
+        $label_remember = isset($wp_login_form['label_remember']) && !empty($wp_login_form['label_remember']) ? $wp_login_form['label_remember'] : __('Remember Me', "growtype-form");
+        $label_log_in = isset($wp_login_form['label_log_in']) && !empty($wp_login_form['label_log_in']) ? $wp_login_form['label_log_in'] : __('Log In', "growtype-form");
+        $remember = isset($wp_login_form['remember']) && !empty($wp_login_form['remember']) ? $wp_login_form['remember'] : true;
 
         return [
             'title' => $title,
             'logo' => $logo,
             'sign_up_btn' => $sign_up_btn,
             'lost_password_btn' => $lost_password_btn,
+            'username_placeholder' => $username_placeholder,
+            'password_placeholder' => $password_placeholder,
             'wp_login_form' => [
                 'redirect' => $redirect,
-                'form_id' => $form_id,
+                'form_id' => $wp_login_form_id,
                 'label_username' => $label_username,
                 'label_password' => $label_password,
                 'label_remember' => $label_remember,
                 'label_log_in' => $label_log_in,
-                'remember' => $remember
+                'remember' => $remember,
+                'placeholder_username' => __('Your username...'),
+                'placeholder_password' => __('Your password...')
             ]
         ];
     }

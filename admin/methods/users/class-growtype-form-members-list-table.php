@@ -61,7 +61,9 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
             'usersearch' => $usersearch,
             'orderby' => 'registered',
             'order' => 'DESC',
-            'role__in' => $user_roles
+            'role__in' => $user_roles,
+            'meta_key' => 'paying_customer',
+            'meta_value' => '1',
         );
 
         if (isset($_REQUEST['orderby'])) {

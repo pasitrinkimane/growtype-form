@@ -854,7 +854,29 @@ class Growtype_Form_Members {
 									<td class="column-fields"><?= $data['label'] ?></td>
 									<td><?= $data['value'] ?></td>
 								</tr>
-								<?php }
+								<?php } ?>
+								<?php
+								if(function_exists('get_user_purchased_products_ids')){
+                                    $user_purchased_products = get_user_purchased_products_ids($signup->ID);
+                                    ?>
+                                  <tr>
+									<td class="column-fields"><?= __('User has bought products:') ?></td>
+									<td>
+									<?php
+									if(!empty($user_purchased_products)){
+                                     foreach ($user_purchased_products as $product_id){
+                                         $product = wc_get_product( $product_id );
+                                         echo $product->get_title();
+									 }
+									} else{
+                                        echo '-';
+									}
+                                     ?>
+                                     </td>
+								</tr>
+								<?php } ?>
+
+                                <?php
 
 								/**
 								 * Fires inside the table listing the activate action confirmation details.
@@ -868,6 +890,10 @@ class Growtype_Form_Members {
 
 							</tbody>
 						</table>
+
+						<div class="actions" style="display: flex;justify-content: flex-end;padding-top: 20px;">
+						<a href="<?= get_edit_user_link($signup->ID) ?>" target="_blank" class="button-primary"><?= __('User profile details', 'growtype-form') ?></a>
+						</div>
 
 						<?php
 						/**
@@ -927,6 +953,7 @@ class Growtype_Form_Members {
 			<?php endforeach; ?>
 			</ol>
 
+			<div class="actions" style="margin-top: 20px;border-top: 1px solid #c8c8c8;padding: 20px;">
 			<?php if ( 'delete' === $action ) : ?>
 
 				<p><strong><?php esc_html_e( 'This action cannot be undone.', 'growtype-form' ) ?></strong></p>
@@ -935,6 +962,7 @@ class Growtype_Form_Members {
 
 			<a class="button-primary" href="<?php echo esc_url( $action_url ); ?>"><?php esc_html_e( 'Confirm', 'growtype-form' ); ?></a>
 			<a class="button" href="<?php echo esc_url( $cancel_url ); ?>"><?php esc_html_e( 'Cancel', 'growtype-form' ) ?></a>
+</div>
 		</div>
 
 		<?php
