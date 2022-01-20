@@ -143,7 +143,7 @@ class Growtype_Form_Loader
      */
     private function load_methods()
     {
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/methods/class-growtype-form-render.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/class-growtype-form-render.php';
 
         $this->loader = new Growtype_Form_Render();
     }

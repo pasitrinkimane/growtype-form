@@ -26,8 +26,8 @@
  */
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-	die;
+if (!defined('WPINC')) {
+    die;
 }
 
 /**
@@ -35,49 +35,56 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'Growtype_Form_VERSION', '1.0.0' );
+define('GROWTYPE_FORM_VERSION', '1.0.0');
+
+/**
+ * Plugin base name
+ */
+define('GROWTYPE_FORM_BASE_NAME', 'growtype-form');
 
 /**
  * Plugin dir path
  */
-define( 'Growtype_Form_Path', plugin_dir_path( __FILE__ ) );
+define('GROWTYPE_FORM_PATH', plugin_dir_path(__FILE__));
 
 /**
  * Plugin url
  */
-define( 'Growtype_Form_Url', plugin_dir_url( __FILE__ ) );
+define('GROWTYPE_FORM_URL', plugin_dir_url(__FILE__));
 
 /**
  * Plugin url public
  */
-define( 'Growtype_Form_Url_Public', plugin_dir_url( __FILE__ ) . 'public/');
+define('GROWTYPE_FORM_URL_PUBLIC', plugin_dir_url(__FILE__) . 'public/');
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-growtype-form-activator.php
  */
-function activate_Growtype_Form() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-growtype-form-activator.php';
-	Growtype_Form_Activator::activate();
+function activate_growtype_form()
+{
+    require_once plugin_dir_path(__FILE__) . 'includes/class-growtype-form-activator.php';
+    Growtype_Form_Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-growtype-form-deactivator.php
  */
-function deactivate_Growtype_Form() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-growtype-form-deactivator.php';
-	Growtype_Form_Deactivator::deactivate();
+function deactivate_growtype_form()
+{
+    require_once plugin_dir_path(__FILE__) . 'includes/class-growtype-form-deactivator.php';
+    Growtype_Form_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_Growtype_Form' );
-register_deactivation_hook( __FILE__, 'deactivate_Growtype_Form' );
+register_activation_hook(__FILE__, 'activate_growtype_form');
+register_deactivation_hook(__FILE__, 'deactivate_growtype_form');
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-growtype-form.php';
+require plugin_dir_path(__FILE__) . 'includes/class-growtype-form.php';
 
 /**
  * Begins execution of the plugin.
@@ -88,10 +95,12 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-growtype-form.php';
  *
  * @since    1.0.0
  */
-function run_Growtype_Form() {
+function run_growtype_form()
+{
 
-	$plugin = new Growtype_Form();
-	$plugin->run();
+    $plugin = new Growtype_Form();
+    $plugin->run();
 
 }
-run_Growtype_Form();
+
+run_growtype_form();

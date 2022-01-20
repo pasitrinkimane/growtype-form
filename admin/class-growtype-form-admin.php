@@ -353,8 +353,8 @@ class Growtype_Form_Admin
         if ( !class_exists( 'WP_List_Table' ) ) require( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
         require_once( ABSPATH . 'wp-admin/includes/class-wp-users-list-table.php' );
 
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/methods/users/class-growtype-form-members.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/methods/users/class-growtype-form-members-list-table.php';
+        require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-members.php';
+        require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-members-list-table.php';
 
         $this->loader = new Growtype_Form_Members();
     }

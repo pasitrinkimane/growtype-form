@@ -69,8 +69,8 @@ class Growtype_Form
      */
     public function __construct()
     {
-        if (defined('Growtype_Form_VERSION')) {
-            $this->version = Growtype_Form_VERSION;
+        if (defined('GROWTYPE_FORM_VERSION')) {
+            $this->version = GROWTYPE_FORM_VERSION;
         } else {
             $this->version = '1.0.0';
         }
@@ -95,7 +95,7 @@ class Growtype_Form
          * Frontend traits
          */
         spl_autoload_register(function ($traitName) {
-            $fileName = plugin_dir_path(dirname(__FILE__)) . 'includes/traits/' . $traitName . '.php';
+            $fileName = GROWTYPE_FORM_PATH . 'includes/traits/' . $traitName . '.php';
 
             if (file_exists($fileName)) {
                 include $fileName;
@@ -112,7 +112,7 @@ class Growtype_Form
          * Admin traits
          */
         spl_autoload_register(function ($traitName) {
-            $fileName = plugin_dir_path(dirname(__FILE__)) . 'admin/traits/' . $traitName . '.php';
+            $fileName = GROWTYPE_FORM_PATH . 'admin/traits/' . $traitName . '.php';
 
             if (file_exists($fileName)) {
                 include $fileName;
@@ -143,33 +143,33 @@ class Growtype_Form
          * The class responsible for orchestrating the actions and filters of the
          * core plugin.
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-growtype-form-loader.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/class-growtype-form-loader.php';
 
         /**
          * The class responsible for defining internationalization functionality
          * of the plugin.
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-growtype-form-i18n.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/class-growtype-form-i18n.php';
 
         /**
          * The class responsible for defining all actions that occur in the admin area.
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-growtype-form-admin.php';
+        require_once GROWTYPE_FORM_PATH . 'admin/class-growtype-form-admin.php';
 
         /**
          * The class responsible for defining all actions that occur in the public-facing
          * side of the site.
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-growtype-form-public.php';
+        require_once GROWTYPE_FORM_PATH . 'public/class-growtype-form-public.php';
 
         /**
          * Helper functions
          */
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/login.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/signup.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/template.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/url.php';
-        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/helpers/wc.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/helpers/login.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/helpers/signup.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/helpers/template.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/helpers/url.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/helpers/wc.php';
 
         $this->loader = new Growtype_Form_Loader();
 

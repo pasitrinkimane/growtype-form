@@ -37,10 +37,10 @@ class Growtype_Form_Render
      */
     function load_methods()
     {
-        require_once Growtype_Form_Path . 'includes/methods/login/class-growtype-form-login.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/login/class-growtype-form-login.php';
         $this->Growtype_Form_Login = new Growtype_Form_Login();
 
-        require_once Growtype_Form_Path . 'includes/methods/crud/class-growtype-form-crud.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/class-growtype-form-crud.php';
         $this->Growtype_Form_Crud = new Growtype_Form_Crud();
     }
 
@@ -79,7 +79,7 @@ class Growtype_Form_Render
      */
     function growtype_form_enqueue_general_styles()
     {
-        wp_enqueue_style('growtype-form.css', plugin_dir_url(dirname(dirname(__FILE__))) . 'public/styles/growtype-form.css', array (), '1.0', 'all');
+        wp_enqueue_style('growtype-form.css', GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form.css', array (), '1.0', 'all');
     }
 
     /**
@@ -330,7 +330,7 @@ class Growtype_Form_Render
         /**
          * Render field
          */
-        include plugin_dir_path(dirname(__FILE__)) . 'methods/components/fields.php';
+        include GROWTYPE_FORM_PATH . 'includes/methods/components/fields.php';
     }
 
     /**

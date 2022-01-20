@@ -94,7 +94,7 @@ class Growtype_Form_Crud
                 }
             } elseif (str_contains($form_name, 'wc_product')) {
 
-                require_once Growtype_Form_Path . 'includes/methods/crud/class-growtype-form-wc-crud.php';
+                require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/class-growtype-form-wc-crud.php';
 
                 $product_data = $submitted_values;
 
@@ -160,7 +160,7 @@ class Growtype_Form_Crud
                 }
             } elseif ($form_name === 'post') {
 
-                require_once Growtype_Form_Path . 'includes/methods/crud/class-growtype-form-wp-crud.php';
+                require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/class-growtype-form-wp-crud.php';
 
                 $wc_crud = new Growtype_Form_Wp_Crud();
 
