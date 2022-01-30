@@ -206,6 +206,11 @@ class Growtype_Form_Render
         $login_btn = $form['login_btn'] ?? null;
 
         /**
+         * Back btn
+         */
+        $back_btn = $form['back_btn'] ?? null;
+
+        /**
          * Post data
          */
         $post = get_post();
@@ -221,7 +226,10 @@ class Growtype_Form_Render
                 <div class="form-wrapper">
 
                     <div class="b-intro">
-                        <a href="<?= growtype_form_login_page_url() ?>" class="btn-back"></a>
+                        <?php
+                        if ($back_btn) { ?>
+                            <a href="<?= growtype_form_login_page_url() ?>" class="btn-back"></a>
+                        <?php } ?>
 
                         <?php if (!empty($form_title)) { ?>
                             <h2 class="e-title-intro"><?= $form_title ?></h2>
