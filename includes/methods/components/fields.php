@@ -135,6 +135,7 @@ if (!in_array($field_type, self::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {
             <?php } ?>
         </div>
         <script>
+            $=jQuery;
             $('.btn-img-remove').click(function () {
                 let type = $(this).attr('data-type');
                 let id = $(this).attr('data-id');

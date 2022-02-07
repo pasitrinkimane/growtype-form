@@ -6,8 +6,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @if(!empty(get_option('growtype_form_signup_terms_page')))
-                    {!! growtype_get_post_content(get_option('growtype_form_signup_terms_page')) !!}
+                @if(class_exists('Growtype_Post') && !empty(get_option('growtype_form_signup_terms_page')))
+                    {!! Growtype_Post::content(get_option('growtype_form_signup_terms_page')) !!}
                 @endif
                 <div class="content-shadow"></div>
             </div>

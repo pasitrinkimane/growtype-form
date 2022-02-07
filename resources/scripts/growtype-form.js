@@ -1,3 +1,5 @@
+$ = jQuery;
+
 /**
  *
  * @param $duplicateBtn
