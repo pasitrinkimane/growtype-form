@@ -1,17 +1,18 @@
 let mix = require('laravel-mix');
 
-mix
-    .sass('resources/styles/growtype-form.scss', 'styles')
-
 mix.setPublicPath('./public');
 mix.setResourceRoot('./')
 
-// mix.autoload({
-//     jquery: ['$', 'window.jQuery']
-// })
+mix
+    .sass('resources/styles/growtype-form.scss', 'styles')
+    .sass('resources/styles/growtype-form-render.scss', 'styles');
 
 mix
     .js('resources/scripts/growtype-form.js', 'scripts')
+    .js('resources/scripts/growtype-form-render.js', 'scripts');
+
+mix
+    .copyDirectory('resources/plugins', 'public/plugins')
 
 mix
     .sourceMaps()

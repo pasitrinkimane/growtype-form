@@ -29,6 +29,7 @@
  */
 class Growtype_Form
 {
+    public $session = null;
 
     /**
      * The loader that's responsible for maintaining and registering all hooks that power
@@ -59,6 +60,11 @@ class Growtype_Form
     protected $version;
 
     /**
+     * @var null
+     */
+    protected static $_instance = null;
+
+    /**
      * Define the core functionality of the plugin.
      *
      * Set the plugin name and the plugin version that can be used throughout the plugin.
@@ -82,8 +88,17 @@ class Growtype_Form
 
         $this->load_dependencies();
         $this->set_locale();
+        $this->set_session();
         $this->define_admin_hooks();
         $this->define_public_hooks();
+    }
+
+    public static function instance()
+    {
+        if (is_null(self::$_instance)) {
+            self::$_instance = new self();
+        }
+        return self::$_instance;
     }
 
     /**
@@ -152,6 +167,11 @@ class Growtype_Form
         require_once GROWTYPE_FORM_PATH . 'includes/class-growtype-form-i18n.php';
 
         /**
+         * Session
+         */
+        require_once GROWTYPE_FORM_PATH . 'includes/class-growtype-form-session.php';
+
+        /**
          * The class responsible for defining all actions that occur in the admin area.
          */
         require_once GROWTYPE_FORM_PATH . 'admin/class-growtype-form-admin.php';
@@ -186,11 +206,27 @@ class Growtype_Form
      */
     private function set_locale()
     {
-
         $plugin_i18n = new Growtype_Form_i18n();
 
         $this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
+    }
 
+    /**
+     * Define the locale for this plugin for internationalization.
+     *
+     * Uses the Growtype_Form_i18n class in order to set the domain and to register the hook
+     * with WordPress.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
+    private function set_session()
+    {
+        $plugin_session = new Growtype_Form_Session();
+
+        $this->loader->add_action('init', $plugin_session, 'start_session');
+        $this->loader->add_action('wp_logout', $plugin_session, 'end_session');
+        $this->loader->add_action('wp_login', $plugin_session, 'start_session');
     }
 
     /**
@@ -202,8 +238,7 @@ class Growtype_Form
      */
     private function define_admin_hooks()
     {
-
-        $plugin_admin = new Growtype_Form_Admin($this->get_Growtype_Form(), $this->get_version());
+        $plugin_admin = new Growtype_Form_Admin($this->get_growtype_form(), $this->get_version());
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
@@ -218,12 +253,10 @@ class Growtype_Form
      */
     private function define_public_hooks()
     {
-        $plugin_public = new Growtype_Form_Public($this->get_Growtype_Form(), $this->get_version());
+        $plugin_public = new Growtype_Form_Public($this->get_growtype_form(), $this->get_version());
 
-        if (str_contains($_SERVER['REQUEST_URI'], 'signup') || str_contains($_SERVER['REQUEST_URI'], 'login') || str_contains($_SERVER['REQUEST_URI'], 'lostpassword')) {
-            $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
-            $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
-        }
+        $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+        $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
     }
 
     /**
@@ -243,7 +276,7 @@ class Growtype_Form
      * @return    string    The name of the plugin.
      * @since     1.0.0
      */
-    public function get_Growtype_Form()
+    public function get_growtype_form()
     {
         return $this->Growtype_Form;
     }

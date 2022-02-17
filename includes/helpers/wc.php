@@ -3,6 +3,14 @@
 /**
  * @return array|WP_Post|null
  */
+function growtype_form_product_upload_page()
+{
+    return get_option('growtype_form_product_upload_page');
+}
+
+/**
+ * @return array|WP_Post|null
+ */
 function growtype_form_default_product_status()
 {
     return get_option('growtype_form_default_product_status');

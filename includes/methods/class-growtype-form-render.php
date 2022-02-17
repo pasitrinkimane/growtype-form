@@ -5,18 +5,25 @@
  */
 class Growtype_Form_Render
 {
+    use Notice;
+
     const GROWTYPE_FORM_SHORTCODE_NAME = 'growtype_form';
 
-    const GROWTYPE_FORM_SUBMITTED_INPUT = 'growtype_form_submitted';
+    const GROWTYPE_FORM_SUBMIT_ACTION = 'growtype_form_submit_action';
+    const GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS = ['submit', 'preview', 'save_as_draft', 'delete'];
     const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
 
     const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
     const GROWTYPE_FORM_POST_IDENTIFICATOR = 'growtype_form_post_id';
 
-    const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['input', 'textarea', 'file', 'email', 'select', 'checkbox', 'hidden', 'number', 'password', 'custom', 'repeater'];
+    const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['text', 'textarea', 'file', 'email', 'select', 'radio', 'checkbox', 'hidden', 'number', 'password', 'custom', 'repeater', 'shortcode'];
 
     const ALTERNATIVE_SUBMITTED_DATA_KEYS = [
         'name' => 'name_s'
+    ];
+
+    const DATE_TIME_DATA = [
+        'date_format' => "yy-mm-dd"
     ];
 
     protected $Growtype_Form_Login;
@@ -27,7 +34,6 @@ class Growtype_Form_Render
         if (!is_admin()) {
             add_shortcode(self::GROWTYPE_FORM_SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
             add_filter('body_class', array ($this, 'growtype_form_body_class'));
-
             $this->load_methods();
         }
     }
@@ -77,9 +83,107 @@ class Growtype_Form_Render
     /**
      * Required scripts
      */
-    function growtype_form_enqueue_general_styles()
+    function growtype_form_enqueue_render_styles()
     {
-        wp_enqueue_style('growtype-form.css', GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form.css', array (), '1.0', 'all');
+        wp_enqueue_style('growtype-form-render', GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form-render.css', array (), '1.1', 'all');
+
+        /**
+         * Styles
+         */
+        if (!wp_script_is('image-uploader', 'enqueued')) {
+            wp_enqueue_style('image-uploader', GROWTYPE_FORM_URL_PUBLIC . 'plugins/image-uploader/image-uploader.css', array (), '1.1', 'all');
+        }
+
+        /**
+         * Jquery UI
+         */
+        if (!wp_script_is('jquery-ui', 'enqueued')) {
+            wp_enqueue_style('jquery-ui', 'https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css', array (), '1.1', 'all');
+        }
+
+        /**
+         * Timepicker
+         */
+        if (!wp_script_is('timepicker-addon', 'enqueued')) {
+            wp_enqueue_style('timepicker-addon', GROWTYPE_FORM_URL_PUBLIC . 'plugins/jquery-ui-timepicker-addon/jquery-ui-timepicker-addon.min.css', array (), '1.1', 'all');
+        }
+    }
+
+    /**
+     * Required scripts
+     */
+    function growtype_form_enqueue_render_scripts()
+    {
+        wp_enqueue_script('growtype-form-render', GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form-render.js', array ('jquery'), '1.1', true);
+
+        wp_localize_script('growtype-form-render', 'growtype_form_date_time_data', self::DATE_TIME_DATA);
+
+        /**
+         * Image uploader
+         */
+        if (!wp_script_is('image-uploader', 'enqueued')) {
+            wp_enqueue_script('image-uploader', GROWTYPE_FORM_URL_PUBLIC . 'plugins/image-uploader/image-uploader.js', array ('jquery'), '1.1', true);
+        }
+
+        /**
+         * Jquery UI
+         */
+        if (!wp_script_is('jquery-ui', 'enqueued') && !wp_script_is('jquery-ui-core', 'enqueued')) {
+            wp_enqueue_script('jquery-ui', 'https://code.jquery.com/ui/1.13.1/jquery-ui.js', array ('jquery'), '1.1', true);
+        }
+
+        if (!wp_script_is('timepicker-addon', 'enqueued')) {
+            wp_enqueue_script('timepicker-addon', GROWTYPE_FORM_URL_PUBLIC . 'plugins/jquery-ui-timepicker-addon/jquery-ui-timepicker-addon.min.js', array ('jquery'), '1.1', true);
+        }
+
+        /**
+         * Autonumeric
+         */
+        if (!wp_script_is('autoNumeric', 'enqueued')) {
+
+            wp_enqueue_script('autoNumeric', GROWTYPE_FORM_URL_PUBLIC . 'plugins/autoNumeric/autoNumeric.min.js', array ('jquery'), '1.1', true);
+
+            $currency_pos = 'left';
+            $currency_symbol = '&euro;';
+            $digitGroupSeparator = ',';
+            $decimalCharacter = '.';
+            $decimalPlacesOverride = 2;
+
+            if (class_exists('woocommerce')) {
+                $currency_pos = get_option('woocommerce_currency_pos');
+                $currency_symbol = get_woocommerce_currency_symbol();
+                $digitGroupSeparator = wc_get_price_thousand_separator();
+                $decimalCharacter = wc_get_price_decimal_separator();
+                $decimalPlacesOverride = wc_get_price_decimals();
+            }
+
+            switch ($currency_pos) {
+                case 'left':
+                    $currency_symbol_placement = 'p';
+                    break;
+                case 'right':
+                    $currency_symbol_placement = 's';
+                    break;
+                case 'left_space':
+                    $currency_symbol_placement = 'p';
+                    $currency_symbol = $currency_symbol . ' ';
+                    break;
+                case 'right_space':
+                    $currency_symbol_placement = 's';
+                    $currency_symbol = ' ' . $currency_symbol;
+                    break;
+            }
+
+            $currency_data = array (
+                'currencySymbolPlacement' => $currency_symbol_placement,
+                'digitGroupSeparator' => $digitGroupSeparator,
+                'decimalCharacter' => $decimalCharacter,
+                'currencySymbol' => $currency_symbol,
+                'decimalPlacesOverride' => $decimalPlacesOverride,
+            );
+
+            wp_localize_script('autoNumeric', 'autoNumericdata', $currency_data);
+        }
     }
 
     /**
@@ -101,6 +205,7 @@ class Growtype_Form_Render
          * Form name
          */
         $form_name = $args['name'];
+        $form_type = $args['type'] ?? null;
 
         /**
          * Get form data
@@ -112,9 +217,15 @@ class Growtype_Form_Render
         }
 
         /**
-         * Enqueue general scripts
+         * Enqueue render scripts
          */
-        $this->growtype_form_enqueue_general_styles();
+        $this->growtype_form_enqueue_render_styles();
+        $this->growtype_form_enqueue_render_scripts();
+
+        /**
+         * Check if edit page and update post request data
+         */
+        $this->update_return_data(get_the_ID(), $form_data, $form_name);
 
         /**
          * Render forms
@@ -124,6 +235,8 @@ class Growtype_Form_Render
              * Render login form
              */
             return Growtype_Form_Login::render_growtype_login_form($form_data);
+        } elseif ($form_type === 'fields') {
+            return $this->render_growtype_fields($form_data, $form_name);
         } else {
             /**
              * Enqueue scripts
@@ -134,8 +247,8 @@ class Growtype_Form_Render
              * Initiate scripts
              */
             add_action('wp_footer', function () {
-                $this->growtype_form_url_scripts_init();
                 $this->growtype_form_validation_scripts_init();
+                $this->growtype_form_submit_scripts_init();
             }, 99);
 
             /**
@@ -146,23 +259,72 @@ class Growtype_Form_Render
     }
 
     /**
+     * @return void
+     */
+    function render_growtype_fields($form, $form_name)
+    {
+        /**
+         * Form main fields
+         */
+        $main_fields = $form['main_fields'] ?? null;
+
+        /**
+         * Form confirmation fields
+         */
+        $confirmation_fields = $form['confirmation_fields'] ?? null;
+
+        /**
+         * Classes
+         */
+        $form_class = $form['class'] ?? null;
+
+        ob_start();
+        ?>
+
+        <div class="growtype-form-wrapper <?= $form_class ?>">
+            <div class="growtype-form-fields">
+                <?php
+                foreach ($form as $key => $form_fields) { ?>
+
+                    <?php if (str_contains('main_fields', $key)) { ?>
+                        <div class="row g-3 main-fields">
+                            <?php
+                            foreach ($main_fields as $field) {
+                                self::render_growtype_form_field($field);
+                            }
+                            ?>
+                        </div>
+                    <?php } ?>
+
+                    <?php if (str_contains('confirmation_fields', $key)) { ?>
+                        <div class="row fields-confirmation">
+                            <?php
+                            foreach ($confirmation_fields as $field) {
+                                self::render_growtype_form_field($field);
+                            }
+                            ?>
+                        </div>
+                    <?php } ?>
+
+                <?php } ?>
+            </div>
+        </div>
+
+        <div>
+            <input type="text" hidden name='<?= self::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
+        </div>
+
+        <?php
+
+        return ob_get_clean();
+    }
+
+    /**
      * @param $form
      * @return false|string|null
      */
     function render_growtype_general_form($form, $form_name)
     {
-        /**
-         * Check if product form add fill input with existing values
-         */
-        if (class_exists('woocommerce') && isset($_REQUEST['customize']) && $_REQUEST['customize'] === 'edit' && str_contains($form_name, 'wc_product')) {
-            $product = wc_get_product(get_the_ID());
-
-            $_REQUEST['title'] = $product->get_title();
-            $_REQUEST['description'] = $product->get_description();
-            $_REQUEST['short_description'] = $product->get_short_description();
-            $_REQUEST['featured_image'] = wp_get_attachment_url($product->get_image_id());
-        }
-
         /**
          * Recaptcha setup
          */
@@ -179,11 +341,6 @@ class Growtype_Form_Render
          * Form main fields
          */
         $main_fields = $form['main_fields'] ?? null;
-
-        /**
-         * Form repeater fields
-         */
-        $repeater_fields = isset($form['repeater_fields']) ? $form['repeater_fields'][0] : null;
 
         /**
          * Form confirmation fields
@@ -211,6 +368,16 @@ class Growtype_Form_Render
         $back_btn = $form['back_btn'] ?? null;
 
         /**
+         * Block class
+         */
+        $class = $form['class'] ?? null;
+
+        /**
+         * Submit row
+         */
+        $submit_row = $form['submit_row'] ?? null;
+
+        /**
          * Post data
          */
         $post = get_post();
@@ -220,7 +387,7 @@ class Growtype_Form_Render
 
         <div class="growtype-form-wrapper">
 
-            <?php $this->render_growtype_form_response_status(); ?>
+            <?php $this->growtype_form_get_notice(); ?>
 
             <div class="growtype-form-container">
                 <div class="form-wrapper">
@@ -236,49 +403,25 @@ class Growtype_Form_Render
                         <?php } ?>
                     </div>
 
-                    <form id="growtype-form" enctype="multipart/form-data" class="form" action="<?php the_permalink(); ?>" method="post" data-name="<?= $form_name ?>">
+                    <form id="growtype-form" enctype="multipart/form-data" class="form <?php echo $class ?>" action="<?php the_permalink(); ?>" method="post" data-name="<?= $form_name ?>">
                         <?php
-                        $repeater_nr = 1;
                         foreach ($form as $key => $form_fields) { ?>
 
                             <?php if (str_contains('main_fields', $key)) { ?>
                                 <div class="row g-3 main-fields">
                                     <?php
                                     foreach ($main_fields as $field) {
-                                        $this->render_growtype_form_field($field);
+                                        self::render_growtype_form_field($field);
                                     }
                                     ?>
                                 </div>
                             <?php } ?>
 
-                            <?php if (str_contains('repeater_fields', $key)) { ?>
-                                <div class="row g-3 mt-0 repeater-fields <?= $repeater_fields['col_class'] ?>" data-form-nr="<?= $repeater_nr ?>">
-                                    <?php
-                                    if (isset($repeater_fields['remove_text'])) { ?>
-                                        <a href="javascript:void(0);" class="btn btn-link btn-remove" style="display: none;"><?= $repeater_fields['remove_text'] ?></a>
-                                    <?php } ?>
-
-                                    <?php
-                                    foreach ($repeater_fields['fields'] as $field) {
-                                        $this->render_growtype_form_field($field);
-                                    }
-                                    ?>
-
-                                    <?php
-                                    if (isset($repeater_fields['duplicate_text'])) { ?>
-                                        <div class="col-12 mt-4 pt-2 btn-wrapper">
-                                            <a href="javascript:void(0);" class="btn btn-secondary btn-add"><?= $repeater_fields['duplicate_text'] ?></a>
-                                        </div>
-                                    <?php } ?>
-                                </div>
-                                <?php $repeater_nr++;
-                            } ?>
-
                             <?php if (str_contains('confirmation_fields', $key)) { ?>
                                 <div class="row fields-confirmation">
                                     <?php
                                     foreach ($confirmation_fields as $field) {
-                                        $this->render_growtype_form_field($field);
+                                        self::render_growtype_form_field($field);
                                     }
                                     ?>
                                 </div>
@@ -286,28 +429,37 @@ class Growtype_Form_Render
 
                         <?php } ?>
 
-                        <div class="row row-submit">
-                            <div class="col-12">
-
-                                <input type="text" hidden name='<?= self::GROWTYPE_FORM_SUBMITTED_INPUT ?>' value="true"/>
-                                <input type="text" hidden name='<?= self::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
-                                <input type="text" hidden name='<?= self::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
-
-                                <?php if (!empty($post)) { ?>
-                                    <input type="text" hidden name='<?= self::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?= $post->ID ?>"/>
-                                <?php } ?>
-
-                                <?php if (!empty($recaptchav3)) { ?>
-                                    <div class="g-recaptcha"
-                                         data-sitekey="<?= $recaptchav3 ?>"
-                                         data-size="invisible"
-                                         data-callback="uploadFormSubmit">
-                                    </div>
-                                <?php } ?>
-
-                                <button type="submit" class="btn btn-primary"><?= $form['submit_label'] ?? __("Save", "growtype-form") ?></button>
-                            </div>
+                        <div>
+                            <input type="text" hidden name='<?= self::GROWTYPE_FORM_SUBMIT_ACTION ?>' value="submit"/>
+                            <input type="text" hidden name='<?= self::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
+                            <input type="text" hidden name='<?= self::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
+                            <?php if (!empty($post)) { ?>
+                                <input type="text" hidden name='<?= self::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?= $post->ID ?>"/>
+                            <?php } ?>
                         </div>
+
+                        <?php if (isset($submit_row) && !empty($submit_row)) { ?>
+                            <div class="row row-submit <?= isset($submit_row['class']) ? $submit_row['class'] : '' ?>">
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <?php if (!empty($recaptchav3)) { ?>
+                                        <div class="g-recaptcha"
+                                             data-sitekey="<?= $recaptchav3 ?>"
+                                             data-size="invisible"
+                                             data-callback="uploadFormSubmit">
+                                        </div>
+                                    <?php } ?>
+
+                                    <?php
+                                    if (isset($submit_row['cta'])) {
+                                        foreach ($submit_row['cta'] as $cta) { ?>
+                                            <button type="<?php echo $cta['type']; ?>" class="<?php echo isset($cta['class']) ? $cta['class'] : 'btn btn-primary'; ?>" data-action="<?php echo isset($cta['action']) ? $cta['action'] : 'submit'; ?>"><?= $cta['label'] ?? __("Save", "growtype-form") ?></button>
+                                        <?php } ?>
+                                    <?php } else { ?>
+                                        <button type="submit" class="btn btn-primary" data-action="submit"><?= $form['submit_label'] ?? __("Save", "growtype-form") ?></button>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                        <?php } ?>
                     </form>
 
                     <?php
@@ -333,7 +485,7 @@ class Growtype_Form_Render
      * @param $field
      * @return null
      */
-    function render_growtype_form_field($field)
+    public static function render_growtype_form_field($field)
     {
         /**
          * Render field
@@ -342,55 +494,15 @@ class Growtype_Form_Render
     }
 
     /**
-     * Response status
-     */
-    function render_growtype_form_response_status()
-    {
-        $response_status = $_GET['status'] ?? null;
-
-        if (!empty($response_status)) {
-
-            $response_status_message = sanitize_text_field(filter_input(INPUT_GET, 'message'));
-
-            if ($response_status === 'success') { ?>
-                <div class="alert alert-success" role="alert">
-                    <?= __($response_status_message, "growtype-form") ?>
-                </div>
-            <?php } else { ?>
-                <div class="alert alert-danger" role="alert">
-                    <?= __($response_status_message, "growtype-form") ?>
-                </div>
-            <?php }
-        }
-    }
-
-    /**
      * Required scripts
      */
     function growtype_form_enqueue_validation_scripts()
     {
-        wp_enqueue_script('jquery.validate.js', 'https://ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/jquery.validate.min.js', '', '', true);
+        wp_enqueue_script('jquery.validate.js', 'https://ajax.aspnetcdn.com/ajax/jquery.validate/1.16.0/jquery.validate.min.js', '', '', true);
 
         if (get_locale() === 'lt_LT') {
-            wp_enqueue_script('jquery.validate.js.localization', 'https://ajax.aspnetcdn.com/ajax/jquery.validate/1.10.0/localization/messages_lt.js', '', '', true);
+            wp_enqueue_script('jquery.validate.js.localization', 'https://ajax.aspnetcdn.com/ajax/jquery.validate/1.16.0/localization/messages_lt.js', '', '', true);
         }
-    }
-
-    /**
-     *
-     */
-    function growtype_form_url_scripts_init()
-    {
-        ?>
-        <script>
-            if (window.location.search.length > 0 && window.location.search.indexOf('action') !== -1) {
-                window.history.replaceState(null, null, window.location.pathname);
-            } else if (window.location.search.length > 0 && window.location.search.indexOf('message') !== -1) {
-                window.growtypeWcUploadFormFailed = true;
-                window.history.replaceState(null, null, window.location.pathname);
-            }
-        </script>
-        <?php
     }
 
     /**
@@ -400,26 +512,8 @@ class Growtype_Form_Render
     {
         ?>
         <script>
-            $.validator.setDefaults({ignore: ":hidden:not(select)"});
-
-            if ($("#growtype-form select").length > 0) {
-                $("#growtype-form select").each(function () {
-                    if ($(this).attr('required') !== undefined) {
-                        $(this).on("change", function () {
-                            $(this).valid();
-                        });
-                    }
-                });
-            }
-
-            $('#growtype-form button[type="submit"]').click(function () {
-                var isValid = $("#growtype-form").valid();
-                if (!isValid) {
-                    event.preventDefault();
-                }
-            });
-
-            $('#growtype-form').validate({
+            jQuery.validator.setDefaults({
+                ignore: ":hidden:not(.e-wrapper:visible select),.chosen-search-input",
                 errorPlacement: function (error, element) {
                     if (element.is("#growtype-form select")) {
                         element.parent().append(error);
@@ -431,7 +525,105 @@ class Growtype_Form_Render
                 }
             });
 
-            $('#growtype-form').validate().settings.ignore = ".chosen-search-input";
+            if ($("#growtype-form select:visible").length > 0) {
+                $("#growtype-form select:visible").each(function () {
+                    if ($(this).attr('required') !== undefined) {
+                        $(this).on("change", function () {
+                            $(this).valid();
+                        });
+                    }
+                });
+            }
+        </script>
+        <?php
+    }
+
+    /**
+     * @return void
+     */
+    function growtype_form_submit_scripts_init()
+    {
+        $validation_message = [
+            'at_leas_one' => __('At least one selection is required.', 'growtype-form'),
+            'wrong_date_format' => __('Wrong date format. Please select again.', 'growtype-form'),
+        ];
+        ?>
+        <script>
+            $('#growtype-form button[type="submit"]').click(function () {
+
+                $(this).attr('disabled', false);
+
+                /**
+                 * Action
+                 */
+                let action = $(this).attr('data-action');
+
+                $('input[name="growtype_form_submit_action"]').val(action);
+
+                if (action === 'delete') {
+                    $('#growtype-form').submit();
+                } else {
+                    let isValid = $("#growtype-form").valid();
+
+                    /**
+                     * Check if form check group is valid
+                     */
+                    if ($(".form-check-wrapper[aria-required='true']").length > 0) {
+                        $(".form-check-wrapper[aria-required='true']:visible").each(function () {
+                            $(this).find('.error').remove();
+                            if ($(this).find("input:checked").length === 0) {
+                                $(this).append('<label class="error"><?php echo $validation_message['at_leas_one'] ?></label>');
+                                isValid = false;
+                            }
+                        });
+                    }
+
+                    /**
+                     * Check if image galleries valid
+                     */
+                    $('.image-uploader:visible').each(function () {
+                        if ($(this).closest('.e-wrapper').attr('data-required') === 'true') {
+                            $(this).closest('.e-wrapper').find('.error').remove();
+                            if (!$(this).find('.image-uploader-inner').hasClass('has-files')) {
+                                $(this).closest('.e-wrapper').append('<label class="error"><?php echo $validation_message['at_leas_one'] ?></label>');
+                                isValid = false;
+                            }
+                        }
+                    });
+
+                    /**
+                     * Datepicker validate
+                     */
+                    if ($('.datetimepicker').length > 0) {
+                        $('.datetimepicker').each(function () {
+                            try {
+                                $.datepicker.parseDate('<?= self::DATE_TIME_DATA['date_format'] ?>', $(this).val());
+                            } catch (e) {
+                                $(this).closest('.e-wrapper').append('<label class="error"><?php echo $validation_message['wrong_date_format'] ?></label>');
+                                isValid = false;
+                            }
+                        });
+                    }
+
+                    /**
+                     * Stop if is not valid
+                     */
+                    if (!isValid) {
+                        event.preventDefault();
+                        return false;
+                    }
+
+                    /**
+                     * Disable btn
+                     */
+                    $(this).attr('disabled', true);
+
+                    /**
+                     * Submit form
+                     */
+                    $('#growtype-form').submit();
+                }
+            });
         </script>
         <?php
     }
@@ -461,5 +653,114 @@ class Growtype_Form_Render
             }
         </script>
         <?php
+    }
+
+    /**
+     * @return void
+     */
+    function update_return_data($post_id, $form_data, $form_name)
+    {
+        $post = get_post($post_id);
+
+        if ($form_name === 'signup') {
+            $signup_data = isset($_COOKIE['signup_data']) ? json_decode(stripslashes($_COOKIE['signup_data']), true) : null;
+
+            if (!empty($signup_data)) {
+                foreach ($signup_data as $key => $field) {
+                    $_REQUEST[$key] = $field;
+                }
+            }
+        } elseif ($post->post_type === 'product') {
+            $product = wc_get_product($post_id);
+
+            if (empty($product)) {
+                return null;
+            }
+
+            $extra_meta_keys = $this->Growtype_Form_Crud->get_product_extra_meta_keys();
+
+            $_REQUEST['title'] = $product->get_title();
+            $_REQUEST['description'] = $product->get_description();
+            $_REQUEST['short_description'] = $product->get_short_description();
+            $_REQUEST['featured_image'] = wp_get_attachment_url($product->get_image_id());
+            $_REQUEST['_price'] = $product->get_price();
+
+            foreach ($extra_meta_keys as $meta_key) {
+                $_REQUEST[$meta_key] = get_post_meta($product->get_id(), $meta_key, true);
+            }
+
+            $_REQUEST['categories'] = [];
+            foreach ($product->get_category_ids() as $category_id) {
+                $term = get_term_by('id', $category_id, 'product_cat');
+                if (!empty($term->parent)) {
+                    $term_parent = get_term_by('id', $term->parent, 'product_cat');
+
+                    if (isset($_REQUEST['categories'][$term_parent->slug])) {
+                        array_push($_REQUEST['categories'][$term_parent->slug], $term->slug);
+                    } else {
+                        $_REQUEST['categories'][$term_parent->slug] = [$term->slug];
+                    }
+                }
+            }
+
+            /**
+             * Set gallery images
+             */
+            $f_img_id = $product->get_image_id();
+            $image_upload_ids = $product->get_gallery_image_ids();
+
+            if (!in_array((int)$f_img_id, $image_upload_ids)) {
+                array_unshift($image_upload_ids, (int)$f_img_id);
+            }
+
+            $gallery_images = [];
+            if (!empty($image_upload_ids)) {
+                foreach ($image_upload_ids as $key => $image_id) {
+                    $gallery_images[$key] = [
+                        'id' => $image_id,
+                        'src' => wp_get_attachment_image_url($image_id),
+                    ];
+                }
+            }
+
+            $growtype_form_image_upload_data = [
+                'preloaded' => json_encode($gallery_images)
+            ];
+
+            /**
+             * Add gallery data to js
+             */
+            wp_localize_script('growtype-form-render', 'growtype_form_image_upload_data', $growtype_form_image_upload_data);
+
+            /**
+             * Update shipping details
+             */
+            if (class_exists('Growtype_Product')) {
+                $shipping_documents = Growtype_Product::shipping_documents();
+                foreach ($shipping_documents as $document) {
+                    if (isset($document['key']) && isset($document['url'])) {
+                        $_REQUEST['shipping_documents[' . $document['key'] . ']'] = $document['url'];
+                    }
+                }
+            }
+        } elseif (str_contains($post->post_name, 'account')) {
+            $user_id = get_current_user_id();
+            if (!empty($user_id) && isset($form_data['main_fields'])) {
+                foreach ($form_data['main_fields'] as $field) {
+                    if (isset($field['name'])) {
+                        $_REQUEST[$field['name']] = get_user_meta($user_id, $field['name'], true);
+                    }
+                }
+            }
+        }
+
+        if (apply_filters('growtype_form_render_update_return_data', $post_id, $_REQUEST) !== $post_id) {
+            $_REQUEST = apply_filters('growtype_form_render_update_return_data', $post_id, $_REQUEST);
+        }
+
+        if (isset($_COOKIE['signup_data'])) {
+            unset($_COOKIE['signup_data']);
+            setcookie('signup_data', '', time() - (15 * 60));
+        }
     }
 }

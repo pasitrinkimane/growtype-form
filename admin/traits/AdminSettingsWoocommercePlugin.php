@@ -43,8 +43,24 @@ trait AdminSettingsWoocommercePlugin
 
         add_settings_field(
             'growtype_form_redirect_after_product_creation',
-            'Redirect Url After Product Creation',
+            'Redirect Url After Upload Form Submit',
             array ($this, 'growtype_form_redirect_after_product_creation_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_woocommerce'
+        );
+
+        /**
+         * Product upload page
+         */
+        register_setting(
+            'growtype_form_settings_woocommerce', // settings group name
+            'growtype_form_product_upload_page'
+        );
+
+        add_settings_field(
+            'growtype_form_product_upload_page',
+            'Product Upload Page',
+            array ($this, 'growtype_form_product_upload_page_callback'),
             'growtype-form-settings',
             'growtype_form_settings_woocommerce'
         );
@@ -168,6 +184,24 @@ trait AdminSettingsWoocommercePlugin
             <?php
             foreach ($options as $value => $option) { ?>
                 <option value='<?= $value ?>' <?php selected($selected, $value); ?>><?= $option ?></option>
+            <?php } ?>
+        </select>
+        <?php
+    }
+
+    /**
+     * Upload page
+     */
+    function growtype_form_product_upload_page_callback()
+    {
+        $selected = get_option('growtype_form_product_upload_page');
+        $pages = get_pages();
+        ?>
+        <select name='growtype_form_product_upload_page'>
+            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <?php
+            foreach ($pages as $page) { ?>
+                <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>
             <?php } ?>
         </select>
         <?php

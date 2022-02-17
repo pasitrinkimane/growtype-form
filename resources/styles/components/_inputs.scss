@@ -1,0 +1,25 @@
+.e-wrapper {
+  position: relative;
+
+  .input-icon {
+    position: absolute;
+    right: 20px;
+    top: 42px;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  &[data-label="false"] {
+    .input-icon {
+      top: 12px;
+    }
+  }
+}
+
+.input-file-wrapper {
+  .dashicons-media-document {
+    font-size: 70px;
+    width: 70px;
+    height: 70px;
+  }
+}

@@ -11,7 +11,7 @@
         "label": "Email",
         "placeholder": "Enter your email",
         "required": "true",
-        "col_class": "col-12"
+        "class": "col-12"
       },
       {
         "type": "password",
@@ -160,7 +160,7 @@
       },
       {
         "type": "textarea",
-        "col_class": "col-12",
+        "class": "col-12",
         "name": "long_description[description]",
         "label": "[:lt]Aprašymas[:]",
         "description": "[:lt]Bendrai aprašykite pamokos turinį, uždavinius, siekinius ir kitą svarbią informaciją.[:]",
@@ -169,7 +169,7 @@
       },
       {
         "type": "textarea",
-        "col_class": "col-12",
+        "class": "col-12",
         "name": "long_description[class]",
         "label": "[:lt]Klasė[:]",
         "description": "[:lt]Patikslinkite kuriai klasei metodinė medžiaga labiausiai pritaikyta.[:]",
@@ -178,7 +178,7 @@
       },
       {
         "type": "textarea",
-        "col_class": "col-12",
+        "class": "col-12",
         "name": "long_description[subject]",
         "label": "[:lt]Pamokos tema[:]",
         "description": "[:lt]Trumpai apibūdinkite pamokos temą.[:]",
@@ -187,7 +187,7 @@
       },
       {
         "type": "textarea",
-        "col_class": "col-12",
+        "class": "col-12",
         "name": "long_description[goal]",
         "label": "[:lt]Pamokos tikslas ir uždaviniai[:]",
         "description": "[:lt]Formuojant tikslą aprašykite, kokius vaikų gebėjimus bus siekiama ugdyti ir kuo jiems jie bus naudingi.[:]",
@@ -196,7 +196,7 @@
       },
       {
         "type": "textarea",
-        "col_class": "col-12",
+        "class": "col-12",
         "name": "long_description[extra]",
         "label": "[:lt]Priedas[:]",
         "description": "[:lt]Aprašykite detalų veiksmų planą, kaip bus organizuojamas užsiėmimas, kokios bus aptariamos temos, kokios vyks veiklos ir pan. Taip pat aprašykite, kokie metodai bus naudojami dirbant su vaikais (pvz.: grupinis darbas, diskusija, viktorina, vaidmenų žaidimas ir kt.), reikalinga įranga, priemonės, ar vaikams bus užduodami namų darbai ar projektai, kaip bus įvertinta, ar pamokos tikslas yra įgyvendintas bei ar vaikai įgijo reikalingas kompetencijas, gebėjimus.[:]",

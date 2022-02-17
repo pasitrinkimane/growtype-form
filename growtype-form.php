@@ -87,6 +87,14 @@ register_deactivation_hook(__FILE__, 'deactivate_growtype_form');
 require plugin_dir_path(__FILE__) . 'includes/class-growtype-form.php';
 
 /**
+ * @return mixed
+ */
+function Growtype_Form()
+{
+    return Growtype_Form::instance();
+}
+
+/**
  * Begins execution of the plugin.
  *
  * Since everything within the plugin is registered via hooks,

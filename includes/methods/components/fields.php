@@ -1,6 +1,7 @@
 <?php
 $field_name = $field['name'] ?? false;
 $field_required = isset($field['required']) && $field['required'] === 'true' ? true : false;
+$field_multiple = isset($field['multiple']) && $field['multiple'] === 'true' ? true : false;
 $field_type = $field['type'];
 $field_hidden = $field['hidden'] ?? false;
 
@@ -22,7 +23,41 @@ if (str_contains($field_name, 'password')) {
     $field_value = null;
 }
 
+
 $field_options = $field['options'] ?? null;
+
+/**
+ * Advanced select options
+ */
+if (!empty($field_options) && !is_array($field_options) && (str_contains($field_options, 'taxonomy=') || str_contains($field_options, 'product_cat='))) {
+    $select_type = 'custom';
+    $field_values = explode('&', $field_options);
+
+    $term_slug = 'alcohol-type';
+    $taxonomy_name = 'product_cat';
+
+    foreach ($field_values as $field_value) {
+        if (str_contains($field_value, 'taxonomy=')) {
+            $taxonomy_name = str_replace('taxonomy=', '', $field_value);
+        }
+        if (str_contains($field_value, 'product_cat=')) {
+            $term_slug = str_replace('product_cat=', '', $field_value);
+        }
+    }
+
+    $term = get_term_by('slug', $term_slug, $taxonomy_name);
+    $term_children = get_term_children($term->term_id, $taxonomy_name);
+
+    $field_options = array ('' => __('Select a value&hellip;', 'woocommerce')) + [];
+    foreach ($term_children as $child) {
+        $term = get_term_by('id', $child, $taxonomy_name);
+        $field_options[$term->slug] = $term->name;
+    }
+} elseif ($field_options === 'wc_countries') {
+    $select_type = 'custom';
+    $field_options = array ('' => __('Select a country / region&hellip;', 'woocommerce')) + WC()->countries->get_allowed_countries();
+}
+
 $field_label = $field['label'] ?? null;
 $field_label = $field_required && !str_contains($field_label, '*') ? $field_label . '<span class="required">*</span>' : $field_label;
 $field_description = $field['description'] ?? null;
@@ -30,152 +65,84 @@ $placeholder = $field['placeholder'] ?? null;
 $field_accept = $field['accept'] ?? null;
 $field_min_value = $field['min'] ?? null;
 $field_max_value = $field['max'] ?? null;
-$field_col_class = $field['col_class'] ?? 'col-auto';
+$field_col_class = $field['class'] ?? 'col-auto';
+$field_fields = $field['fields'] ?? null;
+$field_date = $field['date'] ?? null;
+$field_time = $field['time'] ?? null;
+$field_pattern = $field['pattern'] ?? null;
+$field_maxlength = $field['maxlength'] ?? null;
+$field_input_class = isset($field['input_class']) && !empty($field['input_class']) ? explode(' ', $field['input_class']) : [];
+$field_icon = $field['icon'] ?? null;
+$field_price = $field['price'] ?? null;
+$field_group = $field['group'] ?? null;
+$field_autocomplete = isset($field['autocomplete']) && $field['autocomplete'] === 'true' ? 'on' : 'off';
 
 if (!in_array($field_type, self::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {
     return null;
 }
+
+/**
+ * Extra attributes
+ */
+if ($field_date || $field_time) {
+    $field_pattern = '[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])[ ](0[0-9]|1[0-9]|2[0-4]):(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9])';
+    $field_maxlength = '16';
+}
+
+/**
+ * Extra classes
+ */
+if ($field_date && $field_time) {
+    array_push($field_input_class, 'datetimepicker');
+} elseif ($field_date) {
+    array_push($field_input_class, 'datepicker');
+} elseif ($field_time) {
+    array_push($field_input_class, 'timepicker');
+}
+
+if (!empty($field_value)) {
+    array_push($field_input_class, 'has-value');
+}
+
+if (!empty($field_price)) {
+    array_push($field_input_class, 'autonumeric');
+}
+
+/**
+ * Input class convert to string
+ */
+$field_input_class = implode(" ", $field_input_class);
+
+/**
+ * Block cat types
+ */
+$block_cat_types = ['repeater', 'custom', 'shortcode', 'checkbox'];
 ?>
 
-<div class="<?= $field_col_class ?>" style="<?= $field_hidden ? 'display:none;' : '' ?>" data-name="<?= $field_name ?>">
+<div class="<?= in_array($field_type, $block_cat_types) ? 'b-wrapper' : 'e-wrapper'; ?> <?= $field_col_class ?>" style="<?= $field_hidden ? 'display:none;' : '' ?>" data-name="<?= $field_name ?>" data-label="<?= !empty($field_label) ? 'true' : 'false' ?>" data-group="<?= $field_group ?>">
+    <?php if (!empty($field_icon)) { ?>
+        <div class="input-icon">
+            <?= $field_icon ?>
+        </div>
+    <?php } ?>
     <?php
-    /**
-     * Select
-     */
     if ($field_type === 'select') {
-    if (!empty($field_label)) { ?>
-        <label for="<?= $field_name ?>" class="form-label">
-            <?= $field_label ?>
-        </label>
-    <?php } ?>
-        <select name="<?= $field_name ?>" id="<?= $field_name ?>" <?= $field_required ? 'required' : '' ?>>
-            <?php
-            /**
-             * Use woocommerce country select
-             */
-            if (class_exists('woocommerce') && $field_value === 'wc_country' && $field_type === 'select') {
-                $field_options = array ('' => __('Select a country / region&hellip;', 'woocommerce')) + WC()->countries->get_allowed_countries();
-
-                foreach ($field_options as $key => $field_option) { ?>
-                    <option value="<?= $key ?>" <?= isset($_REQUEST[$field_name]) && $_REQUEST[$field_name] === $key ? 'selected' : '' ?>><?= $field_option ?></option>
-                <?php }
-            } else {
-                foreach ($field_options as $field_option) { ?>
-                    <option value="<?= sanitize_text_field($field_option['value']) ?>" <?= isset($_REQUEST[$field_name]) && $_REQUEST[$field_name] === $field_option['value'] ? 'selected' : '' ?>><?= sanitize_text_field($field_option['label']) ?></option>
-                <?php }
-            } ?>
-        </select>
-    <?php
-    /**
-     * Radio
-     */
+        include 'fields/select.php';
     } elseif ($field_type === 'radio') {
-    foreach ($field_options
-
-    as $field_option) { ?>
-        <div class="radio-wrapper">
-            <input type="radio" id="<?= str_replace(' ', '_', strtolower($field_option)) ?>" name="<?= $field_name ?>" value="<?= strtolower($field_option) ?>" <?= $field_required ? 'required' : '' ?>>
-            <label for="<?= str_replace(' ', '_', strtolower($field_option)) ?>"><?= str_replace('_', ' ', $field_option) ?></label>
-        </div>
-    <?php }
-    /**
-     * Checkbox
-     */
-    } elseif ($field_type === 'checkbox') { ?>
-        <div class="form-check">
-            <input type="<?= $field_type ?>"
-                   class="form-check-input"
-                   name="<?= $field_name ?>"
-                   id="<?= $field_name ?>"
-                   placeholder="<?= $placeholder ?>"
-                <?= $field_required ? 'required' : '' ?>
-                   value="<?= $field_value ?>"
-            >
-            <?php
-            if (!empty($field_label)) { ?>
-                <label for="<?= $field_name ?>" class="form-label">
-                    <?= $field_label ?>
-                </label>
-            <?php }
-            ?>
-        </div>
-    <?php
-    /**
-     * Textarea
-     */
-    } elseif ($field_type === 'textarea') { ?>
-    <?php
-    if (!empty($field_label)) { ?>
-        <label for="<?= $field_name ?>" class="form-label">
-            <?= $field_label ?>
-        </label>
-    <?php }
-        ?>
-        <?php if (!empty($field_description)) { ?>
-        <p class="form-description"><?= $field_description ?></p>
-    <?php } ?>
-        <textarea id="<?= $field_name ?>" name="<?= $field_name ?>" rows="4" cols="50" placeholder="<?= $placeholder ?>" <?= $field_required ? 'required' : '' ?>><?= $field_value ?></textarea>
-    <?php
-    /**
-     * File
-     */
-    } elseif ($field_type === 'file') { ?>
-    <?php if (!empty($field_label)) { ?>
-        <label for="<?= $field_name ?>" class="form-label">
-            <?= $field_label ?>
-        </label>
-    <?php } ?>
-        <div class="img-wrapper">
-            <?php
-            if (!empty($field_value)) { ?>
-                <img class="img-fluid" src="<?= $field_value ?>" alt="" style="max-width: 150px;">
-                <span class="btn-img-remove dashicons dashicons-remove" data-type="<?= $field_type ?>" data-id="<?= $field_name ?>" data-name="<?= $field_name ?>" data-accept="<?= $field_accept ?>" data-required="<?= $field_required ?>" style="cursor: pointer;"></span>
-            <?php } else { ?>
-                <input type="<?= $field_type ?>" id="<?= $field_name ?>" name="<?= $field_name ?>" accept="<?= $field_accept ?>" <?= $field_required ? 'required' : '' ?>>
-            <?php } ?>
-        </div>
-        <script>
-            $=jQuery;
-            $('.btn-img-remove').click(function () {
-                let type = $(this).attr('data-type');
-                let id = $(this).attr('data-id');
-                let name = $(this).attr('data-name');
-                let accept = $(this).attr('data-accept');
-                let required = $(this).attr('data-required');
-                $(this).closest('.img-wrapper').hide();
-                $(this).closest('.col-auto').append('<input type="' + type + '" id="' + id + '" name="' + name + '"  accept="' + accept + '"  ' + required + '>');
-            });
-        </script>
-    <?php
-    /**
-     * Custom, skip sanitization
-     */
+        include 'fields/radio.php';
+    } elseif ($field_type === 'checkbox') {
+        include 'fields/checkbox.php';
+    } elseif ($field_type === 'textarea') {
+        include 'fields/textarea.php';
+    } elseif ($field_type === 'file') {
+        include 'fields/file.php';
     } elseif ($field_type === 'custom') {
-        echo $field['value'];
-        /**
-         * Input
-         */
-    }
-    else { ?>
-    <?php
-    if (!empty($field_label)) { ?>
-        <label for="<?= $field_name ?>" class="form-label">
-            <?= $field_label ?>
-        </label>
-    <?php }
-        ?>
-        <?php if (!empty($field_description)) { ?>
-        <p class="form-description"><?= $field_description ?></p>
-    <?php } ?>
-    <input type="<?= $field_type ?>"
-           class="form-control <?= !empty($field_value) ? 'has-value' : '' ?>"
-           name="<?= $field_name ?>"
-           id="<?= $field_name ?>"
-           placeholder="<?= $placeholder ?? null ?>"
-        <?= $field_required ? 'required' : '' ?>
-           value="<?= $field_value ?>"
-        <?= $field_min_value ? 'min="' . $field_min_value . '"' : '' ?>
-        <?= $field_max_value ? 'max="' . $field_max_value . '"' : '' ?>
-    >
-    <?php } ?>
+        include 'fields/custom.php';
+    } elseif ($field_type === 'shortcode') {
+        include 'fields/shortcode.php';
+    } elseif ($field_type === 'repeater') {
+        include 'fields/repeater.php';
+    } else {
+        include 'fields/general.php';
+    } ?>
 </div>

@@ -29,6 +29,15 @@ function growtype_form_signup_page_url()
 
 /**
  * @return false|string|WP_Error|null
+ * Custom signup url
+ */
+function growtype_form_product_upload_page_url()
+{
+    return !empty(growtype_form_product_upload_page()) ? get_permalink(growtype_form_product_upload_page()) : null;
+}
+
+/**
+ * @return false|string|WP_Error|null
  * Custom lost password url
  */
 function growtype_form_lost_password_page_url()

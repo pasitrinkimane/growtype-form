@@ -15,7 +15,7 @@ class Growtype_Form_Wp_Crud
     {
         $post_type = $form_data['post_type'] ?? null;
         $post_title = $submitted_values['data']['title'] ?? null;
-        $post_author = $submitted_values['data']['form_submitter_id'] ?? null;
+        $post_author = $submitted_values['data'][Growtype_Form_Render::GROWTYPE_FORM_SUBMITTER_ID] ?? null;
         $post_status = $submitted_values['data']['post_status'] ?? 'draft';
         $submitted_data = $submitted_values['data'];
         $post_tags = $submitted_values['data']['tags'] ?? null;
@@ -23,8 +23,8 @@ class Growtype_Form_Wp_Crud
         /**
          * Unset unnecessary values from submitted data
          */
-        unset($submitted_data['form_submitter_id']);
-        unset($submitted_data['growtype_form_submitted']);
+        unset($submitted_data[Growtype_Form_Render::GROWTYPE_FORM_SUBMITTER_ID]);
+        unset($submitted_data[Growtype_Form_Render::GROWTYPE_FORM_SUBMIT_ACTION]);
         unset($submitted_data['terms_and_conditions']);
 
         /**
@@ -87,17 +87,17 @@ class Growtype_Form_Wp_Crud
     /**
      * @return array|int|WP_Error
      */
-    function upload_file_to_media_library($featured_image)
+    function upload_file_to_media_library($file)
     {
-        $featured_image_name = basename($featured_image["name"]);
-        $featured_image_extension = pathinfo($featured_image_name, PATHINFO_EXTENSION);
-        $featured_image_mime = mime_content_type($featured_image['tmp_name']);
+        $file_name = basename($file["name"]);
+        $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
+        $file_mime = mime_content_type($file['tmp_name']);
 
         if (!function_exists('wp_handle_upload')) {
             require_once(ABSPATH . 'wp-admin/includes/file.php');
         }
 
-        $upload_featured_image = wp_handle_upload($featured_image, array ('test_form' => false));
+        $upload_featured_image = wp_handle_upload($file, array ('test_form' => false));
 
         if (isset($upload_featured_image['error'])) {
             $response['success'] = false;
@@ -110,8 +110,8 @@ class Growtype_Form_Wp_Crud
 
         $upload_id = wp_insert_attachment(array (
             'guid' => $upload_featured_image_path,
-            'post_mime_type' => $featured_image_mime,
-            'post_title' => preg_replace('/\.[^.]+$/', '', $featured_image_name),
+            'post_mime_type' => $file_mime,
+            'post_title' => preg_replace('/\.[^.]+$/', '', $file_name),
             'post_content' => '',
             'post_status' => 'inherit'
         ), $upload_featured_image_path);

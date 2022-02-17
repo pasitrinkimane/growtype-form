@@ -1,0 +1,29 @@
+.growtype-form {
+  h3 {
+    font-size: 18px;
+    position: relative;
+
+    &:before {
+      content: "";
+      height: 3px;
+      width: 30px;
+      background: #7963F0;
+      display: inline-block;
+      position: absolute;
+      bottom: -12px;
+    }
+  }
+
+  .horizontal-content {
+    .form-check-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 5px;
+
+      .form-check {
+        margin-right: 15px;
+      }
+    }
+  }
+}
+
