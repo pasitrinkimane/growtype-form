@@ -159,15 +159,18 @@ class Growtype_Form_Wc_Crud
 
         $gallery_preloaded = $product_data['data']['preloaded'] ?? null;
 
+        $all_ids = $gallery_ids;
+
         if (!empty($gallery_preloaded)) {
             $all_ids = array_merge($gallery_ids, $gallery_preloaded);
-            $gallery_ids = $all_ids;
         }
 
+        $gallery_ids = $all_ids;
+
         /**
-         * Set gallery
+         * Set gallery ids
          */
-        if (isset($gallery_ids) && !empty($gallery_ids)) {
+        if (isset($all_ids)) {
             unset($all_ids[0]);
             $product->set_gallery_image_ids($all_ids);
         }
