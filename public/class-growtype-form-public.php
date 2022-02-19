@@ -90,7 +90,7 @@ class Growtype_Form_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-		wp_enqueue_script( $this->Growtype_Form, plugin_dir_url( __FILE__ ) . 'scripts/growtype-form.js', array( 'jquery' ), $this->version, true );
+		wp_enqueue_script( $this->Growtype_Form, GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form.js', array( 'jquery' ), $this->version, true );
 	}
 
 }
