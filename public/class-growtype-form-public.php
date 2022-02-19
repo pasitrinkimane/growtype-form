@@ -69,7 +69,7 @@ class Growtype_Form_Public {
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-		wp_enqueue_style( $this->Growtype_Form, GROWTYPE_FORM_URL . 'styles/growtype-form.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->Growtype_Form, GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form.css', array(), $this->version, 'all' );
 	}
 
 	/**
