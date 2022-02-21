@@ -85,7 +85,7 @@ class Growtype_Form_Wc_Crud
                 $product = new WC_Product_External();
             } elseif (growtype_form_default_product_type() === 'variable') {
                 $product = new WC_Product_Variable();
-            } elseif (class_exists('WC_Product_Auction') && growtype_form_default_product_type() === 'auction') {
+            } elseif (growtype_form_default_product_type() === 'auction') {
                 $product = new WC_Product_Auction($product);
             }
         }
@@ -106,7 +106,7 @@ class Growtype_Form_Wc_Crud
         /**
          * Meta keys to update
          */
-        $meta_keys_to_update = $this->get_product_extra_meta_keys();
+        $meta_keys_to_update = $this->get_product_extra_meta_keys(growtype_form_default_product_type());
 
         foreach ($meta_keys_to_update as $meta_key) {
             if (isset($product_data['data'][$meta_key])) {
@@ -114,6 +114,10 @@ class Growtype_Form_Wc_Crud
 
                 if ($meta_key === '_auction_dates_from' || $meta_key === '_auction_dates_to') {
                     $meta_data = date('Y-m-d H:i', strtotime($meta_data));
+                }
+
+                if ($meta_key === '_auction_bid_increment') {
+                    $meta_data = Growtype_Auction::BID_INCREMENT;
                 }
 
                 $product->update_meta_data($meta_key, $meta_data);
