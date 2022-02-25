@@ -272,7 +272,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
         // Activation email link.
         $email_link = add_query_arg(
             array (
-                'page' => 'bp-signups',
+                'page' => 'gf-signups',
                 'signup_id' => $signup_object->ID,
                 'action' => 'resend',
             ),
@@ -282,7 +282,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
         // Activate link.
         $activate_link = add_query_arg(
             array (
-                'page' => 'bp-signups',
+                'page' => 'gf-signups',
                 'signup_id' => $signup_object->ID,
                 'action' => 'activate',
             ),
@@ -292,7 +292,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
         // Delete link.
         $delete_link = add_query_arg(
             array (
-                'page' => 'bp-signups',
+                'page' => 'gf-signups',
                 'signup_id' => $signup_object->ID,
                 'action' => 'delete',
             ),
@@ -304,7 +304,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
         $actions = array ();
 
         $actions['activate'] = sprintf('<a href="%1$s">%2$s</a>', esc_url($activate_link), __('Evaluate', 'growtype-form'));
-        $actions['resend'] = sprintf('<a href="%1$s">%2$s</a>', esc_url($email_link), __('Email', 'growtype-form'));
+//        $actions['resend'] = sprintf('<a href="%1$s">%2$s</a>', esc_url($email_link), __('Email', 'growtype-form'));
 
         if (current_user_can('delete_users')) {
             $actions['delete'] = sprintf('<a href="%1$s" class="delete">%2$s</a>', esc_url($delete_link), __('Delete', 'growtype-form'));

@@ -12,8 +12,8 @@
                 <div class="content-shadow"></div>
             </div>
             <div class="modal-footer justify-content-center" style="display: none;">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">I Disagree</button>
-                <button type="button" class="btn btn-primary">I Agree</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{!! __('I Disagree','growtype') !!}</button>
+                <button type="button" class="btn btn-primary">{!! __('I Agree','growtype') !!}</button>
             </div>
         </div>
     </div>

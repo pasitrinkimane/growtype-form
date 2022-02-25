@@ -85,10 +85,10 @@ class Growtype_Form_Members {
 
 		// Manage signups.
 			$hooks['signups'] = $this->signups_page = add_users_page(
-				__( 'Manage Signups',  'growtype-form' ),
-				__( 'Manage Signups',  'growtype-form' ),
+				__( 'Manage GF Signups',  'growtype-form' ),
+				__( 'Manage GF Signups',  'growtype-form' ),
 				$this->capability,
-				'bp-signups',
+				'gf-signups',
 				array( $this, 'signups_admin' )
 			);
 
@@ -256,7 +256,7 @@ class Growtype_Form_Members {
 			add_screen_option( 'per_page', array( 'label' => _x( 'Pending Accounts', 'Pending Accounts per page (screen options)', 'growtype-form' ) ) );
 
 			get_current_screen()->add_help_tab( array(
-				'id'      => 'bp-signups-overview',
+				'id'      => 'gf-signups-overview',
 				'title'   => __( 'Overview', 'growtype-form' ),
 				'content' =>
 				'<p>' . __( 'This is the administration screen for pending accounts on your site.', 'growtype-form' ) . '</p>' .
@@ -266,7 +266,7 @@ class Growtype_Form_Members {
 			) );
 
 			get_current_screen()->add_help_tab( array(
-				'id'      => 'bp-signups-actions',
+				'id'      => 'gf-signups-actions',
 				'title'   => __( 'Actions', 'growtype-form' ),
 				'content' =>
 				'<p>' . __( 'Hovering over a row in the pending accounts list will display action links that allow you to manage pending accounts. You can perform the following actions:', 'growtype-form' ) . '</p>' .
@@ -328,6 +328,22 @@ class Growtype_Form_Members {
 			// Handle activated accounts.
 			} elseif ( 'do_activate' == $doaction ) {
 
+                $args = [];
+
+                $mail_details = [
+                'product'  => '',
+				'quantity' => '',
+				'order_id' => '',
+				];
+
+               $args = wp_parse_args($args, $mail_details);
+
+               $platform_url = get_option('growtype_form_account_verification_platform_page');
+               $platform_url = !empty($platform_url) ? get_permalink($platform_url) : '';
+
+		$mail_subject = sprintf( '%s', __( 'Verification status', 'woocommerce' ) );
+		$mail_body = sprintf( __( "Hello, \n\nWe are happy to inform you that your account is %s. You can access platform on %s", 'growtype-form' ), 'verified', $platform_url);
+
 				// Nonce check.
 				check_admin_referer( 'signups_activate' );
 
@@ -340,6 +356,11 @@ class Growtype_Form_Members {
 
                 foreach ($signups as $signup){
                   $user = new WP_User($signup);
+
+                  $to_email = $user->data->user_email;
+
+                  wp_mail( $to_email, $mail_subject, $mail_body );
+
                   $user->set_role($user_active_role);
                 }
 
@@ -644,7 +665,7 @@ class Growtype_Form_Members {
 
 		$form_url = add_query_arg(
 			array(
-				'page' => 'bp-signups',
+				'page' => 'gf-signups',
 			),
 			$form_url
 		);
@@ -675,7 +696,7 @@ class Growtype_Form_Members {
 		?>
 
 		<div class="wrap">
-			<h1 class="wp-heading-inline"><?php _e( 'Users', 'growtype-form' ); ?></h1>
+			<h1 class="wp-heading-inline"><?php _e( 'Signups', 'growtype-form' ); ?></h1>
 
 			<?php if ( current_user_can( 'create_users' ) ) : ?>
 
@@ -697,12 +718,12 @@ class Growtype_Form_Members {
 			<?php // Display each signups on its own row. ?>
 			<?php $bp_members_signup_list_table->views(); ?>
 
-			<form id="bp-signups-search-form" action="<?php echo esc_url( $search_form_url ) ;?>">
+			<form id="gf-signups-search-form" action="<?php echo esc_url( $search_form_url ) ;?>">
 				<input type="hidden" name="page" value="<?php echo esc_attr( $plugin_page ); ?>" />
-				<?php $bp_members_signup_list_table->search_box( __( 'Search Pending Users', 'growtype-form' ), 'bp-signups' ); ?>
+				<?php $bp_members_signup_list_table->search_box( __( 'Search Pending Users', 'growtype-form' ), 'gf-signups' ); ?>
 			</form>
 
-			<form id="bp-signups-form" action="<?php echo esc_url( $form_url );?>" method="post">
+			<form id="gf-signups-form" action="<?php echo esc_url( $form_url );?>" method="post">
 				<?php $bp_members_signup_list_table->display(); ?>
 			</form>
 		</div>
@@ -791,7 +812,7 @@ class Growtype_Form_Members {
 		}
 
 		// These arguments are added to all URLs.
-		$url_args = array( 'page' => 'bp-signups' );
+		$url_args = array( 'page' => 'gf-signups' );
 
 		// These arguments are only added when performing an action.
 		$action_args = array(
@@ -819,7 +840,7 @@ class Growtype_Form_Members {
 
 			<p><?php echo esc_html( $helper_text ); ?></p>
 
-			<ol class="bp-signups-list">
+			<ol class="gf-signups-list">
 			<?php foreach ( $signups as $signup ) :
 				$last_notified = mysql2date( 'Y/m/d g:i:s a', $signup->date_sent );
 

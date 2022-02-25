@@ -163,8 +163,24 @@ trait AdminSettingsSignup
 
         add_settings_field(
             'growtype_form_signup_show_footer',
-            'Show Footer',
+            'Show Footer in Signup page',
             array ($this, 'growtype_form_signup_show_footer_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_signup'
+        );
+
+        /**
+         * Platform page
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_account_verification_platform_page'
+        );
+
+        add_settings_field(
+            'growtype_form_account_verification_platform_page',
+            'Account Verification - Platform Page',
+            array ($this, 'growtype_form_account_verification_platform_page_callback'),
             'growtype-form-settings',
             'growtype_form_settings_signup'
         );
@@ -335,6 +351,24 @@ trait AdminSettingsSignup
         $enabled = get_option('growtype_form_signup_show_footer');
         ?>
         <input type="checkbox" name="growtype_form_signup_show_footer" value="1" <?php echo checked(1, $enabled, false) ?> />
+        <?php
+    }
+
+    /**
+     * Platform page
+     */
+    function growtype_form_account_verification_platform_page_callback()
+    {
+        $selected = get_option('growtype_form_account_verification_platform_page');
+        $pages = get_pages();
+        ?>
+        <select name='growtype_form_account_verification_platform_page'>
+            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <?php
+            foreach ($pages as $page) { ?>
+                <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>
+            <?php } ?>
+        </select>
         <?php
     }
 }
