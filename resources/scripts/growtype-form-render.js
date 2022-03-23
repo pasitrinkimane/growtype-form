@@ -79,7 +79,7 @@ function cloneReapeaterForm($duplicateBtn) {
  * @param newFormNr
  */
 function renameClonedForm(initialRepeaterForm, repeaterFormClone, newFormNr) {
-    initialRepeaterForm.find('div').map(function (index, element) {
+    initialRepeaterForm.find('.e-wrapper').map(function (index, element) {
         let groupName = $(element).attr('data-name');
         if (typeof groupName !== 'undefined' && groupName.length > 0) {
             let newName = '';
@@ -90,7 +90,7 @@ function renameClonedForm(initialRepeaterForm, repeaterFormClone, newFormNr) {
                 newName = groupName + '_' + newFormNr;
             }
 
-            let field = $(repeaterFormClone.find('div')[index]);
+            let field = $(repeaterFormClone.find('div')[index + 1]);
             field.attr('data-name', newName);
             field.find('label').attr('for', newName)
             field.find('.form-control')

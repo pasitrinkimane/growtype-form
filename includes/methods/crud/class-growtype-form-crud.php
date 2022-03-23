@@ -219,7 +219,7 @@ class Growtype_Form_Crud
          */
         if ($submit_data['success'] === false) {
             $return_values = [];
-            foreach ($submitted_values['data'] as $key => $value) {
+            foreach ($submitted_data as $key => $value) {
                 if (!in_array($key, self::EXCLUDED_VALUES_FROM_RETURN) && !in_array($key, self::EXCLUDED_VALUES_FROM_VALIDATION)) {
                     $return_values[$key] = $value;
                 }
@@ -426,7 +426,7 @@ class Growtype_Form_Crud
             $passed_values = [];
             foreach ($submitted_values_notsanitized as $value) {
                 $match = array_filter($required_fields_names, function ($key) use ($value) {
-                    return str_contains($key, $value);
+                    return str_contains($value, $key);
                 });
 
                 if (!$match && str_contains($value, $submitted_values_notsanitized[0])) {

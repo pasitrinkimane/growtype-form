@@ -30,7 +30,7 @@ if (isset($_REQUEST['repeater']) && !empty($_REQUEST['repeater'])) {
                 if (isset($single_field['name'])) {
                     $name = explode('[', $single_field['name'])[1];
                     $name = str_replace(']', '', $name);
-                    $single_field['value'] = $repeater[$name];
+                    $single_field['value'] = $repeater[$name] ?? null;
                 }
 
                 Growtype_Form_Render::render_growtype_form_field($single_field);

@@ -869,7 +869,6 @@ class Growtype_Form_Members {
 								</tr>
 
 								<?php
-
 								foreach ($signup_data as $data){ ?>
                                     <tr>
 									<td class="column-fields"><?= $data['label'] ?></td>

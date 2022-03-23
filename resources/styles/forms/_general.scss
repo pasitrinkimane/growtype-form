@@ -1,16 +1,18 @@
 .growtype-form {
-  h3 {
-    font-size: 18px;
-    position: relative;
+  .main-fields{
+    h3 {
+      font-size: 18px;
+      position: relative;
 
-    &:before {
-      content: "";
-      height: 3px;
-      width: 30px;
-      background: #7963F0;
-      display: inline-block;
-      position: absolute;
-      bottom: -12px;
+      &:before {
+        content: "";
+        height: 3px;
+        width: 30px;
+        background: #7963F0;
+        display: inline-block;
+        position: absolute;
+        bottom: -12px;
+      }
     }
   }
 

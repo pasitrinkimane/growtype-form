@@ -331,12 +331,35 @@ trait AdminSettingsSignup
 
         $user_data = [];
         foreach ($main_fields as $field) {
-            $meta_value = isset($field['name']) && isset($user_meta[$field['name']]) ? $user_meta[$field['name']][0] : null;
-            if (!empty($meta_value)) {
-                $user_data[$field['name']] = [
-                    'label' => $field['label'],
-                    'value' => $meta_value
-                ];
+            $field_name = $field['name'] ?? null;
+            $field_type = $field['type'] ?? null;
+
+            if ($field['type'] === 'custom') {
+                continue;
+            }
+
+            if ($field_type === 'repeater') {
+                foreach ($user_meta as $meta_key => $meta_value) {
+                    if (str_contains($meta_key, $field_name)) {
+                        $json_data = unserialize($meta_value[0]);
+                        $json_data_formatted = '';
+                        foreach ($json_data as $key => $value) {
+                            $json_data_formatted .= $key . ' - ' . $value . ",\n";
+                        }
+                        $user_data[$meta_key] = [
+                            'label' => $meta_key,
+                            'value' => $json_data_formatted
+                        ];
+                    }
+                }
+            } else {
+                $meta_value = isset($user_meta[$field_name]) ? $user_meta[$field_name][0] : null;
+                if (!empty($meta_value)) {
+                    $user_data[$field['name']] = [
+                        'label' => $field['label'] ?? null,
+                        'value' => $meta_value
+                    ];
+                }
             }
         }
 
