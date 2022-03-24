@@ -210,6 +210,10 @@ $('document').ready(function () {
             }
         }
 
+        let startDateMinDate = new Date();
+        startDateMinDate.setDate(startDateMinDate.getDate() + 1);
+        startDateMinDate.toLocaleDateString();
+
         $('.datetimepicker').datetimepicker({
             language: 'en',
             defaultDate: date,
@@ -217,13 +221,13 @@ $('document').ready(function () {
             numberOfMonths: 1,
             hour: hour,
             minute: minute,
-            minDate: new Date(),
+            minDate: startDateMinDate,
             onClose: function (dateText, inst) {
                 if ($(this).attr('name') === '_auction_dates_from') {
-                    let tomorrow = new Date(dateText);
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    tomorrow.toLocaleDateString();
-                    $('.datetimepicker[name="_auction_dates_to"]').datetimepicker("option", "minDate", tomorrow);
+                    let endDateMinDate = new Date(dateText);
+                    endDateMinDate.setDate(endDateMinDate.getDate() + 1);
+                    endDateMinDate.toLocaleDateString();
+                    $('.datetimepicker[name="_auction_dates_to"]').datetimepicker("option", "minDate", endDateMinDate);
                 }
                 validateValue($(this), dateText)
             },

@@ -7,12 +7,13 @@
 class Growtype_Form_Wc_Crud
 {
     use Product;
+    use User;
 
     /**
      * @param $data
      * @return array
      */
-    function create_or_update_product($product_data, $existing_product = null)
+    function create_or_update_product($product_data)
     {
         $product_title = $product_data['data']['title'] ?? __('New product', 'growtype-form');
 
@@ -73,11 +74,21 @@ class Growtype_Form_Wc_Crud
         $auction_start_price = $product_data['data']['_auction_start_price'] ?? '';
 
         /**
-         * Create product
+         * Check if products exists
          */
-        if (!empty($existing_product)) {
-            $product = $existing_product;
-        } else {
+        if (isset($product_data['data'][Growtype_Form_Render::GROWTYPE_FORM_POST_IDENTIFICATOR])) {
+            $product = wc_get_product($product_data['data'][Growtype_Form_Render::GROWTYPE_FORM_POST_IDENTIFICATOR]);
+
+            if (!empty($product)) {
+                wc_delete_product_transients($product->get_id());
+            }
+
+            if ($product && !$this->user_has_uploaded_product($product->get_id())) {
+                $product = null;
+            }
+        }
+
+        if (empty($product)) {
             $product = new WC_Product_Simple();
             if (growtype_form_default_product_type() === 'grouped') {
                 $product = new WC_Product_Grouped();
@@ -325,6 +336,8 @@ class Growtype_Form_Wc_Crud
          * Save product
          */
         $product->save();
+
+        do_action('woocommerce_product_quick_edit_save', $product);
 
         /**
          * Response

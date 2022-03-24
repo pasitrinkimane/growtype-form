@@ -27,7 +27,8 @@ trait Product
             '_amount_in_units',
             '_product_location_city',
             '_product_location_country',
-            '_price_per_unit'
+            '_price_per_unit',
+            '_price_per_unit_buy_now',
         ];
 
         if ($product_type === 'auction') {

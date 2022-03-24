@@ -147,21 +147,7 @@ class Growtype_Form_Crud
                 /**
                  * Check if product is set
                  */
-                $product = null;
-
-                if (isset($product_data['data'][Growtype_Form_Render::GROWTYPE_FORM_POST_IDENTIFICATOR])) {
-                    $product = wc_get_product($product_data['data'][Growtype_Form_Render::GROWTYPE_FORM_POST_IDENTIFICATOR]);
-
-                    if ($product && !$this->user_has_uploaded_product($product->get_id())) {
-                        $product = null;
-                    }
-                }
-
-                if (!empty($product)) {
-                    $submit_data = $wc_crud->create_or_update_product($product_data, $product);
-                } else {
-                    $submit_data = $wc_crud->create_or_update_product($product_data);
-                }
+                $submit_data = $wc_crud->create_or_update_product($product_data);
 
                 /**
                  * Status
@@ -424,19 +410,22 @@ class Growtype_Form_Crud
          */
         if (!empty($submitted_values_notsanitized)) {
             $passed_values = [];
-            foreach ($submitted_values_notsanitized as $value) {
+            foreach ($submitted_values_notsanitized as $index => $value) {
                 $match = array_filter($required_fields_names, function ($key) use ($value) {
-                    return str_contains($value, $key);
+                    return str_contains($key, $value);
                 });
 
-                if (!$match && str_contains($value, $submitted_values_notsanitized[0])) {
-                    $match = true;
+                if (!$match) {
+                    $match = array_filter($required_fields_names, function ($key) use ($value) {
+                        return str_contains($value, $key);
+                    });
                 }
 
                 if ($match) {
                     array_push($passed_values, $value);
                 }
             }
+
             if ($passed_values !== $submitted_values_notsanitized) {
                 return null;
             }
