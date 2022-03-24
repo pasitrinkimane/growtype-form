@@ -119,6 +119,13 @@ class Growtype_Form_Render
         wp_localize_script('growtype-form-render', 'growtype_form_date_time_data', self::DATE_TIME_DATA);
 
         /**
+         * File styles
+         */
+        if (!wp_script_is('bootstrap-filestyle', 'enqueued')) {
+            wp_enqueue_script('bootstrap-filestyle', GROWTYPE_FORM_URL_PUBLIC . 'plugins/bootstrap-filestyle/src/bootstrap-filestyle.min.js', array ('jquery'), '1.1', true);
+        }
+
+        /**
          * Image uploader
          */
         if (!wp_script_is('image-uploader', 'enqueued')) {
@@ -445,7 +452,7 @@ class Growtype_Form_Render
                                         <div class="g-recaptcha"
                                              data-sitekey="<?= $recaptchav3 ?>"
                                              data-size="invisible"
-                                             data-callback="uploadFormSubmit">
+                                             data-callback="recaptchaFormSubmit">
                                         </div>
                                     <?php } ?>
 
@@ -518,6 +525,8 @@ class Growtype_Form_Render
                     if (element.is("#growtype-form select")) {
                         element.parent().append(error);
                     } else if (element.is("#growtype-form input[type='checkbox']")) {
+                        element.parent().append(error);
+                    } else if (element.is("#growtype-form .filestyle")) {
                         element.parent().append(error);
                     } else {
                         error.insertAfter(element);
@@ -648,7 +657,7 @@ class Growtype_Form_Render
                 grecaptcha.execute();
             });
 
-            function uploadFormSubmit(token) {
+            function recaptchaFormSubmit(token) {
                 document.getElementById("growtype-form").submit();
             }
         </script>
@@ -739,7 +748,7 @@ class Growtype_Form_Render
                 $shipping_documents = Growtype_Product::shipping_documents();
                 foreach ($shipping_documents as $document) {
                     if (isset($document['key']) && isset($document['url'])) {
-                        $_REQUEST['shipping_documents[' . $document['key'] . ']'] = $document['url'];
+                        $_REQUEST['shipping_documents[' . $document['key'] . ']'] = $document;
                     }
                 }
             }

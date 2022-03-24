@@ -24,6 +24,7 @@ trait Product
             '_product_volume',
             '_amount_in_cases',
             '_cases_per_pallet',
+            '_units_per_case',
             '_amount_in_units',
             '_product_location_city',
             '_product_location_country',

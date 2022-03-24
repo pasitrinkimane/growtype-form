@@ -104,15 +104,7 @@ class Growtype_Form_Wc_Crud
         $product->set_name($product_title);
         $product->set_status($status);
         $product->set_catalog_visibility($visibility);
-        $product->set_price($price);
         $product->set_sold_individually(true);
-
-        /**
-         * Set regular price
-         */
-        if (isset($regular_price)) {
-            $product->set_regular_price($regular_price);
-        }
 
         /**
          * Meta keys to update
@@ -136,14 +128,39 @@ class Growtype_Form_Wc_Crud
         }
 
         /**
-         * Auction start price
+         * Auction set start price
          */
         $price_per_unit = $product_data['data']['_price_per_unit'] ?? null;
+        $price_per_unit_buy_now = $product_data['data']['_price_per_unit_buy_now'] ?? null;
         $amount_in_units = $product_data['data']['_amount_in_units'] ?? null;
         $auction_start_price = isset($auction_start_price) && !empty($auction_start_price) ? $auction_start_price : $price_per_unit * $amount_in_units;
 
         if (!empty($auction_start_price)) {
             $product->update_meta_data('_auction_start_price', $auction_start_price);
+        }
+
+        /**
+         * Set regular price
+         */
+        if (!empty($price_per_unit_buy_now) && !empty($amount_in_units)) {
+            $regular_price = $price_per_unit_buy_now * $amount_in_units;
+        }
+
+        if (!empty($regular_price)) {
+            $product->save();
+            update_post_meta($product->get_id(), '_regular_price', wc_format_decimal(wc_clean($regular_price)));
+        }
+
+        /**
+         * Set price
+         */
+        if (empty($price)) {
+            $price = $regular_price;
+        }
+
+        if (!empty($price)) {
+            $product->save();
+            update_post_meta($product->get_id(), '_price', wc_format_decimal(wc_clean($price)));
         }
 
         /**
@@ -325,6 +342,15 @@ class Growtype_Form_Wc_Crud
          */
         if (isset($product_shipping_documents) && !empty($product_shipping_documents)) {
             $product->update_meta_data('_shipping_documents', array_values($product_shipping_documents));
+        }
+
+        /**
+         * Auction bid increment
+         */
+        $auction_bid_increment = get_post_meta($product->get_id(), '_auction_bid_increment', true);
+
+        if (empty($auction_bid_increment)) {
+            $product->update_meta_data('_auction_bid_increment', Growtype_Auction::bid_increase_value());
         }
 
         /**

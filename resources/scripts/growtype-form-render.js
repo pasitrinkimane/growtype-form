@@ -261,12 +261,20 @@ $('document').ready(function () {
      * File input
      */
     $('.e-wrapper .btn-img-remove').click(function () {
-        let type = $(this).attr('data-type');
-        let id = $(this).attr('data-id');
-        let name = $(this).attr('data-name');
-        let accept = $(this).attr('data-accept');
-        let required = $(this).attr('data-required');
+        let inputType = $(this).attr('data-type');
+        let inputId = $(this).attr('data-id');
+        let inputClass = $(this).attr('data-class');
+        let inputName = $(this).attr('data-name');
+        let inputAccept = $(this).attr('data-accept');
+        let inputRequired = $(this).attr('data-required');
+        let newInput = $('<input type="' + inputType + '" id="' + inputId + '" class="' + inputClass + '" name="' + inputName + '"  accept="' + inputAccept + '"  ' + inputRequired + '>');
+
+        newInput.removeClass('has-value');
+
         $(this).closest('.input-file-wrapper').hide();
-        $(this).closest('.e-wrapper').append('<input type="' + type + '" id="' + id + '" name="' + name + '"  accept="' + accept + '"  ' + required + '>');
+        $(this).closest('.e-wrapper')
+            .append(newInput);
+
+        newInput.filestyle({buttonBefore: true})
     });
 });

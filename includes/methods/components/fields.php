@@ -12,7 +12,7 @@ if ($field_type === 'hidden') {
 $field_value = isset($field['value']) ? sanitize_text_field($field['value']) : null;
 
 if (empty($field_value)) {
-    $field_value = isset($_REQUEST[$field_name]) ? sanitize_text_field($_REQUEST[$field_name]) : null;
+    $field_value = isset($_REQUEST[$field_name]) && $field_type !== 'file' ? sanitize_text_field($_REQUEST[$field_name]) : $_REQUEST[$field_name] ?? null;
 }
 
 if ($field_name === 'name') {
@@ -22,7 +22,6 @@ if ($field_name === 'name') {
 if (str_contains($field_name, 'password')) {
     $field_value = null;
 }
-
 
 $field_options = $field['options'] ?? null;
 
@@ -63,6 +62,7 @@ $field_label = $field_required && !str_contains($field_label, '*') ? $field_labe
 $field_description = $field['description'] ?? null;
 $placeholder = $field['placeholder'] ?? null;
 $field_accept = $field['accept'] ?? null;
+$field_cta_text = $field['cta_text'] ?? null;
 $field_min_value = $field['min'] ?? null;
 $field_max_value = $field['max'] ?? null;
 $field_col_class = $field['class'] ?? 'col-auto';

@@ -23,3 +23,13 @@
     height: 70px;
   }
 }
+
+.bootstrap-filestyle {
+  .woocommerce form .form-row input.input-text, .woocommerce form .form-row textarea, input:not([type=checkbox]):not([type=radio]):not([type=submit]):not(.qty), textarea {
+    width: initial;
+  }
+
+  .group-span-filestyle {
+    z-index: 1;
+  }
+}
