@@ -53,6 +53,21 @@ class Growtype_Form_Wc_Crud
         $visibility = growtype_form_default_product_catalog_visibility();
 
         /**
+         * Price per unit
+         */
+        $price_per_unit = $product_data['data']['_price_per_unit'] ?? null;
+
+        /**
+         * Price per unit buy now
+         */
+        $price_per_unit_buy_now = $product_data['data']['_price_per_unit_buy_now'] ?? null;
+
+        /**
+         * Amount in units
+         */
+        $amount_in_units = $product_data['data']['_amount_in_units'] ?? null;
+
+        /**
          * Price
          */
         $price = $product_data['data']['price'] ?? '';
@@ -61,6 +76,10 @@ class Growtype_Form_Wc_Crud
          * Regular price
          */
         $regular_price = $product_data['data']['regular_price'] ?? '';
+
+        if (!empty($price_per_unit_buy_now) && !empty($amount_in_units)) {
+            $regular_price = $price_per_unit_buy_now * $amount_in_units;
+        }
 
         /**
          * Get descriptions
@@ -130,37 +149,10 @@ class Growtype_Form_Wc_Crud
         /**
          * Auction set start price
          */
-        $price_per_unit = $product_data['data']['_price_per_unit'] ?? null;
-        $price_per_unit_buy_now = $product_data['data']['_price_per_unit_buy_now'] ?? null;
-        $amount_in_units = $product_data['data']['_amount_in_units'] ?? null;
         $auction_start_price = isset($auction_start_price) && !empty($auction_start_price) ? $auction_start_price : $price_per_unit * $amount_in_units;
 
         if (!empty($auction_start_price)) {
             $product->update_meta_data('_auction_start_price', $auction_start_price);
-        }
-
-        /**
-         * Set regular price
-         */
-        if (!empty($price_per_unit_buy_now) && !empty($amount_in_units)) {
-            $regular_price = $price_per_unit_buy_now * $amount_in_units;
-        }
-
-        if (!empty($regular_price)) {
-            $product->save();
-            update_post_meta($product->get_id(), '_regular_price', wc_format_decimal(wc_clean($regular_price)));
-        }
-
-        /**
-         * Set price
-         */
-        if (empty($price)) {
-            $price = $regular_price;
-        }
-
-        if (!empty($price)) {
-            $product->save();
-            update_post_meta($product->get_id(), '_price', wc_format_decimal(wc_clean($price)));
         }
 
         /**
@@ -354,12 +346,37 @@ class Growtype_Form_Wc_Crud
         }
 
         /**
-         * Set changes
+         * Save product for later price update
+         */
+        if (!empty($regular_price) || !empty($price)) {
+            $product->save();
+        }
+
+        /**
+         * Set regular price
+         */
+        if (!empty($regular_price)) {
+            update_post_meta($product->get_id(), '_regular_price', wc_format_decimal(wc_clean($regular_price)));
+        }
+
+        /**
+         * Set price
+         */
+        if (empty($price)) {
+            $price = $regular_price;
+        }
+
+        if (!empty($price)) {
+            update_post_meta($product->get_id(), '_price', wc_format_decimal(wc_clean($price)));
+        }
+
+        /**
+         * Apply external changes
          */
         $product = apply_filters('growtype_form_wc_crud_product_update', $product, $product_data);
 
         /**
-         * Save product
+         * Save product to be sure
          */
         $product->save();
 
