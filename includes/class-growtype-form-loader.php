@@ -167,9 +167,6 @@ class Growtype_Form_Loader
         require_once GROWTYPE_FORM_PATH . 'includes/methods/user/class-growtype-form-profile.php';
         $this->Growtype_Form_Profile = new Growtype_Form_Profile();
 
-        require_once GROWTYPE_FORM_PATH . 'includes/methods/user/class-growtype-form-user.php';
-        $this->Growtype_Form_User = new Growtype_Form_User();
-
         /**
          * Render
          */

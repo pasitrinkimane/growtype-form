@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Provide a admin area view for the plugin
+ * Provide user methods
  *
  * This file is used to markup the admin-facing aspects of the plugin.
  *
@@ -11,24 +11,16 @@
  * @package    Growtype_Form
  * @subpackage Growtype_Form/admin/partials
  */
-
 trait User
 {
     /**
-     * @param $product_id
-     * @param $user_id
-     * @return bool
+     * @return WP_User|null
      */
-    public function user_has_uploaded_product($product_id, $user_id = null)
+    public function get_user_data($user_id = null)
     {
-        $user_id = $user_id ?? wp_get_current_user()->ID ?? null;
+        $user_data['profile_data'] = wp_get_current_user()->data;
+        $user_data['signup_data'] = Growtype_Form_Signup::get_signup_data();
 
-        if (empty($user_id)) {
-            return false;
-        }
-
-        $creator_id = (int)get_post_meta($product_id, '_product_creator_id', true);
-
-        return $creator_id === $user_id;
+        return $user_data;
     }
 }

@@ -156,15 +156,16 @@ trait AdminSettingsLogin
      */
     function growtype_form_redirect_after_login_page_callback()
     {
-        $selected = get_option('growtype_form_redirect_after_login_page');
+        $selected = growtype_form_redirect_after_login_page();
         $pages = get_pages();
         ?>
         <select name='growtype_form_redirect_after_login_page'>
-            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <option value='none' <?php selected($selected, 'none'); ?>>None - Growtype Form</option>
+            <option value='default-profile' <?php selected($selected, 'default-profile'); ?>>Default profile page - Growtype Form</option>
             <option value='dashboard' <?php selected($selected, 'dashboard'); ?>>Dashboard</option>
             <?php
             foreach ($pages as $page) { ?>
-                <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>
+                <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?> - Page</option>
             <?php } ?>
         </select>
         <?php

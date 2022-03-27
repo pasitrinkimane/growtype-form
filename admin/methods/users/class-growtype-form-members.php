@@ -844,7 +844,7 @@ class Growtype_Form_Members {
 			<?php foreach ( $signups as $signup ) :
 				$last_notified = mysql2date( 'Y/m/d g:i:s a', $signup->date_sent );
 
-                $signup_data = $this->growtype_form_get_user_signup_data($signup);
+                $signup_data = Growtype_Form_Signup::get_signup_data($signup->ID);
 
                 ?>
 

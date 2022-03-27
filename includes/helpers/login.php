@@ -13,17 +13,17 @@ function growtype_form_login_page_ID()
  */
 function growtype_form_login_page_is_active()
 {
-    $login_ID = growtype_form_login_page_ID();
+    $page_ID = growtype_form_login_page_ID();
 
-    if ($login_ID === 'default') {
+    if (isset($_SERVER['PHP_SELF']) && $page_ID === 'default') {
         $current_url_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
 
-        return $current_url_slug === Growtype_Form_Login::CUSTOM_SLUG;
+        return $current_url_slug === Growtype_Form_Login::URL_SLUG;
     }
 
-    $post = get_post($login_ID);
+    $post = get_post($page_ID);
 
-    return !empty($post) && is_page($post->post_name);
+    return !empty($post) && str_contains($_SERVER['REQUEST_URI'], $post->post_name);
 }
 
 /**
@@ -33,7 +33,7 @@ function growtype_form_login_page_is_active()
 function growtype_form_login_page_url()
 {
     if (!empty(growtype_form_login_page_ID()) && growtype_form_login_page_ID() === 'default') {
-        return home_url(Growtype_Form_Login::CUSTOM_SLUG);
+        return home_url(Growtype_Form_Login::URL_SLUG);
     }
 
     return !empty(growtype_form_login_page_ID()) ? get_permalink(growtype_form_login_page_ID()) : null;
@@ -44,7 +44,7 @@ function growtype_form_login_page_url()
  */
 function growtype_form_redirect_after_login_page()
 {
-    return get_post(get_option('growtype_form_redirect_after_login_page'));
+    return get_option('growtype_form_redirect_after_login_page');
 }
 
 /**
@@ -59,6 +59,8 @@ function growtype_form_redirect_url_after_login()
         $redirect_url = get_dashboard_url();
     } elseif ($redirect_page === 'dashboard') {
         $redirect_url = get_dashboard_url();
+    } elseif ($redirect_page === 'default-profile') {
+        $redirect_url = home_url(Growtype_Form_Profile::URL_SLUG);
     } else {
         $redirect_url = get_permalink($redirect_page);
     }

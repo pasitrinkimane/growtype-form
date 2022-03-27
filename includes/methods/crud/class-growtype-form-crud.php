@@ -6,7 +6,9 @@
  */
 class Growtype_Form_Crud
 {
+    use Post;
     use User;
+    use File;
     use Product;
     use Notice;
 
@@ -55,10 +57,13 @@ class Growtype_Form_Crud
         if (isset($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]) && in_array(sanitize_text_field($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]), self::GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS)) {
             if ($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION] === 'delete') {
                 $product_id = $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] ?? null;
-                $product = wc_get_product($product_id);
 
-                if (!empty($product)) {
-                    $product->delete();
+                if (class_exists('woocommerce')) {
+                    $product = wc_get_product($product_id);
+
+                    if (!empty($product)) {
+                        $product->delete();
+                    }
                 }
 
                 $redirect_url = growtype_form_redirect_url_after_product_creation();
@@ -93,7 +98,7 @@ class Growtype_Form_Crud
         /**
          * Current post id
          */
-        $post_id = $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] ?? null;
+        $post_id = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
 
         if (empty($form_data)) {
             return null;
@@ -130,11 +135,6 @@ class Growtype_Form_Crud
                     }
                 }
             } elseif (str_contains($form_name, 'wc_product')) {
-                /**
-                 * Include wc product crud class
-                 */
-                require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/wc/class-growtype-form-wc-crud.php';
-
                 $product_data = $submitted_values;
 
                 /**
@@ -160,12 +160,10 @@ class Growtype_Form_Crud
                     $product_data['data']['description'] = $description_formatted;
                 }
 
-                $wc_crud = new Growtype_Form_Wc_Crud();
-
                 /**
                  * Check if product is set
                  */
-                $submit_data = $wc_crud->create_or_update_product($product_data);
+                $submit_data = $this->create_or_update_product($product_data);
 
                 /**
                  * Status
@@ -188,18 +186,13 @@ class Growtype_Form_Crud
                     }
                 }
             } elseif ($form_name === 'post') {
-
-                require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/wp/class-growtype-form-wp-crud.php';
-
-                $wc_crud = new Growtype_Form_Wp_Crud();
-
-                $submit_data = $wc_crud->upload_post($form_data, $submitted_values);
+                $submit_data = $this->upload_post($form_data, $submitted_values);
 
                 /**
                  * Attach featured image
                  */
                 if (isset($submitted_values['files']) && isset($submitted_values['files']['featured_image'])) {
-                    $featured_image = $wc_crud->post_attach_featured_image($submit_data['post_id'], $submitted_values['files']['featured_image']);
+                    $featured_image = $this->post_attach_featured_image($submit_data['post_id'], $submitted_values['files']['featured_image']);
                 }
 
                 /**
@@ -290,31 +283,10 @@ class Growtype_Form_Crud
     }
 
     /**
-     * @param $form_name
-     * @return void
-     */
-    public static function get_growtype_form_sign_up_extra_data($form_name = 'signup')
-    {
-        $form_data = self::get_growtype_form_data($form_name);
-        $skipped_values = ['email', 'first_name', 'last_name', 'password', 'repeat_password'];
-
-        $important_data = [];
-        if (isset($form_data['main_fields'])) {
-            foreach ($form_data['main_fields'] as $key => $field) {
-                if ($field['type'] !== 'custom' && $field['type'] !== 'repeater' && !in_array($field['name'], $skipped_values)) {
-                    $important_data[$key] = $field;
-                }
-            }
-        }
-
-        return $important_data;
-    }
-
-    /**
      * @param $data
      * @return array
      */
-    function save_submitted_signup_data($data)
+    public function save_submitted_signup_data($data)
     {
         $email = isset($data['email']) ? sanitize_text_field($data['email']) : null;
         $username = isset($data['username']) ? sanitize_text_field($data['username']) : null;

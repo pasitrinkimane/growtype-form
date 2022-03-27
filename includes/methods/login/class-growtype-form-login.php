@@ -5,7 +5,7 @@
  */
 class Growtype_Form_Login
 {
-    const CUSTOM_SLUG = 'login';
+    const URL_SLUG = 'login';
 
     public function __construct()
     {
@@ -37,7 +37,7 @@ class Growtype_Form_Login
      */
     function custom_url()
     {
-        add_rewrite_endpoint(self::CUSTOM_SLUG, EP_ALL);
+        add_rewrite_endpoint(self::URL_SLUG, EP_ALL);
     }
 
     /**
@@ -48,7 +48,7 @@ class Growtype_Form_Login
         if (!empty($_SERVER['PHP_SELF'])) {
             $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
 
-            if (growtype_form_login_page_is_active() && growtype_form_login_page_ID() === 'default' && $page_slug === self::CUSTOM_SLUG) {
+            if (growtype_form_login_page_is_active() && growtype_form_login_page_ID() === 'default' && $page_slug === self::URL_SLUG) {
                 echo growtype_form_include_view('login/default');
                 exit;
             }

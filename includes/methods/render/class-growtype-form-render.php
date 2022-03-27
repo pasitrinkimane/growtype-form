@@ -6,6 +6,8 @@
 class Growtype_Form_Render
 {
     use Notice;
+    use File;
+    use Product;
 
     const GROWTYPE_FORM_SHORTCODE_NAME = 'growtype_form';
 
@@ -416,11 +418,11 @@ class Growtype_Form_Render
                         <?php } ?>
 
                         <div>
-                            <input type="text" hidden name='<?= Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION ?>' value="submit"/>
-                            <input type="text" hidden name='<?= Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
+                            <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION ?>' value="submit"/>
+                            <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
                             <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
                             <?php if (!empty($post)) { ?>
-                                <input type="text" hidden name='<?= Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?= $post->ID ?>"/>
+                                <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?= $post->ID ?>"/>
                             <?php } ?>
                         </div>
 
@@ -477,7 +479,7 @@ class Growtype_Form_Render
         if (!empty($_SERVER['PHP_SELF'])) {
             $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
 
-            if ($page_slug === Growtype_Form_Signup::CUSTOM_SLUG || $page_slug === Growtype_Form_Login::CUSTOM_SLUG) {
+            if ($page_slug === Growtype_Form_Signup::CUSTOM_SLUG || $page_slug === Growtype_Form_Login::URL_SLUG) {
                 return '';
             }
         }
@@ -493,7 +495,7 @@ class Growtype_Form_Render
         if (!empty($_SERVER['PHP_SELF'])) {
             $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
 
-            if ($page_slug === Growtype_Form_Signup::CUSTOM_SLUG || $page_slug === Growtype_Form_Login::CUSTOM_SLUG) {
+            if ($page_slug === Growtype_Form_Signup::CUSTOM_SLUG || $page_slug === Growtype_Form_Login::URL_SLUG) {
                 return $page_slug;
             }
         }
@@ -711,7 +713,7 @@ class Growtype_Form_Render
                 return null;
             }
 
-            $extra_meta_keys = $this->Growtype_Form_Crud->get_product_extra_meta_keys(growtype_form_default_product_type());
+            $extra_meta_keys = $this->get_product_extra_meta_keys(growtype_form_default_product_type());
 
             $_REQUEST['title'] = $product->get_title();
             $_REQUEST['description'] = $product->get_description();

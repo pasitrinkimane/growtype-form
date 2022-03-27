@@ -5,6 +5,8 @@
  */
 class Growtype_Form_Profile
 {
+    use User;
+
     const URL_SLUG = 'profile';
 
     public function __construct()
@@ -50,7 +52,7 @@ class Growtype_Form_Profile
                     /**
                      * Add user data
                      */
-                    $data['user'] = wp_get_current_user();
+                    $data['user'] = $this->get_user_data();
 
                     /**
                      * Check if child template available
@@ -66,7 +68,7 @@ class Growtype_Form_Profile
                      */
                     echo growtype_form_include_view('profile/default', $data);
                 } else {
-                    wp_redirect(growtype_form_signup_page_url());
+                    wp_redirect(growtype_form_login_page_url());
                 }
 
                 exit;
