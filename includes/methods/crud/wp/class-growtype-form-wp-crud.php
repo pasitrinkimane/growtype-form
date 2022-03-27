@@ -15,7 +15,7 @@ class Growtype_Form_Wp_Crud
     {
         $post_type = $form_data['post_type'] ?? null;
         $post_title = $submitted_values['data']['title'] ?? null;
-        $post_author = $submitted_values['data'][Growtype_Form_Render::GROWTYPE_FORM_SUBMITTER_ID] ?? null;
+        $post_author = $submitted_values['data'][Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID] ?? null;
         $post_status = $submitted_values['data']['post_status'] ?? 'draft';
         $submitted_data = $submitted_values['data'];
         $post_tags = $submitted_values['data']['tags'] ?? null;
@@ -23,8 +23,8 @@ class Growtype_Form_Wp_Crud
         /**
          * Unset unnecessary values from submitted data
          */
-        unset($submitted_data[Growtype_Form_Render::GROWTYPE_FORM_SUBMITTER_ID]);
-        unset($submitted_data[Growtype_Form_Render::GROWTYPE_FORM_SUBMIT_ACTION]);
+        unset($submitted_data[Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID]);
+        unset($submitted_data[Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION]);
         unset($submitted_data['terms_and_conditions']);
 
         /**

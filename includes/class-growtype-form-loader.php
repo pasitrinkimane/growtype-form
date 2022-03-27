@@ -143,8 +143,37 @@ class Growtype_Form_Loader
      */
     private function load_methods()
     {
-        require_once GROWTYPE_FORM_PATH . 'includes/methods/class-growtype-form-render.php';
+        /**
+         * CRUD
+         */
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/class-growtype-form-crud.php';
+        $this->Growtype_Form_Crud = new Growtype_Form_Crud();
 
+        /**
+         * Login
+         */
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/login/class-growtype-form-login.php';
+        $this->Growtype_Form_Login = new Growtype_Form_Login();
+
+        /**
+         * Signup
+         */
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/signup/class-growtype-form-signup.php';
+        $this->Growtype_Form_Signup = new Growtype_Form_Signup();
+
+        /**
+         * User
+         */
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/user/class-growtype-form-profile.php';
+        $this->Growtype_Form_Profile = new Growtype_Form_Profile();
+
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/user/class-growtype-form-user.php';
+        $this->Growtype_Form_User = new Growtype_Form_User();
+
+        /**
+         * Render
+         */
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/render/class-growtype-form-render.php';
         $this->loader = new Growtype_Form_Render();
     }
 }

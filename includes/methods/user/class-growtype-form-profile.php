@@ -5,7 +5,7 @@
  */
 class Growtype_Form_Profile
 {
-    const CUSTOM_SLUG = 'profile';
+    const URL_SLUG = 'profile';
 
     public function __construct()
     {
@@ -32,7 +32,7 @@ class Growtype_Form_Profile
      */
     function custom_url()
     {
-        add_rewrite_endpoint(self::CUSTOM_SLUG, EP_ALL);
+        add_rewrite_endpoint(self::URL_SLUG, EP_ALL);
     }
 
     /**
@@ -43,16 +43,28 @@ class Growtype_Form_Profile
         if (!empty($_SERVER['PHP_SELF'])) {
             $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
 
-            if (growtype_form_profile_page_is_active() && growtype_form_profile_page_ID() === 'default' && $page_slug === self::CUSTOM_SLUG) {
+            if (growtype_form_profile_page_is_active() && growtype_form_profile_page_ID() === 'default' && $page_slug === self::URL_SLUG) {
 
                 if (is_user_logged_in()) {
-                    $child_template_path = get_stylesheet_directory() . '/views/growtype-form/';
 
+                    /**
+                     * Add user data
+                     */
+                    $data['user'] = wp_get_current_user();
+
+                    /**
+                     * Check if child template available
+                     */
+                    $child_template_path = get_stylesheet_directory() . '/views/growtype-form/';
                     if (file_exists($child_template_path . 'profile/default.blade.php')) {
-                        echo growtype_form_include_view('profile/default', [], $child_template_path);
-                    } else {
-                        echo growtype_form_include_view('profile/default');
+                        echo growtype_form_include_view('profile/default', $data, $child_template_path);
+                        exit;
                     }
+
+                    /**
+                     * Use default template
+                     */
+                    echo growtype_form_include_view('profile/default', $data);
                 } else {
                     wp_redirect(growtype_form_signup_page_url());
                 }

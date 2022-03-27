@@ -20,7 +20,7 @@ class Growtype_Form_Wc_Crud
         /**
          * Get wordpress crud methods
          */
-        require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/class-growtype-form-wp-crud.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/wp/class-growtype-form-wp-crud.php';
 
         $wp_crud = new Growtype_Form_Wp_Crud();
 
@@ -95,8 +95,8 @@ class Growtype_Form_Wc_Crud
         /**
          * Check if products exists
          */
-        if (isset($product_data['data'][Growtype_Form_Render::GROWTYPE_FORM_POST_IDENTIFICATOR])) {
-            $product = wc_get_product($product_data['data'][Growtype_Form_Render::GROWTYPE_FORM_POST_IDENTIFICATOR]);
+        if (isset($product_data['data'][self::GROWTYPE_FORM_POST_IDENTIFICATOR])) {
+            $product = wc_get_product($product_data['data'][self::GROWTYPE_FORM_POST_IDENTIFICATOR]);
 
             if (!empty($product)) {
                 wc_delete_product_transients($product->get_id());
@@ -269,7 +269,7 @@ class Growtype_Form_Wc_Crud
         /**
          * Add product creator id
          */
-        $creator_id = $product_data['data'][Growtype_Form_Render::GROWTYPE_FORM_SUBMITTER_ID] ?? null;
+        $creator_id = $product_data['data'][self::GROWTYPE_FORM_SUBMITTER_ID] ?? null;
 
         if (!empty($creator_id)) {
             $product->update_meta_data('_product_creator_id', $creator_id);

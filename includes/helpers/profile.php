@@ -18,7 +18,7 @@ function growtype_form_profile_page_is_active()
     if (isset($_SERVER['PHP_SELF']) && $page_ID === 'default') {
         $current_url_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
 
-        return $current_url_slug === Growtype_Form_Profile::CUSTOM_SLUG;
+        return $current_url_slug === Growtype_Form_Profile::URL_SLUG;
     }
 
     $post = get_post($page_ID);

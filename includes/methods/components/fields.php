@@ -16,7 +16,7 @@ if (empty($field_value)) {
 }
 
 if ($field_name === 'name') {
-    $field_value = $_REQUEST[self::ALTERNATIVE_SUBMITTED_DATA_KEYS[$field_name]] ?? null;
+    $field_value = $_REQUEST[Growtype_Form_Crud::ALTERNATIVE_SUBMITTED_DATA_KEYS[$field_name]] ?? null;
 }
 
 if (str_contains($field_name, 'password')) {

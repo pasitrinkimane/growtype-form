@@ -9,18 +9,7 @@ class Growtype_Form_Render
 
     const GROWTYPE_FORM_SHORTCODE_NAME = 'growtype_form';
 
-    const GROWTYPE_FORM_SUBMIT_ACTION = 'growtype_form_submit_action';
-    const GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS = ['submit', 'preview', 'save_as_draft', 'delete'];
-    const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
-
-    const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
-    const GROWTYPE_FORM_POST_IDENTIFICATOR = 'growtype_form_post_id';
-
     const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['text', 'textarea', 'file', 'email', 'select', 'radio', 'checkbox', 'hidden', 'number', 'password', 'custom', 'repeater', 'shortcode'];
-
-    const ALTERNATIVE_SUBMITTED_DATA_KEYS = [
-        'name' => 'name_s'
-    ];
 
     const DATE_TIME_DATA = [
         'date_format' => "yy-mm-dd"
@@ -34,26 +23,6 @@ class Growtype_Form_Render
         if (!is_admin()) {
             add_shortcode(self::GROWTYPE_FORM_SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
         }
-
-        $this->load_methods();
-    }
-
-    /**
-     * @return void
-     */
-    function load_methods()
-    {
-        require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/class-growtype-form-crud.php';
-        $this->Growtype_Form_Crud = new Growtype_Form_Crud();
-
-        require_once GROWTYPE_FORM_PATH . 'includes/methods/login/class-growtype-form-login.php';
-        $this->Growtype_Form_Login = new Growtype_Form_Login();
-
-        require_once GROWTYPE_FORM_PATH . 'includes/methods/signup/class-growtype-form-signup.php';
-        $this->Growtype_Form_Signup = new Growtype_Form_Signup();
-
-        require_once GROWTYPE_FORM_PATH . 'includes/methods/profile/class-growtype-form-profile.php';
-        $this->Growtype_Form_Profile = new Growtype_Form_Profile();
     }
 
     /**
@@ -328,7 +297,7 @@ class Growtype_Form_Render
         </div>
 
         <div>
-            <input type="text" hidden name='<?= self::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
+            <input type="text" hidden name='<?= Growtype_Form_Crud::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
         </div>
 
         <?php
@@ -416,11 +385,11 @@ class Growtype_Form_Render
                         <?php } ?>
 
                         <?php if (!empty($form_title)) { ?>
-                            <h2 class="e-title-intro"><?= $form_title ?></h2>
+                            <h2 class="e-title-intro"><?php echo $form_title ?></h2>
                         <?php } ?>
                     </div>
 
-                    <form enctype="multipart/form-data" class="growtype-form form <?php echo $class ?>" action="<?php echo self::growtype_form_get_action_url(); ?>" method="post" data-name="<?= $form_name ?>">
+                    <form id="growtype-form-<?php echo $form_name ?>" enctype="multipart/form-data" class="growtype-form form <?php echo $class ?>" action="<?php echo self::growtype_form_get_action_url(); ?>" method="post" data-name="<?php echo $form_name ?>">
                         <?php
                         foreach ($form as $key => $form_fields) { ?>
 
@@ -447,11 +416,11 @@ class Growtype_Form_Render
                         <?php } ?>
 
                         <div>
-                            <input type="text" hidden name='<?= self::GROWTYPE_FORM_SUBMIT_ACTION ?>' value="submit"/>
-                            <input type="text" hidden name='<?= self::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
-                            <input type="text" hidden name='<?= self::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
+                            <input type="text" hidden name='<?= Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION ?>' value="submit"/>
+                            <input type="text" hidden name='<?= Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
+                            <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
                             <?php if (!empty($post)) { ?>
-                                <input type="text" hidden name='<?= self::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?= $post->ID ?>"/>
+                                <input type="text" hidden name='<?= Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?= $post->ID ?>"/>
                             <?php } ?>
                         </div>
 

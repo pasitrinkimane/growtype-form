@@ -11,16 +11,32 @@ class Growtype_Form_Crud
     use Notice;
 
     const EXCLUDED_VALUES_FROM_VALIDATION = [
-        Growtype_Form_Render::GROWTYPE_FORM_SUBMIT_ACTION,
-        Growtype_Form_Render::GROWTYPE_FORM_SUBMITTER_ID,
-        Growtype_Form_Render::GROWTYPE_FORM_NAME_IDENTIFICATOR,
-        Growtype_Form_Render::GROWTYPE_FORM_POST_IDENTIFICATOR,
+        self::GROWTYPE_FORM_SUBMIT_ACTION,
+        self::GROWTYPE_FORM_SUBMITTER_ID,
+        self::GROWTYPE_FORM_NAME_IDENTIFICATOR,
+        self::GROWTYPE_FORM_POST_IDENTIFICATOR,
         'preloaded',
     ];
 
-    const EXCLUDED_VALUES_FROM_SAVING = ['username', 'password', 'repeat_password', 'email', 'submit', Growtype_Form_Render::GROWTYPE_FORM_SUBMIT_ACTION];
+    const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
+
+    const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
+    const GROWTYPE_FORM_POST_IDENTIFICATOR = 'growtype_form_post_id';
+
+    const GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS = ['submit', 'preview', 'save_as_draft', 'delete'];
+
+    const GROWTYPE_FORM_SUBMIT_ACTION = 'growtype_form_submit_action';
+
+    const EXCLUDED_VALUES_FROM_SAVING = ['username', 'password', 'repeat_password', 'email', 'submit', self::GROWTYPE_FORM_SUBMIT_ACTION];
     const EXCLUDED_VALUES_FROM_RETURN = ['password', 'repeat_password'];
 
+    const ALTERNATIVE_SUBMITTED_DATA_KEYS = [
+        'name' => 'name_s'
+    ];
+
+    /**
+     *
+     */
     public function __construct()
     {
         if (!is_admin()) {
@@ -36,9 +52,9 @@ class Growtype_Form_Crud
         /**
          * Process posted values
          */
-        if (isset($_POST[Growtype_Form_Render::GROWTYPE_FORM_SUBMIT_ACTION]) && in_array(sanitize_text_field($_POST[Growtype_Form_Render::GROWTYPE_FORM_SUBMIT_ACTION]), Growtype_Form_Render::GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS)) {
-            if ($_POST[Growtype_Form_Render::GROWTYPE_FORM_SUBMIT_ACTION] === 'delete') {
-                $product_id = $_POST[Growtype_Form_Render::GROWTYPE_FORM_POST_IDENTIFICATOR] ?? null;
+        if (isset($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]) && in_array(sanitize_text_field($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]), self::GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS)) {
+            if ($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION] === 'delete') {
+                $product_id = $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] ?? null;
                 $product = wc_get_product($product_id);
 
                 if (!empty($product)) {
@@ -47,7 +63,7 @@ class Growtype_Form_Crud
 
                 $redirect_url = growtype_form_redirect_url_after_product_creation();
             } else {
-                $form_name = sanitize_text_field($_POST[Growtype_Form_Render::GROWTYPE_FORM_NAME_IDENTIFICATOR]);
+                $form_name = sanitize_text_field($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]);
 
                 $submitted_values = [
                     'files' => $_FILES,
@@ -77,7 +93,7 @@ class Growtype_Form_Crud
         /**
          * Current post id
          */
-        $post_id = $_POST[Growtype_Form_Render::GROWTYPE_FORM_POST_IDENTIFICATOR] ?? null;
+        $post_id = $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] ?? null;
 
         if (empty($form_data)) {
             return null;
@@ -117,7 +133,7 @@ class Growtype_Form_Crud
                 /**
                  * Include wc product crud class
                  */
-                require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/class-growtype-form-wc-crud.php';
+                require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/wc/class-growtype-form-wc-crud.php';
 
                 $product_data = $submitted_values;
 
@@ -163,7 +179,7 @@ class Growtype_Form_Crud
 
                     $redirect_url = growtype_form_redirect_url_after_product_creation();
 
-                    if ($_POST[Growtype_Form_Render::GROWTYPE_FORM_SUBMIT_ACTION] === 'preview') {
+                    if ($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION] === 'preview') {
                         $redirect_url = Growtype_Product::preview_permalink($product_id);
                     }
 
@@ -173,7 +189,7 @@ class Growtype_Form_Crud
                 }
             } elseif ($form_name === 'post') {
 
-                require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/class-growtype-form-wp-crud.php';
+                require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/wp/class-growtype-form-wp-crud.php';
 
                 $wc_crud = new Growtype_Form_Wp_Crud();
 
@@ -229,7 +245,7 @@ class Growtype_Form_Crud
 
         $redirect_url = !empty($post_id) ? get_permalink($post_id) : home_url($current_slug);
 
-        if ($_POST[Growtype_Form_Render::GROWTYPE_FORM_SUBMIT_ACTION] === 'preview' && class_exists('Growtype_Product')) {
+        if ($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION] === 'preview' && class_exists('Growtype_Product')) {
             $redirect_url = Growtype_Product::edit_permalink($post_id);
         }
 
@@ -405,7 +421,7 @@ class Growtype_Form_Crud
              * Prepare keys for return
              */
             if ($key === 'name') {
-                $key = Growtype_Form_Render::ALTERNATIVE_SUBMITTED_DATA_KEYS[$key];
+                $key = self::ALTERNATIVE_SUBMITTED_DATA_KEYS[$key];
             }
 
             $submitted_values_sanitized[$key] = $value;

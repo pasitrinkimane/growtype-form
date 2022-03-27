@@ -17,7 +17,7 @@ function growtype_form_include_view($path, $data = [], $view_path = null)
 
     $full_path = $view_path . str_replace('.', '/', $path) . '.blade.php';
 
-    return sage('blade')->render($full_path, $data);
+    return sage('blade')->render($full_path, ['data' => $data]);
 }
 
 /**
