@@ -191,13 +191,15 @@ class Growtype_Form_Admin
      */
     function growtype_form_settings_tabs($current = 'login')
     {
-        $tabs = [
-            'login' => 'Login',
-            'signup' => 'Signup',
-            'woocommerce' => 'Woocommerce',
-            'post' => 'Post',
-            'examples' => 'Examples',
-        ];
+        $tabs['login'] = 'Login';
+        $tabs['signup'] = 'Signup';
+        $tabs['post'] = 'Post';
+
+        if (class_exists('woocompress')) {
+            $tabs['woocommerce'] = 'Woocommerce';
+        }
+
+        $tabs['examples'] = 'Examples';
 
         echo '<div id="icon-themes" class="icon32"><br></div>';
         echo '<h2 class="nav-tab-wrapper">';
@@ -232,6 +234,8 @@ class Growtype_Form_Admin
                     $this->growtype_form_settings_tabs();
                 }
                 ?>
+
+                <p><b>Json beautifier:</b> <a href="https://jsonbeautify.com/" target="_blank">https://jsonbeautify.com/</a></p>
 
                 <form id="growtype_form_main_settings_form" method="post" action="options.php">
                     <?php
@@ -350,8 +354,10 @@ class Growtype_Form_Admin
         /**
          * Load members
          */
-        if ( !class_exists( 'WP_List_Table' ) ) require( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
-        require_once( ABSPATH . 'wp-admin/includes/class-wp-users-list-table.php' );
+        if (!class_exists('WP_List_Table')) {
+            require(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
+        }
+        require_once(ABSPATH . 'wp-admin/includes/class-wp-users-list-table.php');
 
         require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-members.php';
         require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-members-list-table.php';

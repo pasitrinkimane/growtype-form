@@ -2,14 +2,20 @@
 
 use function App\sage;
 
-function growtype_form_include_view($path, $data = null)
+/**
+ * @param $path
+ * @param $data
+ * @param $view_path
+ * @return mixed
+ */
+function growtype_form_include_view($path, $data = [], $view_path = null)
 {
-    $plugin_root = plugin_dir_path(dirname(__DIR__));
-    $full_path = $plugin_root . 'resources/views/' . str_replace('.', '/', $path) . '.blade.php';
-
-    if (empty($data)) {
-        return sage('blade')->render($full_path);
+    if (empty($view_path)) {
+        $plugin_root = plugin_dir_path(dirname(__DIR__));
+        $view_path = $plugin_root . 'resources/views/';
     }
+
+    $full_path = $view_path . str_replace('.', '/', $path) . '.blade.php';
 
     return sage('blade')->render($full_path, $data);
 }

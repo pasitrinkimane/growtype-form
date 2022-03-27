@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Growtype - Form\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-18 10:57+0000\n"
+"POT-Creation-Date: 2022-03-26 20:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -16,12 +16,119 @@ msgstr ""
 "X-Loco-Version: 2.5.3; wp-5.8\n"
 "X-Domain: growtype-form"
 
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:274
+msgid ""
+"\"Delete\" allows you to delete a pending account from your site. You will "
+"be asked to confirm this deletion."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:273
+msgid ""
+"\"Email\" takes you to the confirmation screen before being able to send the "
+"activation link to the desired pending account. You can only send the "
+"activation email once per day."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:941
+msgid "(less than 24 hours ago)"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:282
+msgid "<a href=\"https://buddypress.org/support/\">Support Forums</a>"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:270
+msgid "Actions"
+msgstr ""
+
 #. Description of the plugin
 msgid "Advanced form functionality for \"Growtype\" theme."
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/methods/form-render.php:58
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:612
+msgid "At least one selection is required."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:276
+msgid ""
+"Bulk actions allow you to perform these 3 actions for the selected rows."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:275
+msgid ""
+"By clicking on a Username you will be able to activate a pending account "
+"from the confirmation screen."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:984
+msgid "Cancel"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:123
+msgid "Check your e-mail for login information."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:983
+msgid "Confirm"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:177
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:310
+msgid "Delete"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:787
+msgid "Delete Pending Accounts"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:857
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:953
+msgid "Display Name"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:485
+msgid "Do you already have an account?"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:157
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:862
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:958
+msgid "Email"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:160
+msgid "Emails Sent"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:306
+msgid "Evaluate"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:796
+msgid "Evaluate Pending Accounts"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:154
+msgid "Extended"
+msgstr ""
+
+#. accessibility text
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:288
+msgid "Filter users list"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:281
+msgid "For more information:"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:233
 msgid "Form is not configured. Please contact site admin."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:263
+msgid ""
+"From the screen options, you can customize the displayed columns and the "
+"pagination of this screen."
 msgstr ""
 
 #. Author of the plugin
@@ -29,9 +136,27 @@ msgid "Growtype"
 msgstr ""
 
 #. Name of the plugin
-#: ../../../../../packages/growtype-form/admin/class-growtype-form-admin.php:116
-#: ../../../../../packages/growtype-form/admin/class-growtype-form-admin.php:117
 msgid "Growtype - Form"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/AdminAppearanceMenu.php:24
+msgid "Growtype Form"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:345
+#, php-format
+msgid ""
+"Hello, \n"
+"\n"
+"We are happy to inform you that your account is %s. You can access platform "
+"on %s"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:272
+msgid ""
+"Hovering over a row in the pending accounts list will display action links "
+"that allow you to manage pending accounts. You can perform the following "
+"actions:"
 msgstr ""
 
 #. URI of the plugin
@@ -39,51 +164,342 @@ msgstr ""
 msgid "http://newcoolstudio.com/"
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/methods/form-render.php:560
-msgid "Missing data. Please contact site admin."
+#. %s: notification date
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:936
+#, php-format
+msgid "Last notified: %s"
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/methods/form-render.php:386
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:159
+msgid "Last Sent"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:217
+msgid "Log In"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:162
+msgid "Lost your password?"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:88
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:89
+msgid "Manage GF Signups"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:312
 msgid "Missing required values"
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/methods/form-render.php:393
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:156
+msgid "Name"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wc-crud.php:18
+msgid "New product"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:192
+msgid "No pending accounts found."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:260
+msgid "Overview"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:215
+msgid "Password"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:319
 msgid "Passwords do not match"
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/methods/form-render.php:566
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:256
+msgctxt "Pending Accounts per page (screen options)"
+msgid "Pending Accounts"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:173
+msgctxt "Pending signup action"
+msgid "Email"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:172
+msgctxt "Pending signup action"
+msgid "Evaluate"
+msgstr ""
+
+#. accessibility text
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:292
+msgid "Pending users list"
+msgstr ""
+
+#. accessibility text
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:290
+msgid "Pending users list navigation"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:550
+msgid "Please enter password."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:202
 msgid "Please fill all required fields."
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/crud/wc.php:112
+#: ../../../../../../packages/plugins/growtype-form/resources/views/modals/privacy.blade.php:5
+msgid "Privacy policy"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wc-crud.php:397
 msgid "Product created."
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/methods/form-render.php:542
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wc-crud.php:395
+msgid "Product updated."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:162
 msgid "Product uploaded."
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/methods/form-render.php:419
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:348
 msgid "Profile already registered."
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/methods/form-render.php:556
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:194
 msgid "Record created successfully."
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/methods/form-render.php:424
-msgid "Registration successful."
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:158
+msgid "Registered"
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/methods/form-render.php:190
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:867
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:963
+msgid "Registration Date"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:216
+msgid "Remember Me"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:805
+msgid "Resend Activation Emails"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:472
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:475
 msgid "Save"
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/methods/form-render.php:426
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:723
+msgid "Search Pending Users"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:712
+#, php-format
+msgid "Search results for &#8220;%s&#8221;"
+msgstr ""
+
+#. accessibility text
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:255
+#, php-format
+msgid "Select user: %s"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:486
+msgid "Sign in"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:169
+msgid "Sign up"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:353
+msgid "Sign up successful."
+msgstr ""
+
+#. %s: number of deleted signups
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:530
+#, php-format
+msgctxt "signup deleted"
+msgid "%s sign-up successfully deleted!"
+msgid_plural "%s sign-ups successfully deleted!"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:542
+#, php-format
+msgctxt "signup notdeleted"
+msgid "%s sign-up was not deleted."
+msgid_plural "%s sign-ups were not deleted."
+msgstr[0] ""
+msgstr[1] ""
+
+#. %s: number of accounts not activated
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:506
+#, php-format
+msgctxt "signup notsent"
+msgid "%s account was not activated."
+msgid_plural "%s accounts were not activated."
+msgstr[0] ""
+msgstr[1] ""
+
+#. %s: number of unsent activation emails
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:470
+#, php-format
+msgctxt "signup notsent"
+msgid "%s activation email was not sent."
+msgid_plural "%s activation emails were not sent."
+msgstr[0] ""
+msgstr[1] ""
+
+#. %s: number of activated accounts
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:494
+#, php-format
+msgctxt "signup resent"
+msgid "%s account successfully activated! "
+msgid_plural "%s accounts successfully activated! "
+msgstr[0] ""
+msgstr[1] ""
+
+#. %s: number of activation emails sent
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:458
+#, php-format
+msgctxt "signup resent"
+msgid "%s activation email successfully sent! "
+msgid_plural "%s activation emails successfully sent! "
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:699
+msgid "Signups"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:355
 msgid "Something went wrong."
 msgstr ""
 
-#: ../../../../../packages/growtype-form/includes/crud/wc.php:109
-#: ../../../../../packages/growtype-form/includes/crud/wp.php:52
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:110
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wc-crud.php:390
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wp-crud.php:53
 msgid "Something went wrong. Please contact administrator."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/resources/views/modals/confirmation.blade.php:5
+#: ../../../../../../packages/plugins/growtype-form/resources/views/modals/terms.blade.php:5
+msgid "Terms & Conditions"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:574
+msgid "There was a problem activating accounts. Please try again."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:581
+msgid "There was a problem deleting sign-ups. Please try again."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:567
+msgid "There was a problem sending the activation emails. Please try again."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:979
+msgid "This action cannot be undone."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:262
+msgid "This is the administration screen for pending accounts on your site."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:707
+msgctxt "user"
+msgid "Add Existing"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:703
+msgctxt "user"
+msgid "Add New"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:915
+msgid "User profile details"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:214
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:155
+msgid "Username"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:265
+msgid ""
+"Using the search form, you can find pending accounts more easily. The "
+"Username and Email fields will be included in the search."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:198
+msgid "Wrong data submitted. Please contact site admin."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:613
+msgid "Wrong date format. Please select again."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:119
+msgid "Wrong login details. Please try again."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:798
+msgid "You are about to activate the following account:"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:800
+msgid "You are about to activate the following accounts:"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:789
+msgid "You are about to delete the following account:"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:791
+msgid "You are about to delete the following accounts:"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:807
+msgid "You are about to resend an activation email to the following account:"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:809
+msgid "You are about to resend an activation email to the following accounts:"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:121
+msgid "You are now logged out."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:264
+msgid ""
+"You can reorder the list of your pending accounts by clicking on the "
+"Username, Email or Registered column headers."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:168
+msgid "You don’t have an account?"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:543
+msgid "Your Password Must Contain At Least 1 Capital Letter!"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:546
+msgid "Your Password Must Contain At Least 1 Lowercase Letter!"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:540
+msgid "Your Password Must Contain At Least 1 Number!"
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:537
+msgid "Your Password Must Contain At Least 8 Characters!"
 msgstr ""

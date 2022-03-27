@@ -1,0 +1,20 @@
+{
+  "login": {
+    "title": "[:en]Sign in[:lt]Prisijungimas",
+    "logo": false,
+    "sign_up_btn": true,
+    "lost_password_btn": true,
+    "username_placeholder": "[:en]Your email[:lt]Jūsų el. paštas",
+    "password_placeholder": "[:en]Your password[:lt]Jūsų slaptažodis",
+    "wp_login_form": [
+      {
+        "redirect": "",
+        "form_id": "loginform-custom",
+        "label_password": "[:en]Password[:lt]Slaptažodis",
+        "label_remember": "[:en]Remember Me[:lt]Prisiminti",
+        "label_log_in": "[:en]Continue[:lt]Prisijungti",
+        "remember": true
+      }
+    ]
+  }
+}

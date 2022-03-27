@@ -33,9 +33,9 @@ class Growtype_Form_Render
     {
         if (!is_admin()) {
             add_shortcode(self::GROWTYPE_FORM_SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
-            add_filter('body_class', array ($this, 'growtype_form_body_class'));
-            $this->load_methods();
         }
+
+        $this->load_methods();
     }
 
     /**
@@ -43,11 +43,17 @@ class Growtype_Form_Render
      */
     function load_methods()
     {
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/class-growtype-form-crud.php';
+        $this->Growtype_Form_Crud = new Growtype_Form_Crud();
+
         require_once GROWTYPE_FORM_PATH . 'includes/methods/login/class-growtype-form-login.php';
         $this->Growtype_Form_Login = new Growtype_Form_Login();
 
-        require_once GROWTYPE_FORM_PATH . 'includes/methods/crud/class-growtype-form-crud.php';
-        $this->Growtype_Form_Crud = new Growtype_Form_Crud();
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/signup/class-growtype-form-signup.php';
+        $this->Growtype_Form_Signup = new Growtype_Form_Signup();
+
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/profile/class-growtype-form-profile.php';
+        $this->Growtype_Form_Profile = new Growtype_Form_Profile();
     }
 
     /**
@@ -55,11 +61,7 @@ class Growtype_Form_Render
      */
     function growtype_form_body_class($classes)
     {
-        global $post;
-
-        if (!empty($post) && has_shortcode($post->post_content, self::GROWTYPE_FORM_SHORTCODE_NAME)) {
-            $classes[] = 'growtype-form';
-        }
+        $classes[] = 'has-growtype-form';
 
         if (growtype_form_login_page_is_active()) {
             $classes[] = 'login-' . growtype_form_get_login_page_template();
@@ -85,6 +87,9 @@ class Growtype_Form_Render
      */
     function growtype_form_enqueue_render_styles()
     {
+        /**
+         * Main css
+         */
         wp_enqueue_style('growtype-form-render', GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form-render.css', array (), '1.1', 'all');
 
         /**
@@ -207,6 +212,11 @@ class Growtype_Form_Render
         if (empty($args)) {
             return null;
         }
+
+        /**
+         * Init body classes
+         */
+        add_filter('body_class', array ($this, 'growtype_form_body_class'));
 
         /**
          * Form name
@@ -387,7 +397,7 @@ class Growtype_Form_Render
         /**
          * Post data
          */
-        $post = get_post();
+        $post = self::growtype_form_get_current_post();
 
         ob_start();
         ?>
@@ -410,7 +420,7 @@ class Growtype_Form_Render
                         <?php } ?>
                     </div>
 
-                    <form id="growtype-form" enctype="multipart/form-data" class="form <?php echo $class ?>" action="<?php the_permalink(); ?>" method="post" data-name="<?= $form_name ?>">
+                    <form enctype="multipart/form-data" class="growtype-form form <?php echo $class ?>" action="<?php echo self::growtype_form_get_action_url(); ?>" method="post" data-name="<?= $form_name ?>">
                         <?php
                         foreach ($form as $key => $form_fields) { ?>
 
@@ -472,8 +482,8 @@ class Growtype_Form_Render
                     <?php
                     if ($login_btn) { ?>
                         <div class="b-actions">
-                            <label for=""><?= __("Do you already have an account?", "growtype-registration") ?></label>
-                            <a class="btn btn-link" href="<?= growtype_form_login_page_url() ?>"><?= __("Sign in", "growtype-registration") ?></a>
+                            <p><?= __("Do you already have an account?", "growtype-form") ?></p>
+                            <a class="btn btn-link" href="<?= growtype_form_login_page_url() ?>"><?= __("Sign in", "growtype-form") ?></a>
                         </div>
                     <?php } ?>
 
@@ -485,7 +495,53 @@ class Growtype_Form_Render
 
         echo growtype_form_include_view('modals/terms');
 
+        echo growtype_form_include_view('modals/privacy');
+
         return ob_get_clean();
+    }
+
+    /**
+     * Form action url
+     */
+    public static function growtype_form_get_current_post()
+    {
+        if (!empty($_SERVER['PHP_SELF'])) {
+            $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
+
+            if ($page_slug === Growtype_Form_Signup::CUSTOM_SLUG || $page_slug === Growtype_Form_Login::CUSTOM_SLUG) {
+                return '';
+            }
+        }
+
+        return get_post();
+    }
+
+    /**
+     * Form action url
+     */
+    public static function growtype_form_get_current_post_slug()
+    {
+        if (!empty($_SERVER['PHP_SELF'])) {
+            $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
+
+            if ($page_slug === Growtype_Form_Signup::CUSTOM_SLUG || $page_slug === Growtype_Form_Login::CUSTOM_SLUG) {
+                return $page_slug;
+            }
+        }
+
+        $current_post = self::growtype_form_get_current_post();
+
+        return !empty($current_post) ? $current_post->post_name : '';
+    }
+
+    /**
+     * Form action url
+     */
+    public static function growtype_form_get_action_url()
+    {
+        $current_post_slug = self::growtype_form_get_current_post_slug();
+
+        return home_url($current_post_slug);
     }
 
     /**
@@ -522,11 +578,11 @@ class Growtype_Form_Render
             jQuery.validator.setDefaults({
                 ignore: ":hidden:not(.e-wrapper:visible select),.chosen-search-input",
                 errorPlacement: function (error, element) {
-                    if (element.is("#growtype-form select")) {
+                    if (element.is(".growtype-form select")) {
                         element.parent().append(error);
-                    } else if (element.is("#growtype-form input[type='checkbox']")) {
+                    } else if (element.is(".growtype-form input[type='checkbox']")) {
                         element.parent().append(error);
-                    } else if (element.is("#growtype-form .filestyle")) {
+                    } else if (element.is(".growtype-form .filestyle")) {
                         element.parent().append(error);
                     } else {
                         error.insertAfter(element);
@@ -534,8 +590,8 @@ class Growtype_Form_Render
                 }
             });
 
-            if ($("#growtype-form select:visible").length > 0) {
-                $("#growtype-form select:visible").each(function () {
+            if ($(".growtype-form select:visible").length > 0) {
+                $(".growtype-form select:visible").each(function () {
                     if ($(this).attr('required') !== undefined) {
                         $(this).on("change", function () {
                             $(this).valid();
@@ -558,7 +614,7 @@ class Growtype_Form_Render
         ];
         ?>
         <script>
-            $('#growtype-form button[type="submit"]').click(function () {
+            $('.growtype-form button[type="submit"]').click(function () {
 
                 $(this).attr('disabled', false);
 
@@ -570,9 +626,9 @@ class Growtype_Form_Render
                 $('input[name="growtype_form_submit_action"]').val(action);
 
                 if (action === 'delete') {
-                    $('#growtype-form').submit();
+                    $(this).closest('.growtype-form').submit();
                 } else {
-                    let isValid = $("#growtype-form").valid();
+                    let isValid = $(this).closest(".growtype-form").valid();
 
                     /**
                      * Check if form check group is valid
@@ -630,7 +686,7 @@ class Growtype_Form_Render
                     /**
                      * Submit form
                      */
-                    $('#growtype-form').submit();
+                    $(this).closest('.growtype-form').submit();
                 }
             });
         </script>
@@ -650,7 +706,7 @@ class Growtype_Form_Render
         </style>
         <script src="https://www.google.com/recaptcha/api.js?render=<?= $recaptcha_key ?>"></script>
         <script>
-            $('#growtype-form').submit(function (event) {
+            $('.growtype-form').submit(function (event) {
                 event.preventDefault();
                 $(this).find('button[type="submit"]').attr('disabled', true);
                 grecaptcha.reset();
@@ -679,7 +735,7 @@ class Growtype_Form_Render
                     $_REQUEST[$key] = $field;
                 }
             }
-        } elseif ($post->post_type === 'product') {
+        } elseif (!empty($post) && $post->post_type === 'product') {
             $product = wc_get_product($post_id);
 
             if (empty($product)) {
@@ -752,7 +808,7 @@ class Growtype_Form_Render
                     }
                 }
             }
-        } elseif (str_contains($post->post_name, 'account')) {
+        } elseif (!empty($post) && str_contains($post->post_name, 'account')) {
             $user_id = get_current_user_id();
             if (!empty($user_id) && isset($form_data['main_fields'])) {
                 foreach ($form_data['main_fields'] as $field) {
@@ -763,13 +819,13 @@ class Growtype_Form_Render
             }
         }
 
-        if (apply_filters('growtype_form_render_update_return_data', $post_id, $_REQUEST) !== $post_id) {
+        if ($post_id && apply_filters('growtype_form_render_update_return_data', $post_id, $_REQUEST) !== $post_id) {
             $_REQUEST = apply_filters('growtype_form_render_update_return_data', $post_id, $_REQUEST);
         }
 
         if (isset($_COOKIE['signup_data'])) {
             unset($_COOKIE['signup_data']);
-            setcookie('signup_data', '', time() - (15 * 60));
+            setcookie('signup_data', null, time(), home_url());
         }
     }
 }

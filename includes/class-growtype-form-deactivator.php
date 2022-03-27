@@ -20,17 +20,20 @@
  * @subpackage Growtype_Form/includes
  * @author     Your Name <email@example.com>
  */
-class Growtype_Form_Deactivator {
+class Growtype_Form_Deactivator
+{
 
-	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
-	 *
-	 * @since    1.0.0
-	 */
-	public static function deactivate() {
-
-	}
+    /**
+     * Short Description. (use period)
+     *
+     * Long Description.
+     *
+     * @since    1.0.0
+     */
+    public static function deactivate()
+    {
+        global $wp_rewrite;
+        $wp_rewrite->flush_rules();
+    }
 
 }

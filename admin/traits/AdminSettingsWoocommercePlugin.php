@@ -161,7 +161,11 @@ trait AdminSettingsWoocommercePlugin
     function growtype_form_default_product_catalog_visibility_callback()
     {
         $selected = growtype_form_default_product_catalog_visibility();
-        $options = wc_get_product_visibility_options();
+        $options = [];
+
+        if (class_exists('woocommerce')) {
+            $options = wc_get_product_visibility_options();
+        }
         ?>
         <select name='growtype_form_default_product_catalog_visibility'>
             <?php
@@ -178,7 +182,10 @@ trait AdminSettingsWoocommercePlugin
     function growtype_form_default_product_type_callback()
     {
         $selected = growtype_form_default_product_type();
-        $options = wc_get_product_types();
+        $options = [];
+        if (class_exists('woocompress')) {
+            $options = wc_get_product_types();
+        }
         ?>
         <select name='growtype_form_default_product_type'>
             <?php

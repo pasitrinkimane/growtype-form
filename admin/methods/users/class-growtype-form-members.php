@@ -60,7 +60,7 @@ class Growtype_Form_Members {
 		$this->current_user_id = get_current_user_id();
 		$this->is_self_profile = false;
 		$this->edit_profile_args = array( 'page' => 'bp-profile-edit' );
-		$this->users_url    = growtype_form_admin_url( 'users.php' );
+		$this->users_url = growtype_form_admin_url( 'users.php' );
 	}
 
 	/**

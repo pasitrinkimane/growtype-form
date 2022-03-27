@@ -10,8 +10,8 @@ trait Notice
      */
     public function growtype_form_set_notice($message, $status)
     {
-        setcookie('notice_message', $message);
-        setcookie('notice_status', $status);
+        setcookie('notice_message', $message, time() + 1);
+        setcookie('notice_status', $status, time() + 1);
     }
 
     /**

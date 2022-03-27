@@ -5,20 +5,60 @@
  */
 class Growtype_Form_Login
 {
+    const CUSTOM_SLUG = 'login';
+
     public function __construct()
     {
         if (!is_admin()) {
             add_action('wp_login_failed', array ($this, 'custom_login_failed'), 10, 2);
             add_filter('authenticate', array ($this, 'custom_authenticate_username_password'), 30, 3);
             add_filter('login_redirect', array ($this, 'growtype_form_login_redirect'));
-            add_filter('login_url', array ($this, 'custom_login_url'), 10, 2);
+            add_filter('login_url', array ($this, 'change_default_login_url'), 10, 2);
+
+            if (growtype_form_login_page_is_active()) {
+                add_action('wp_enqueue_scripts', array ($this, 'growtype_form_enqueue_styles'));
+            }
+        }
+
+        add_action('init', array ($this, 'custom_url'), 1);
+        add_action('template_redirect', array ($this, 'custom_url_template'));
+    }
+
+    /**
+     * @return void
+     */
+    function growtype_form_enqueue_styles()
+    {
+        wp_enqueue_style('growtype-form-login', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/login/main.css', array (), '1.1', 'all');
+    }
+
+    /**
+     * @return void
+     */
+    function custom_url()
+    {
+        add_rewrite_endpoint(self::CUSTOM_SLUG, EP_ALL);
+    }
+
+    /**
+     * @return void
+     */
+    function custom_url_template()
+    {
+        if (!empty($_SERVER['PHP_SELF'])) {
+            $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
+
+            if (growtype_form_login_page_is_active() && growtype_form_login_page_ID() === 'default' && $page_slug === self::CUSTOM_SLUG) {
+                echo growtype_form_include_view('login/default');
+                exit;
+            }
         }
     }
 
     /**
      * Change the login url to the custom login page
      */
-    function custom_login_url($login_url = '', $redirect = '')
+    function change_default_login_url($login_url = '', $redirect = '')
     {
         if (isset($_GET["action"]) && $_GET["action"] === 'lostpassword') {
             $login_url = growtype_form_login_page_url();
@@ -54,8 +94,8 @@ class Growtype_Form_Login
             return wp_login_url();
         }
 
-        if (!empty($referrer) && !empty(growtype_form_login_page())) {
-            if (!empty($_GET['loggedout'])) {
+        if (!empty($referrer) && !empty(growtype_form_login_page_ID())) {
+            if (isset($_GET['loggedout']) && !empty($_GET['loggedout'])) {
                 return wp_redirect(add_query_arg('action', 'loggedout', growtype_form_login_page_url()));
             } else {
                 return wp_redirect(add_query_arg('action', 'failed', growtype_form_login_page_url()));
@@ -76,11 +116,11 @@ class Growtype_Form_Login
 
         if (!empty($_GET['action'])) {
             if ('failed' == $_GET['action']) {
-                $message = __("Wrong login details. Please try again.", "growtype-registration");
+                $message = __("Wrong login details. Please try again.", "growtype-form");
             } elseif ('loggedout' == $_GET['action']) {
-                $message = __("You are now logged out.", "growtype-registration");
+                $message = __("You are now logged out.", "growtype-form");
             } elseif ('recovered' == $_GET['action']) {
-                $message = __("Check your e-mail for login information.", "growtype-registration");
+                $message = __("Check your e-mail for login information.", "growtype-form");
             }
         }
 
@@ -100,11 +140,11 @@ class Growtype_Form_Login
                 <?php if ($message) { ?>
                     <?php if (isset($_GET['action']) && $_GET['action'] === 'failed') { ?>
                         <div class="alert alert-danger" role="alert">
-                            <?= __($message, 'growtype-registration') ?>
+                            <?php echo $message ?>
                         </div>
                     <?php } else { ?>
                         <div class="alert alert-success" role="alert">
-                            <?= __($message, 'growtype-registration') ?>
+                            <?php echo $message ?>
                         </div>
                     <?php } ?>
                 <?php } ?>
@@ -119,14 +159,14 @@ class Growtype_Form_Login
 
                     <?php
                     if ($login_form_args['lost_password_btn']) { ?>
-                        <a class="btn btn-link btn-recover-password" href="<?= growtype_form_lost_password_page_url() ?>"><?= __("Lost your password?", "growtype-registration") ?></a>
+                        <a class="btn btn-link btn-recover-password" href="<?= growtype_form_lost_password_page_url() ?>"><?= isset($login_form_args['lost_password_label']) ? __($login_form_args['lost_password_label'], "growtype-form") : __("Lost your password?", "growtype-form") ?></a>
                     <?php } ?>
 
                     <div class="b-actions">
                         <?php
                         if ($login_form_args['sign_up_btn']) { ?>
-                            <label for=""><?= __("You don’t have an account?", "growtype-registration") ?></label>
-                            <a class="btn btn-link" href="<?= growtype_form_signup_page_url() ?>"><?= __("Sign up", "growtype-registration") ?></a>
+                            <p><?= __("You don’t have an account?", "growtype-form") ?></p>
+                            <a class="btn btn-link" href="<?= growtype_form_signup_page_url() ?>"><?= __("Sign up", "growtype-form") ?></a>
                         <?php } ?>
                     </div>
                 </div>
@@ -164,6 +204,7 @@ class Growtype_Form_Login
         $logo = $form['logo'] ?? null;
         $sign_up_btn = $form['sign_up_btn'] ?? null;
         $lost_password_btn = $form['lost_password_btn'] ?? null;
+        $lost_password_label = $form['lost_password_label'] ?? null;
         $username_placeholder = $form['username_placeholder'] ?? null;
         $password_placeholder = $form['password_placeholder'] ?? null;
 
@@ -181,6 +222,7 @@ class Growtype_Form_Login
             'logo' => $logo,
             'sign_up_btn' => $sign_up_btn,
             'lost_password_btn' => $lost_password_btn,
+            'lost_password_label' => $lost_password_label,
             'username_placeholder' => $username_placeholder,
             'password_placeholder' => $password_placeholder,
             'wp_login_form' => [

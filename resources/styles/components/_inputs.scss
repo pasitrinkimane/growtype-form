@@ -33,3 +33,14 @@
     z-index: 1;
   }
 }
+
+.radio-wrapper {
+  input[type=radio] {
+    cursor: pointer;
+    margin-right: 6px;
+  }
+
+  label {
+    cursor: pointer;
+  }
+}

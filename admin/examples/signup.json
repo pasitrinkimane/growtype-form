@@ -1,0 +1,49 @@
+{
+  "signup": {
+    "title": "[:en]Sign up[:lt]Registracija",
+    "recaptcha": [],
+    "login_btn": true,
+    "back_btn": true,
+    "submit_row": {
+      "class": "pt-2",
+      "cta": [
+        {
+          "type": "submit",
+          "label": "[:en]Continue[:lt]Registruotis"
+        }
+      ]
+    },
+    "main_fields": [
+      {
+        "type": "email",
+        "name": "email",
+        "label": "[:en]Email[:lt]El. paštas",
+        "placeholder": "[:en]Enter your email[:lt]Įveskite el. paštą",
+        "required": "true",
+        "class": "col-12"
+      },
+      {
+        "type": "password",
+        "name": "password",
+        "label": "[:en]Password[:lt]Slaptažodis",
+        "placeholder": "[:en]Enter your password[:lt]Įveskite slaptažodį",
+        "required": "true"
+      },
+      {
+        "type": "password",
+        "name": "repeat_password",
+        "label": "[:en]Confirm password[:lt]Pakartotinas slaptažodis",
+        "placeholder": "[:en]Confirm your password[:lt]Pakartokite slaptažodį",
+        "required": "true"
+      }
+    ],
+    "confirmation_fields": [
+      {
+        "type": "checkbox",
+        "name": "terms_and_conditions",
+        "label": "[:en]I agree with <a href='#' data-bs-toggle='modal' data-bs-target='#termsModal'>terms & conditions</a>[:lt]Sutinku su  <a href='#' data-bs-toggle='modal' data-bs-target='#termsModal'>sąlygomis ir nuostatomis</a>",
+        "required": "true"
+      }
+    ]
+  }
+}

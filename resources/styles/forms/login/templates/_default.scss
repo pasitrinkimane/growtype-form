@@ -6,6 +6,9 @@
   .form-wrapper {
     box-shadow: 0px 0px 16px 0px #e3e3e3;
     border-radius: 10px;
+    position: relative;
+    background: white;
+    overflow: hidden;
   }
 
   .e-title-intro {
@@ -27,13 +30,9 @@
     }
   }
 
-  .form-wrapper {
-    position: relative;
-  }
-
   .btn-recover-password {
     position: absolute;
-    bottom: 206px;
+    bottom: 190px;
     right: 30px;
     font-size: 14px;
     text-decoration: none;
@@ -55,15 +54,29 @@
     font-weight: bold;
   }
 
+  label {
+    line-height: 18px;
+  }
+
   .b-actions {
     margin: 0;
     background: #F5F6F7;
     color: #9A9EA7;
     padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .btn-link {
+      padding-left: 5px;
+    }
 
     a {
       font-weight: bold;
     }
+
+    p {
+      margin: 0;
+    }
   }
 }
-

@@ -1,0 +1,71 @@
+{
+  "post": {
+    "type": "upload",
+    "post_type": "projects",
+    "title": "Dalintis iniciatyva",
+    "submit_label": "[:lt]Pateikti iniciatyvą[:en]Upload[:]",
+    "success_message": "[:lt]Iniciatyva sėkmingai pasidalinta[:]",
+    "main_fields": [
+      {
+        "type": "input",
+        "name": "title",
+        "label": "[:lt]Iniciatyvos pavadinimas[:]",
+        "placeholder": "[:lt]Įrašykite pavadinimą[:]",
+        "required": "true"
+      },
+      {
+        "type": "input",
+        "name": "school",
+        "label": "[:lt]Dalyvaujančios mokyklos ar grupės pavadinimas[:]",
+        "placeholder": "[:lt]Įrašykite pavadinimą[:]",
+        "required": "true"
+      },
+      {
+        "type": "input",
+        "name": "contact_person",
+        "label": "[:lt]Kontaktinis asmuo[:]",
+        "placeholder": "[:lt]Įrašykite pavadinimą[:]",
+        "required": "true"
+      },
+      {
+        "type": "number",
+        "min": "1",
+        "name": "participants_amount",
+        "label": "[:lt]Iniciatyvos dalyvių skaičius[:]",
+        "placeholder": "[:lt]Įrašykite skaičių[:]",
+        "required": "false"
+      },
+      {
+        "type": "textarea",
+        "name": "short_description",
+        "label": "[:lt]Aprašymas[:]",
+        "placeholder": "[:lt]Trumpai aprašykite iniciatyvą[:]",
+        "required": "true"
+      },
+      {
+        "type": "file",
+        "name": "featured_image",
+        "label": "[:lt]Iniciatyvos įvaizdinė nuotrauka[:]",
+        "required": "true",
+        "accept": "image/*"
+      },
+      {
+        "type": "hidden",
+        "name": "tags[identificator]",
+        "value": "User uploaded post"
+      }
+    ],
+    "confirmation_fields": [
+      {
+        "type": "checkbox",
+        "name": "terms_and_conditions",
+        "label": "[:lt]Sutinku su taisyklėmis[:]",
+        "required": "true"
+      }
+    ],
+    "recaptcha": {
+      "type": "recaptchav3",
+      "api_key": ""
+    }
+  }
+}

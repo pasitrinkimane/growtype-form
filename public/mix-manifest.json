@@ -1,6 +1,8 @@
 {
-    "/scripts/growtype-form.js": "/scripts/growtype-form.js?id=b1f433a8c529e63a84ea",
+    "/scripts/growtype-form.js": "/scripts/growtype-form.js?id=340b62adb5d7728aefed",
     "/scripts/growtype-form-render.js": "/scripts/growtype-form-render.js?id=c61fb436f49fcf6a712b",
-    "/styles/growtype-form-render.css": "/styles/growtype-form-render.css?id=813190c4394ac0a63289",
+    "/styles/forms/signup/main.css": "/styles/forms/signup/main.css?id=5b7896d5492da16c133a",
+    "/styles/forms/login/main.css": "/styles/forms/login/main.css?id=04fa2e133f8e33371014",
+    "/styles/growtype-form-render.css": "/styles/growtype-form-render.css?id=9c938ed145c88722fd93",
     "/styles/growtype-form.css": "/styles/growtype-form.css?id=68b329da9893e34099c7"
 }

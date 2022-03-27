@@ -23,7 +23,9 @@ class Growtype_Form_Crud
 
     public function __construct()
     {
-        add_filter('wp_loaded', array ($this, 'growtype_form_process_posted_data'));
+        if (!is_admin()) {
+            add_filter('wp_loaded', array ($this, 'growtype_form_process_posted_data'));
+        }
     }
 
     /**
@@ -77,7 +79,7 @@ class Growtype_Form_Crud
          */
         $post_id = $_POST[Growtype_Form_Render::GROWTYPE_FORM_POST_IDENTIFICATOR] ?? null;
 
-        if (empty($form_data) || empty($post_id)) {
+        if (empty($form_data)) {
             return null;
         }
 
@@ -94,7 +96,7 @@ class Growtype_Form_Crud
             if ($form_name === 'signup') {
                 $submit_data = $this->save_submitted_signup_data($submitted_data);
 
-                if ($submit_data['success']) {
+                if (isset($submit_data['success']) && $submit_data['success']) {
                     $user_id = $submit_data['user_id'];
                     $user = get_user_by('id', $user_id);
 
@@ -210,7 +212,8 @@ class Growtype_Form_Crud
                     $return_values[$key] = $value;
                 }
             }
-            setcookie('signup_data', json_encode($return_values));
+
+            setcookie('signup_data', json_encode($return_values), time() + 1, home_url());
         }
 
         /**
@@ -221,7 +224,10 @@ class Growtype_Form_Crud
         /**
          * Redirect url
          */
-        $redirect_url = get_permalink($post_id);
+
+        $current_slug = isset($_SERVER['PHP_SELF']) ? str_replace('/', '', $_SERVER['PHP_SELF']) : '';
+
+        $redirect_url = !empty($post_id) ? get_permalink($post_id) : home_url($current_slug);
 
         if ($_POST[Growtype_Form_Render::GROWTYPE_FORM_SUBMIT_ACTION] === 'preview' && class_exists('Growtype_Product')) {
             $redirect_url = Growtype_Product::edit_permalink($post_id);
@@ -528,20 +534,20 @@ class Growtype_Form_Crud
 
             if (strlen($password) <= '8') {
                 $status['success'] = false;
-                $status['message'] = __("Your Password Must Contain At Least 8 Characters!", "growtype-registration");
+                $status['message'] = __("Your Password Must Contain At Least 8 Characters!", "growtype-form");
             } elseif (!preg_match("#[0-9]+#", $password)) {
                 $status['success'] = false;
-                $status['message'] = __("Your Password Must Contain At Least 1 Number!", "growtype-registration");
+                $status['message'] = __("Your Password Must Contain At Least 1 Number!", "growtype-form");
             } elseif (!preg_match("#[A-Z]+#", $password)) {
                 $status['success'] = false;
-                $status['message'] = __("Your Password Must Contain At Least 1 Capital Letter!", "growtype-registration");
+                $status['message'] = __("Your Password Must Contain At Least 1 Capital Letter!", "growtype-form");
             } elseif (!preg_match("#[a-z]+#", $password)) {
                 $status['success'] = false;
-                $status['message'] = __("Your Password Must Contain At Least 1 Lowercase Letter!", "growtype-registration");
+                $status['message'] = __("Your Password Must Contain At Least 1 Lowercase Letter!", "growtype-form");
             }
         } else {
             $status['success'] = false;
-            $status['message'] = __("Please enter password.", "growtype-registration");
+            $status['message'] = __("Please enter password.", "growtype-form");
         }
 
         return $status;

@@ -36,6 +36,57 @@ trait AdminSettingsSignup
         );
 
         /**
+         * Redirect after signup
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_redirect_after_signup_page', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_redirect_after_signup_page',
+            '<span style="color: orange;">Redirect After Signup To</span>',
+            array ($this, 'growtype_form_redirect_after_signup_page_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_signup'
+        );
+
+        /**
+         * Default user role
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_default_user_role', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_default_user_role',
+            '<span style="color: orange;">Default User Role</span>',
+            array ($this, 'growtype_form_default_user_role_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_signup'
+        );
+
+        /**
+         * Active user role
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_active_user_role', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_active_user_role',
+            '<span style="color: orange;">Active User Role</span>',
+            array ($this, 'growtype_form_active_user_role_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_signup'
+        );
+
+        /**
          * Signup page
          */
         register_setting(
@@ -69,57 +120,6 @@ trait AdminSettingsSignup
         );
 
         /**
-         * Redirect after signup
-         */
-        register_setting(
-            'growtype_form_settings_signup', // settings group name
-            'growtype_form_redirect_after_signup_page', // option name
-            'sanitize_text_field' // sanitization function
-        );
-
-        add_settings_field(
-            'growtype_form_redirect_after_signup_page',
-            'Redirect After Signup To',
-            array ($this, 'growtype_form_redirect_after_signup_page_callback'),
-            'growtype-form-settings',
-            'growtype_form_settings_signup'
-        );
-
-        /**
-         * Default user role
-         */
-        register_setting(
-            'growtype_form_settings_signup', // settings group name
-            'growtype_form_default_user_role', // option name
-            'sanitize_text_field' // sanitization function
-        );
-
-        add_settings_field(
-            'growtype_form_default_user_role',
-            'Default User Role',
-            array ($this, 'growtype_form_default_user_role_callback'),
-            'growtype-form-settings',
-            'growtype_form_settings_signup'
-        );
-
-        /**
-         * Active user role
-         */
-        register_setting(
-            'growtype_form_settings_signup', // settings group name
-            'growtype_form_active_user_role', // option name
-            'sanitize_text_field' // sanitization function
-        );
-
-        add_settings_field(
-            'growtype_form_active_user_role',
-            'Active User Role',
-            array ($this, 'growtype_form_active_user_role_callback'),
-            'growtype-form-settings',
-            'growtype_form_settings_signup'
-        );
-
-        /**
          * Allow simple password
          */
         register_setting(
@@ -148,6 +148,22 @@ trait AdminSettingsSignup
             'growtype_form_signup_terms_page',
             '"Terms And Conditions" Page',
             array ($this, 'growtype_form_signup_terms_page_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_signup'
+        );
+
+        /**
+         * Privacy page
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_signup_privacy_page'
+        );
+
+        add_settings_field(
+            'growtype_form_signup_privacy_page',
+            '"Privacy policy" Page',
+            array ($this, 'growtype_form_signup_privacy_page_callback'),
             'growtype-form-settings',
             'growtype_form_settings_signup'
         );
@@ -191,8 +207,13 @@ trait AdminSettingsSignup
      */
     function growtype_form_signup_json_content_callback()
     {
+        $json_content = get_option('growtype_form_signup_json_content');
+
+        if (empty($json_content)) {
+            $json_content = file_get_contents(plugin_dir_url(__DIR__) . 'examples/signup.json');
+        }
         ?>
-        <textarea id="growtype_form_signup_json_content" class="growtype_form_json_content" name="growtype_form_signup_json_content" rows="40" cols="100" style="width: 100%;"><?= get_option('growtype_form_signup_json_content') ?></textarea>
+        <textarea id="growtype_form_signup_json_content" class="growtype_form_json_content" name="growtype_form_signup_json_content" rows="40" cols="100" style="width: 100%;"><?= $json_content ?></textarea>
         <?php
     }
 
@@ -201,14 +222,15 @@ trait AdminSettingsSignup
      */
     function growtype_form_signup_page_callback()
     {
-        $selected = get_option('growtype_form_signup_page');
+        $selected = growtype_form_signup_page_ID();
         $pages = get_pages();
         ?>
         <select name='growtype_form_signup_page'>
-            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <option value='none' <?php selected($selected, 'none'); ?>>None - Growtype Form</option>
+            <option value='default' <?php selected($selected, 'default'); ?>>Default - Growtype Form</option>
             <?php
             foreach ($pages as $page) { ?>
-                <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>
+                <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?> - Page</option>
             <?php } ?>
         </select>
         <?php
@@ -233,12 +255,30 @@ trait AdminSettingsSignup
     }
 
     /**
+     * Privacy page
+     */
+    function growtype_form_signup_privacy_page_callback()
+    {
+        $selected = get_option('growtype_form_signup_privacy_page');
+        $pages = get_pages();
+        ?>
+        <select name='growtype_form_signup_privacy_page'>
+            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <?php
+            foreach ($pages as $page) { ?>
+                <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>
+            <?php } ?>
+        </select>
+        <?php
+    }
+
+    /**
      * Login page template
      */
     function growtype_form_signup_page_template_callback()
     {
         $selected = growtype_form_get_signup_page_template();
-        $options = ['template-default', 'template-1', 'template-2'];
+        $options = ['template-default', 'template-wide', 'template-2'];
         ?>
         <select name='growtype_form_signup_page_template'>
             <?php
@@ -254,11 +294,12 @@ trait AdminSettingsSignup
      */
     function growtype_form_redirect_after_signup_page_callback()
     {
-        $selected = get_option('growtype_form_redirect_after_signup_page');
+        $selected = growtype_form_redirect_after_signup_page();
         $pages = get_pages();
         ?>
         <select name='growtype_form_redirect_after_signup_page'>
             <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <option value='default-profile' <?php selected($selected, 'default-profile'); ?>>Default profile page - Growtype Form</option>
             <?php
             foreach ($pages as $page) { ?>
                 <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>

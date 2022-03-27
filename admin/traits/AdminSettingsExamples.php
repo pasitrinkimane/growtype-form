@@ -38,7 +38,10 @@ trait AdminSettingsExamples
      */
     function growtype_form_examples_json_content_callback()
     {
-        $json = file_get_contents(plugin_dir_url(__DIR__) . 'json/examples.json');
+        $json = file_get_contents(plugin_dir_url(__DIR__) . 'examples/login.json') . ',' .
+            file_get_contents(plugin_dir_url(__DIR__) . 'examples/signup.json') . ',' .
+            file_get_contents(plugin_dir_url(__DIR__) . 'examples/woocommerce.json') . ',' .
+            file_get_contents(plugin_dir_url(__DIR__) . 'examples/post.json');
         ?>
         <textarea id="growtype_form_examples_json_content" class="growtype_form_json_content" name="growtype_form_examples_json_content" rows="40" cols="100" style="width: 100%;margin-bottom: 100px;"><?= $json ?></textarea>
         <?php

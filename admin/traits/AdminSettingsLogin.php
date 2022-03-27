@@ -105,8 +105,13 @@ trait AdminSettingsLogin
      */
     function growtype_form_login_json_content_callback()
     {
+        $json_content = get_option('growtype_form_login_json_content');
+
+        if (empty($json_content)) {
+            $json_content = file_get_contents(plugin_dir_url(__DIR__) . 'examples/login.json');
+        }
         ?>
-        <textarea id="growtype_form_login_json_content" class="growtype_form_json_content" name="growtype_form_login_json_content" rows="40" cols="100" style="width: 100%;"><?= get_option('growtype_form_login_json_content') ?></textarea>
+        <textarea id="growtype_form_login_json_content" class="growtype_form_json_content" name="growtype_form_login_json_content" rows="40" cols="100" style="width: 100%;"><?= $json_content ?></textarea>
         <?php
     }
 
@@ -115,14 +120,15 @@ trait AdminSettingsLogin
      */
     function growtype_form_login_page_callback()
     {
-        $selected = get_option('growtype_form_login_page');
+        $selected = growtype_form_login_page_ID();
         $pages = get_pages();
         ?>
         <select name='growtype_form_login_page'>
-            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <option value='none' <?php selected($selected, 'none'); ?>>None - Growtype form</option>
+            <option value='default' <?php selected($selected, 'default'); ?>>Default - Growtype form</option>
             <?php
             foreach ($pages as $page) { ?>
-                <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>
+                <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?> - Page</option>
             <?php } ?>
         </select>
         <?php
@@ -134,7 +140,7 @@ trait AdminSettingsLogin
     function growtype_form_login_page_template_callback()
     {
         $selected = growtype_form_get_login_page_template();
-        $options = ['template-default', 'template-1', 'template-2'];
+        $options = ['template-default', 'template-wide', 'template-2'];
         ?>
         <select name='growtype_form_login_page_template'>
             <?php

@@ -38,8 +38,14 @@ trait AdminSettingsPost
      */
     function growtype_form_post_json_content_callback()
     {
+        $json_content = get_option('growtype_form_post_json_content');
+
+        if (empty($json_content)) {
+            $json_content = file_get_contents(plugin_dir_url(__DIR__) . 'examples/post.json');
+        }
+
         ?>
-        <textarea id="growtype_form_post_json_content" class="growtype_form_json_content" name="growtype_form_post_json_content" rows="40" cols="100" style="width: 100%;margin-bottom: 100px;"><?= get_option('growtype_form_post_json_content') ?></textarea>
+        <textarea id="growtype_form_post_json_content" class="growtype_form_json_content" name="growtype_form_post_json_content" rows="40" cols="100" style="width: 100%;margin-bottom: 100px;"><?= $json_content ?></textarea>
         <?php
     }
 }
