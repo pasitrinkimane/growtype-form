@@ -483,7 +483,7 @@ class Growtype_Form_Render
 
                         <?php if (isset($submit_row) && !empty($submit_row)) { ?>
                             <div class="row row-submit <?= isset($submit_row['class']) ? $submit_row['class'] : '' ?>">
-                                <div class="d-grid gap-2 d-md-flex">
+                                <div class="d-md-grid gap-2 d-md-flex">
                                     <?php if (!empty($recaptchav3)) { ?>
                                         <div class="g-recaptcha"
                                              data-sitekey="<?= $recaptchav3 ?>"
