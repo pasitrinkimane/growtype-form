@@ -9,22 +9,8 @@ class Growtype_Form_Signup
 
     public function __construct()
     {
-        if (!is_admin()) {
-            if (growtype_form_signup_page_is_active()) {
-                add_action('wp_enqueue_scripts', array ($this, 'growtype_form_enqueue_styles'));
-            }
-        }
-
         add_action('init', array ($this, 'custom_url'), 1);
         add_action('template_redirect', array ($this, 'custom_url_template'));
-    }
-
-    /**
-     * @return void
-     */
-    function growtype_form_enqueue_styles()
-    {
-        wp_enqueue_style('growtype-form-signup', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/signup/main.css', array (), '1.1', 'all');
     }
 
     /**
@@ -42,8 +28,8 @@ class Growtype_Form_Signup
      */
     function custom_url_template()
     {
-        if (!empty($_SERVER['PHP_SELF'])) {
-            $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
 
             if (growtype_form_signup_page_is_active() && growtype_form_signup_page_ID() === 'default' && $page_slug === self::CUSTOM_SLUG) {
                 echo growtype_form_include_view('signup/default');
@@ -58,7 +44,7 @@ class Growtype_Form_Signup
      */
     public static function get_signup_data($user_id = null)
     {
-        if (empty($user)) {
+        if (empty($user_id)) {
             $user_id = get_current_user_id();
         }
 

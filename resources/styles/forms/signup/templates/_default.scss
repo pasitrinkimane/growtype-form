@@ -26,92 +26,68 @@
     overflow: hidden;
   }
 
-  .b-actions {
-    margin: 0;
-    background: #F5F6F7;
-    color: #9A9EA7;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .btn-link {
-      padding-left: 5px;
-    }
-
-    a {
-      font-weight: bold;
-    }
-
-    p {
-      margin: 0;
-    }
-  }
-
-  .btn-secondary {
-    @include bp-phone-xl() {
+  .growtype-form-wrapper {
+    form button[type=submit] {
+      min-width: 250px;
       width: 100%;
-    }
-  }
-
-  .growtype-form-wrapper form button[type=submit] {
-    min-width: 250px;
-    width: 100%;
-    @include bp-phone-xl() {
-      min-width: initial;
-    }
-  }
-
-  .fields-confirmation {
-    .col-auto {
-      padding-left: 0;
-    }
-
-    .form-label {
-      color: #9A9EA7;
-      margin: 0;
-      position: relative;
-    }
-  }
-
-  .b-intro {
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    padding-top: 25px;
-    padding-bottom: 25px;
-    padding-left: 40px;
-    padding-right: 40px;
-    align-items: center;
-    @include bp-phone-xl() {
-      margin-bottom: 10px;
-      padding-left: 25px;
-      padding-right: 25px;
-    }
-
-    .e-title-intro {
-      text-align: center;
-      font-size: 18px;
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      margin: auto;
-      height: 22px;
-
-      &:before {
-        content: none;
+      @include bp-phone-xl() {
+        min-width: initial;
       }
     }
-  }
 
-  .growtype-form {
-    padding: 30px;
-    border-top: 2px solid #efefef;
-    @include bp-phone-xl() {
-      padding-right: 20px;
-      padding-left: 20px;
+    .b-intro {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      padding-top: 25px;
+      padding-bottom: 25px;
+      padding-left: 40px;
+      padding-right: 40px;
+      align-items: center;
+      min-height: 65px;
+      @include bp-phone-xl() {
+        margin-bottom: 10px;
+        padding-left: 25px;
+        padding-right: 25px;
+      }
+
+      .e-title-intro {
+        text-align: center;
+        font-size: 18px;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        height: 22px;
+
+        &:before {
+          content: none;
+        }
+      }
+    }
+
+    .b-actions {
+      margin: 0;
+      background: #F5F6F7;
+      color: #9A9EA7;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .btn-link {
+        padding-left: 5px;
+      }
+
+      a {
+        font-weight: bold;
+      }
+
+      p {
+        margin: 0;
+      }
     }
   }
 
@@ -124,5 +100,30 @@
     bottom: -5px;
     margin-left: 0;
     margin-bottom: 10px;
+
+    .col-auto {
+      padding-left: 0;
+    }
+
+    .form-label {
+      color: #9A9EA7;
+      margin: 0;
+      position: relative;
+    }
+  }
+
+  .growtype-form {
+    padding: 30px;
+    border-top: 2px solid #efefef;
+    @include bp-phone-xl() {
+      padding-right: 20px;
+      padding-left: 20px;
+    }
+
+    .btn-secondary {
+      @include bp-phone-xl() {
+        width: 100%;
+      }
+    }
   }
 }

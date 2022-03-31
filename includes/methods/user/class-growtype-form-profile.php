@@ -42,10 +42,15 @@ class Growtype_Form_Profile
      */
     function custom_url_template()
     {
-        if (!empty($_SERVER['PHP_SELF'])) {
-            $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
 
             if (growtype_form_profile_page_is_active() && growtype_form_profile_page_ID() === 'default' && $page_slug === self::URL_SLUG) {
+
+                /**
+                 * Add profile page class to body
+                 */
+                add_filter('body_class', array ($this, 'growtype_form_profile_body_class'));
 
                 if (is_user_logged_in()) {
 
@@ -74,5 +79,15 @@ class Growtype_Form_Profile
                 exit;
             }
         }
+    }
+
+    /**
+     * Add signup class to body
+     */
+    function growtype_form_profile_body_class($classes)
+    {
+        $classes[] = 'profile-page';
+
+        return $classes;
     }
 }

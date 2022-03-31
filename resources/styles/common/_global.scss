@@ -31,6 +31,7 @@
 
     .fields-confirmation {
       padding-top: 20px;
+      padding-bottom: 10px;
 
       .col-auto {
         width: 100%;
@@ -58,13 +59,6 @@
       color: #FF5050;
       padding-left: 2px;
     }
-  }
-
-  .chosen-container-single .chosen-single {
-    border-radius: 5px !important;
-    border: 1px solid #e4e4e4;
-    box-shadow: none;
-    height: 43px !important;
   }
 
   .repeater-fields {

@@ -114,17 +114,21 @@ class Growtype_Form_Crud
 
             $success_message = $form_data['success_message'] ?? null;
 
-            if ($form_name === 'signup') {
-                $submit_data = $this->save_submitted_signup_data($submitted_data);
+            if (str_contains($form_name, 'signup')) {
+                $child_user = isset($form_data['child_user']) && $form_data['child_user'] ? true : false;
+                $submit_data = $this->save_submitted_signup_data($submitted_data, $child_user);
 
                 if (isset($submit_data['success']) && $submit_data['success']) {
                     $user_id = $submit_data['user_id'];
                     $user = get_user_by('id', $user_id);
 
                     if ($user) {
-                        wp_set_current_user($user_id, $user->user_login);
-                        wp_set_auth_cookie($user_id);
-                        do_action('wp_login', $user->user_login, $user);
+
+                        if (!$child_user) {
+                            wp_set_current_user($user_id, $user->user_login);
+                            wp_set_auth_cookie($user_id);
+                            do_action('wp_login', $user->user_login, $user);
+                        }
 
                         if (!growtype_form_redirect_url_after_signup()) {
                             error_log('Redirect url is missing. growtype-form');
@@ -234,7 +238,7 @@ class Growtype_Form_Crud
          * Redirect url
          */
 
-        $current_slug = isset($_SERVER['PHP_SELF']) ? str_replace('/', '', $_SERVER['PHP_SELF']) : '';
+        $current_slug = isset($_SERVER['REQUEST_URI']) ? str_replace('/', '', $_SERVER['REQUEST_URI']) : '';
 
         $redirect_url = !empty($post_id) ? get_permalink($post_id) : home_url($current_slug);
 
@@ -286,14 +290,13 @@ class Growtype_Form_Crud
      * @param $data
      * @return array
      */
-    public function save_submitted_signup_data($data)
+    public function save_submitted_signup_data($data, $child_user)
     {
         $email = isset($data['email']) ? sanitize_text_field($data['email']) : null;
         $username = isset($data['username']) ? sanitize_text_field($data['username']) : null;
         $username = !empty($username) ? $username : $email;
         $password = isset($data['password']) ? sanitize_text_field($_REQUEST['password']) : null;
         $repeat_password = isset($data['repeat_password']) ? sanitize_text_field($_REQUEST['repeat_password']) : null;
-
 
         if (empty($username) || empty($password) || empty($email)) {
             $response['success'] = false;
@@ -335,7 +338,41 @@ class Growtype_Form_Crud
             $response['success'] = false;
             $response['message'] = __("Profile already registered.", "growtype-form");
         } else {
+
+            /**
+             * Save child user parameters
+             */
+            if ($child_user) {
+                /**
+                 * Set parent users
+                 */
+                $parent_user_ids = get_user_meta($user_id, 'parent_user_ids', true);
+
+                if (empty($parent_user_ids)) {
+                    $parent_user_ids = [get_current_user_id()];
+                } else {
+                    array_push($parent_user_ids, get_current_user_id());
+                }
+
+                update_user_meta($user_id, 'parent_user_ids', $parent_user_ids);
+
+                /**
+                 * Set child users
+                 */
+                $child_user_ids = get_user_meta(get_current_user_id(), 'child_user_ids', true);
+
+                if (empty($child_user_ids)) {
+                    $child_user_ids = [$user_id];
+                } else {
+                    array_push($child_user_ids, $user_id);
+                }
+
+                update_user_meta(get_current_user_id(), 'child_user_ids', $child_user_ids);
+            }
+
             $response = $this->update_user_data($user_id, $data);
+
+            apply_filters('growtype_form_update_signup_user_data', $user_id, $data);
 
             if ($response['success']) {
                 $response['message'] = __("Sign up successful.", "growtype-form");

@@ -30,21 +30,17 @@ class Growtype_Form_Render
     /**
      * Add login class to body
      */
-    function growtype_form_body_class($classes)
+    function growtype_form_page_body_class($classes)
     {
         $classes[] = 'has-growtype-form';
 
         if (growtype_form_login_page_is_active()) {
-            $classes[] = 'login-' . growtype_form_get_login_page_template();
-
             if (empty(get_option('growtype_form_login_show_footer')) || !get_option('growtype_form_login_show_footer')) {
                 $classes[] = 'footer-disabled';
             }
         }
 
         if (growtype_form_signup_page_is_active()) {
-            $classes[] = 'signup-' . growtype_form_get_signup_page_template();
-
             if (empty(get_option('growtype_form_signup_show_footer')) || !get_option('growtype_form_signup_show_footer')) {
                 $classes[] = 'footer-disabled';
             }
@@ -54,9 +50,29 @@ class Growtype_Form_Render
     }
 
     /**
+     * Add signup class to body
+     */
+    function growtype_form_signup_body_class($classes)
+    {
+        $classes[] = 'signup-' . growtype_form_get_signup_page_template();
+
+        return $classes;
+    }
+
+    /**
+     * Add login class to body
+     */
+    function growtype_form_login_body_class($classes)
+    {
+        $classes[] = 'login-' . growtype_form_get_login_page_template();
+
+        return $classes;
+    }
+
+    /**
      * Required scripts
      */
-    function growtype_form_enqueue_render_styles()
+    function growtype_form_enqueue_render_styles($form_name)
     {
         /**
          * Main css
@@ -82,6 +98,20 @@ class Growtype_Form_Render
          */
         if (!wp_script_is('timepicker-addon', 'enqueued')) {
             wp_enqueue_style('timepicker-addon', GROWTYPE_FORM_URL_PUBLIC . 'plugins/jquery-ui-timepicker-addon/jquery-ui-timepicker-addon.min.css', array (), '1.1', 'all');
+        }
+
+        /**
+         * Signup styles
+         */
+        if (str_contains($form_name, 'signup')) {
+            wp_enqueue_style('growtype-form-signup', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/signup/main.css', array (), '1.1', 'all');
+        }
+
+        /**
+         * Signup styles
+         */
+        if (str_contains($form_name, 'login')) {
+            wp_enqueue_style('growtype-form-login', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/login/main.css', array (), '1.1', 'all');
         }
     }
 
@@ -185,9 +215,9 @@ class Growtype_Form_Render
         }
 
         /**
-         * Init body classes
+         * Init page body classes
          */
-        add_filter('body_class', array ($this, 'growtype_form_body_class'));
+        add_filter('body_class', array ($this, 'growtype_form_page_body_class'));
 
         /**
          * Form name
@@ -200,14 +230,38 @@ class Growtype_Form_Render
          */
         $form_data = Growtype_Form_Crud::get_growtype_form_data($form_name);
 
+        /**
+         * Overwrite form data with existing extra arguments
+         */
+        $extra_args = $args;
+
+        unset($extra_args["name"]);
+
+        if (!empty($extra_args)) {
+            foreach ($form_data as $key => $form_data_element) {
+                if (in_array($key, array_keys($extra_args))) {
+                    $form_data[$key] = $extra_args[$key] == 'true' || $extra_args[$key] == 'false' ? filter_var($extra_args[$key], FILTER_VALIDATE_BOOLEAN) : $extra_args[$key];
+                }
+            }
+        }
+
         if (empty($form_data)) {
             return __('Form is not configured. Please contact site admin.', 'growtype-form');
         }
 
         /**
+         * Init form body classes
+         */
+        if (str_contains($form_name, 'signup')) {
+            add_filter('body_class', array ($this, 'growtype_form_signup_body_class'));
+        } elseif (str_contains($form_name, 'login')) {
+            add_filter('body_class', array ($this, 'growtype_form_login_body_class'));
+        }
+
+        /**
          * Enqueue render scripts
          */
-        $this->growtype_form_enqueue_render_styles();
+        $this->growtype_form_enqueue_render_styles($form_name);
         $this->growtype_form_enqueue_render_scripts();
 
         /**
@@ -217,6 +271,7 @@ class Growtype_Form_Render
 
         /**
          * Render forms
+         * $form_type Fields - plain fields with no extra features
          */
         if (str_contains($form_name, 'login')) {
             /**
@@ -476,8 +531,8 @@ class Growtype_Form_Render
      */
     public static function growtype_form_get_current_post()
     {
-        if (!empty($_SERVER['PHP_SELF'])) {
-            $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
 
             if ($page_slug === Growtype_Form_Signup::CUSTOM_SLUG || $page_slug === Growtype_Form_Login::URL_SLUG) {
                 return '';
@@ -492,8 +547,8 @@ class Growtype_Form_Render
      */
     public static function growtype_form_get_current_post_slug()
     {
-        if (!empty($_SERVER['PHP_SELF'])) {
-            $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
 
             if ($page_slug === Growtype_Form_Signup::CUSTOM_SLUG || $page_slug === Growtype_Form_Login::URL_SLUG) {
                 return $page_slug;

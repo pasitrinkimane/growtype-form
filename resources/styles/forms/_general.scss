@@ -1,5 +1,5 @@
 .growtype-form {
-  .main-fields{
+  .main-fields {
     h3 {
       font-size: 18px;
       position: relative;
@@ -12,6 +12,12 @@
         display: inline-block;
         position: absolute;
         bottom: -12px;
+      }
+    }
+
+    .e-wrapper.col-12 {
+      .select2-container {
+        width: 100% !important;
       }
     }
   }

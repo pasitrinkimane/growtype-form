@@ -14,22 +14,10 @@ class Growtype_Form_Login
             add_filter('authenticate', array ($this, 'custom_authenticate_username_password'), 30, 3);
             add_filter('login_redirect', array ($this, 'growtype_form_login_redirect'));
             add_filter('login_url', array ($this, 'change_default_login_url'), 10, 2);
-
-            if (growtype_form_login_page_is_active()) {
-                add_action('wp_enqueue_scripts', array ($this, 'growtype_form_enqueue_styles'));
-            }
         }
 
         add_action('init', array ($this, 'custom_url'), 1);
         add_action('template_redirect', array ($this, 'custom_url_template'));
-    }
-
-    /**
-     * @return void
-     */
-    function growtype_form_enqueue_styles()
-    {
-        wp_enqueue_style('growtype-form-login', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/login/main.css', array (), '1.1', 'all');
     }
 
     /**
@@ -45,8 +33,8 @@ class Growtype_Form_Login
      */
     function custom_url_template()
     {
-        if (!empty($_SERVER['PHP_SELF'])) {
-            $page_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
+        if (!empty($_SERVER['REQUEST_URI'])) {
+            $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
 
             if (growtype_form_login_page_is_active() && growtype_form_login_page_ID() === 'default' && $page_slug === self::URL_SLUG) {
                 echo growtype_form_include_view('login/default');

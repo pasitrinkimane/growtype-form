@@ -15,8 +15,8 @@ function growtype_form_login_page_is_active()
 {
     $page_ID = growtype_form_login_page_ID();
 
-    if (isset($_SERVER['PHP_SELF']) && $page_ID === 'default') {
-        $current_url_slug = str_replace('/', '', $_SERVER['PHP_SELF']);
+    if (isset($_SERVER['REQUEST_URI']) && $page_ID === 'default') {
+        $current_url_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
 
         return $current_url_slug === Growtype_Form_Login::URL_SLUG;
     }
