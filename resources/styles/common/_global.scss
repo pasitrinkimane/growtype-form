@@ -4,7 +4,11 @@
     font-size: 14px;
   }
 
-  .growtype-form {
+  form {
+    input[type="submit"], button[type="submit"] {
+      width: 100%;
+      margin-top: 20px;
+    }
 
     .b-file-preview {
       margin-top: 10px;
@@ -30,8 +34,9 @@
     }
 
     .fields-confirmation {
-      padding-top: 20px;
-      padding-bottom: 10px;
+      padding-top: 10px;
+      padding-bottom: 0;
+      bottom: -10px;
 
       .col-auto {
         width: 100%;
@@ -163,11 +168,6 @@
     }
 
     form {
-      input[type="submit"], button[type="submit"] {
-        width: 100%;
-        margin-top: 20px;
-      }
-
       &[name="lostpasswordform"] {
         padding: 0 !important;
         background: none !important;

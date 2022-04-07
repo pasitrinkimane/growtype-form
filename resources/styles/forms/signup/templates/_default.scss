@@ -46,7 +46,6 @@
       align-items: center;
       min-height: 65px;
       @include bp-phone-xl() {
-        margin-bottom: 10px;
         padding-left: 25px;
         padding-right: 25px;
       }

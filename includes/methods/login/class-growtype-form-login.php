@@ -25,7 +25,9 @@ class Growtype_Form_Login
      */
     function custom_url()
     {
-        add_rewrite_endpoint(self::URL_SLUG, EP_ALL);
+        if (growtype_form_login_page_ID() === 'default') {
+            add_rewrite_endpoint(self::URL_SLUG, EP_ALL);
+        }
     }
 
     /**
