@@ -37,9 +37,6 @@
     font-size: 14px;
     text-decoration: none;
     border: none;
-    @include bp-phone-xl() {
-      bottom: 207px;
-    }
   }
 
   .login-submit {
