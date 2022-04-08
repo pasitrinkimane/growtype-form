@@ -38,7 +38,7 @@ class Growtype_Form_Login
         if (!empty($_SERVER['REQUEST_URI'])) {
             $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
 
-            if (growtype_form_login_page_is_active() && growtype_form_login_page_ID() === 'default' && $page_slug === self::URL_SLUG) {
+            if (growtype_form_login_page_is_active() && growtype_form_login_page_ID() === 'default') {
                 echo growtype_form_include_view('login/default');
                 exit;
             }
