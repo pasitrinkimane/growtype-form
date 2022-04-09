@@ -1,46 +1,53 @@
-.e-wrapper {
-  position: relative;
+.growtype-form-wrapper {
+  .e-wrapper {
+    position: relative;
 
-  .input-icon {
-    position: absolute;
-    right: 20px;
-    top: 42px;
-    opacity: 0.7;
-    pointer-events: none;
-  }
-
-  &[data-label="false"] {
     .input-icon {
-      top: 12px;
+      position: absolute;
+      right: 20px;
+      top: 42px;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    &[data-label="false"] {
+      .input-icon {
+        top: 12px;
+      }
     }
   }
-}
 
-.input-file-wrapper {
-  .dashicons-media-document {
-    font-size: 70px;
-    width: 70px;
-    height: 70px;
-  }
-}
-
-.bootstrap-filestyle {
-  .woocommerce form .form-row input.input-text, .woocommerce form .form-row textarea, input:not([type=checkbox]):not([type=radio]):not([type=submit]):not(.qty), textarea {
-    width: initial;
+  .input-file-wrapper {
+    .dashicons-media-document {
+      font-size: 70px;
+      width: 70px;
+      height: 70px;
+    }
   }
 
-  .group-span-filestyle {
-    z-index: 1;
-  }
-}
+  .bootstrap-filestyle {
+    .woocommerce form .form-row input.input-text, .woocommerce form .form-row textarea, input:not([type=checkbox]):not([type=radio]):not([type=submit]):not(.qty), textarea {
+      width: initial;
+    }
 
-.radio-wrapper {
-  input[type=radio] {
-    cursor: pointer;
-    margin-right: 6px;
+    .group-span-filestyle {
+      z-index: 1;
+    }
+
+    .form-control {
+      background: none !important;
+      border: none !important;
+    }
   }
 
-  label {
-    cursor: pointer;
+  .radio-wrapper {
+    input[type=radio] {
+      cursor: pointer;
+      margin-right: 6px;
+    }
+
+    label {
+      cursor: pointer;
+    }
   }
 }

@@ -6,7 +6,6 @@
 
   form {
     input[type="submit"], button[type="submit"] {
-      width: 100%;
       margin-top: 20px;
     }
 
@@ -175,6 +174,10 @@
         margin-top: 5px !important;
         display: inline-block;
       }
+
+      input[type="submit"], button[type="submit"] {
+        width: 100%;
+      }
     }
 
     .lostpassword {
@@ -186,14 +189,16 @@
   }
 }
 
-.footer-disabled {
-  .site-footer {
-    display: none;
+.has-growtype-form {
+  .footer-disabled {
+    .site-footer {
+      display: none;
+    }
   }
-}
 
-form {
-  .chosen-container {
-    width: 100% !important;
+  form {
+    .chosen-container {
+      width: 100% !important;
+    }
   }
 }

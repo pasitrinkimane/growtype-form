@@ -17,7 +17,7 @@ trait Product
     /**
      * @return void
      */
-    public function get_product_extra_meta_keys($product_type = null)
+    public function get_product_meta_keys($product_type = null)
     {
         $extra_meta_keys = [
             '_regular_price',
@@ -166,14 +166,22 @@ trait Product
         /**
          * Meta keys to update
          */
-        $meta_keys_to_update = $this->get_product_extra_meta_keys(growtype_form_default_product_type());
+        $meta_keys_to_update = $this->get_product_meta_keys(growtype_form_default_product_type());
 
         foreach ($meta_keys_to_update as $meta_key) {
             if (isset($product_data['data'][$meta_key])) {
                 $meta_data = $product_data['data'][$meta_key];
 
                 if ($meta_key === '_auction_dates_from' || $meta_key === '_auction_dates_to') {
-                    $meta_data = date('Y-m-d H:i', strtotime($meta_data));
+                    if (!empty($meta_data)) {
+                        $meta_data = date('Y-m-d H:i', strtotime($meta_data));
+                    } else {
+                        if ($meta_key === '_auction_dates_from') {
+                            $meta_data = date('Y-m-d H:i', strtotime('+1 day'));
+                        } else {
+                            $meta_data = date('Y-m-d H:i', strtotime('+8 days'));
+                        }
+                    }
                 }
 
                 if ($meta_key === '_auction_bid_increment') {
