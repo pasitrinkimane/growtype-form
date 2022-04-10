@@ -768,7 +768,7 @@ class Growtype_Form_Render
                 return null;
             }
 
-            $extra_meta_keys = $this->get_product_extra_meta_keys(growtype_form_default_product_type());
+            $extra_meta_keys = $this->get_product_meta_keys(growtype_form_default_product_type());
 
             $_REQUEST['title'] = $product->get_title();
             $_REQUEST['description'] = $product->get_description();
