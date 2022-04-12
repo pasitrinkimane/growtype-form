@@ -359,9 +359,9 @@ class Growtype_Form_Admin
         }
         require_once(ABSPATH . 'wp-admin/includes/class-wp-users-list-table.php');
 
-        require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-members.php';
-        require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-members-list-table.php';
+        require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signup-details.php';
+        require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signups-list-table.php';
 
-        $this->loader = new Growtype_Form_Members();
+        $this->loader = new Growtype_Form_Signup_Details();
     }
 }

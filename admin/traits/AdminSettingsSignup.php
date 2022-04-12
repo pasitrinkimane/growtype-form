@@ -186,6 +186,23 @@ trait AdminSettingsSignup
         );
 
         /**
+         * Account requires evaluation
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_signup_requires_confirmation', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_signup_requires_confirmation',
+            'Signup requires confirmation',
+            array ($this, 'growtype_form_signup_requires_confirmation_callback'),
+            'growtype-form-settings',
+            'growtype_form_settings_signup'
+        );
+
+        /**
          * Platform page
          */
         register_setting(
@@ -195,7 +212,7 @@ trait AdminSettingsSignup
 
         add_settings_field(
             'growtype_form_account_verification_platform_page',
-            'Account Verification - Platform Page',
+            'Platform Page (Main page after account verification to redirect)',
             array ($this, 'growtype_form_account_verification_platform_page_callback'),
             'growtype-form-settings',
             'growtype_form_settings_signup'
@@ -365,6 +382,17 @@ trait AdminSettingsSignup
         $enabled = get_option('growtype_form_signup_show_footer');
         ?>
         <input type="checkbox" name="growtype_form_signup_show_footer" value="1" <?php echo checked(1, $enabled, false) ?> />
+        <?php
+    }
+
+    /**
+     * Allow simple password for signup
+     */
+    function growtype_form_signup_requires_confirmation_callback()
+    {
+        $enabled = get_option('growtype_form_signup_requires_confirmation');
+        ?>
+        <input type="checkbox" name="growtype_form_signup_requires_confirmation" value="1" <?php echo checked(1, $enabled, false) ?> />
         <?php
     }
 

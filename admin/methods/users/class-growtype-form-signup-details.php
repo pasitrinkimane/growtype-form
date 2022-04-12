@@ -14,7 +14,7 @@ if ( !class_exists( 'BP_Members_Admin' ) ) :
  *
  * @since 2.0.0
  */
-class Growtype_Form_Members {
+class Growtype_Form_Signup_Details {
 
      use AdminSettingsSignup;
      
@@ -85,8 +85,8 @@ class Growtype_Form_Members {
 
 		// Manage signups.
 			$hooks['signups'] = $this->signups_page = add_users_page(
-				__( 'Manage GF Signups',  'growtype-form' ),
-				__( 'Manage GF Signups',  'growtype-form' ),
+				__( 'GF Signups',  'growtype-form' ),
+				__( 'GF Signups',  'growtype-form' ),
 				$this->capability,
 				'gf-signups',
 				array( $this, 'signups_admin' )
@@ -250,7 +250,7 @@ class Growtype_Form_Members {
 		// Prepare the display of the Community Profile screen.
 		if ( ! in_array( $doaction, $allowed_actions ) || ( -1 == $doaction ) ) {
 
-			$bp_members_signup_list_table = self::get_list_table_class( 'Growtype_Form_Members_List_Table', 'users' );
+			$bp_members_signup_list_table = self::get_list_table_class( 'Growtype_Form_Signups_List_Table', 'users' );
 
 			// The per_page screen option.
 			add_screen_option( 'per_page', array( 'label' => _x( 'Pending Accounts', 'Pending Accounts per page (screen options)', 'growtype-form' ) ) );
@@ -656,7 +656,7 @@ class Growtype_Form_Members {
 	public function signups_admin_index() {
 		global $plugin_page, $bp_members_signup_list_table;
 
-		$usersearch = ! empty( $_REQUEST['s'] ) ? stripslashes( $_REQUEST['s'] ) : '';
+		$search_value = ! empty( $_REQUEST['s'] ) ? stripslashes( $_REQUEST['s'] ) : '';
 
 		// Prepare the group items for display.
 		$bp_members_signup_list_table->prepare_items();
@@ -708,8 +708,8 @@ class Growtype_Form_Members {
 
 			<?php endif;
 
-			if ( $usersearch ) {
-				printf( '<span class="subtitle">' . __( 'Search results for &#8220;%s&#8221;', 'growtype-form' ) . '</span>', esc_html( $usersearch ) );
+			if ( $search_value ) {
+				printf( '<span class="subtitle">' . __( 'Search results for &#8220;%s&#8221;', 'growtype-form' ) . '</span>', esc_html( $search_value ) );
 			}
 			?>
 
@@ -720,7 +720,7 @@ class Growtype_Form_Members {
 
 			<form id="gf-signups-search-form" action="<?php echo esc_url( $search_form_url ) ;?>">
 				<input type="hidden" name="page" value="<?php echo esc_attr( $plugin_page ); ?>" />
-				<?php $bp_members_signup_list_table->search_box( __( 'Search Pending Users', 'growtype-form' ), 'gf-signups' ); ?>
+				<?php $bp_members_signup_list_table->search_box( __( 'Search Users', 'growtype-form' ), 'growtype-form' ); ?>
 			</form>
 
 			<form id="gf-signups-form" action="<?php echo esc_url( $form_url );?>" method="post">
@@ -793,11 +793,11 @@ class Growtype_Form_Members {
 				break;
 
 			case 'activate' :
-				$header_text = __( 'Evaluate Pending Accounts', 'growtype-form' );
+				$header_text = __( 'Signup details', 'growtype-form' );
 				if ( 1 == count( $signup_ids ) ) {
-					$helper_text = __( 'You are about to activate the following account:', 'growtype-form' );
+					$helper_text = __( 'Below are user signup details:', 'growtype-form' );
 				} else {
-					$helper_text = __( 'You are about to activate the following accounts:', 'growtype-form' );
+					$helper_text = __( 'Below are multiple users signup details:', 'growtype-form' );
 				}
 				break;
 
@@ -871,7 +871,7 @@ class Growtype_Form_Members {
 								<?php
 								foreach ($signup_data as $data){ ?>
                                     <tr>
-									<td class="column-fields"><?= $data['label'] ?></td>
+									<td class="column-fields"><?= __($data['label'],'growtype-form') ?></td>
 									<td><?= $data['value'] ?></td>
 								</tr>
 								<?php } ?>
@@ -980,8 +980,12 @@ class Growtype_Form_Members {
 
 			<?php endif ; ?>
 
-			<a class="button-primary" href="<?php echo esc_url( $action_url ); ?>"><?php esc_html_e( 'Confirm', 'growtype-form' ); ?></a>
+<?php
+if(get_option('growtype_form_signup_requires_confirmation')){ ?>
+    <a class="button-primary" href="<?php echo esc_url( $action_url ); ?>"><?php esc_html_e( 'Confirm', 'growtype-form' ); ?></a>
 			<a class="button" href="<?php echo esc_url( $cancel_url ); ?>"><?php esc_html_e( 'Cancel', 'growtype-form' ) ?></a>
+<?php } ?>
+
 </div>
 		</div>
 

@@ -184,7 +184,7 @@ msgstr ""
 
 #: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:88
 #: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:89
-msgid "Manage GF Signups"
+msgid "GF Signups"
 msgstr ""
 
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:312

@@ -200,8 +200,8 @@ msgstr "Pamiršote slaptažodį?"
 
 #: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:88
 #: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:89
-msgid "Manage GF Signups"
-msgstr "Tvarkykite GF registracijas"
+msgid "GF Signups"
+msgstr "GF registracijas"
 
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:312
 msgid "Missing required values"

@@ -11,7 +11,7 @@ defined('ABSPATH') || exit;
  *
  * @since 2.0.0
  */
-class Growtype_Form_Members_List_Table extends WP_Users_List_Table
+class Growtype_Form_Signups_List_Table extends WP_Users_List_Table
 {
     /**
      * Signup counts.
@@ -47,9 +47,7 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
      */
     public function prepare_items()
     {
-        global $usersearch;
-
-        $usersearch = isset($_REQUEST['s']) ? $_REQUEST['s'] : '';
+        $search_value = isset($_REQUEST['s']) ? $_REQUEST['s'] : '';
         $signups_per_page = $this->get_items_per_page(str_replace('-', '_', "{$this->screen->id}_per_page"));
         $paged = $this->get_pagenum();
 
@@ -58,12 +56,12 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
         $args = array (
             'offset' => ($paged - 1) * $signups_per_page,
             'number' => $signups_per_page,
-            'usersearch' => $usersearch,
+            'search' => $search_value,
             'orderby' => 'registered',
             'order' => 'DESC',
             'role__in' => $user_roles,
-            'meta_key' => 'paying_customer',
-            'meta_value' => '1',
+//            'meta_key' => 'paying_customer',
+//            'meta_value' => '1',
         );
 
         if (isset($_REQUEST['orderby'])) {
@@ -75,6 +73,22 @@ class Growtype_Form_Members_List_Table extends WP_Users_List_Table
         }
 
         $signups = get_users($args);
+
+        if (str_contains($search_value, '=')) {
+            $values = explode('=', $search_value);
+            $meta_key = $values[0] ?? null;
+            $meta_value = $values[1] ?? null;
+
+            $all_users = get_users();
+
+            $signups = [];
+            foreach ($all_users as $user) {
+                $meta_value_in_db = get_user_meta($user->ID, $meta_key, true);
+                if ($meta_value_in_db === $meta_value) {
+                    array_push($signups, $user);
+                }
+            }
+        }
 
         $this->items = $signups;
         $this->signup_counts = count($signups);

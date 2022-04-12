@@ -82,7 +82,7 @@ class Growtype_Form_Signup
                 $meta_value = isset($user_meta[$field_name]) ? $user_meta[$field_name][0] : null;
                 if (!empty($meta_value)) {
                     $user_data[$field['name']] = [
-                        'label' => $field['label'] ?? null,
+                        'label' => $field['label'] ?? $field['name'] ?? null,
                         'value' => $meta_value
                     ];
                 }
