@@ -539,7 +539,7 @@ class Growtype_Form_Render
             }
         }
 
-        return get_post();
+        return !empty(get_post()) && str_contains($_SERVER['REQUEST_URI'], get_post()->post_name) ? get_post() : null;
     }
 
     /**
@@ -555,9 +555,7 @@ class Growtype_Form_Render
             }
         }
 
-        $current_post = self::growtype_form_get_current_post();
-
-        return !empty($current_post) ? $current_post->post_name : '';
+        return $_SERVER['REQUEST_URI'] ?? home_url();
     }
 
     /**

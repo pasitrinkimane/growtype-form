@@ -26,7 +26,7 @@ class Growtype_Form_Profile
      */
     function growtype_form_enqueue_styles()
     {
-        wp_enqueue_style('growtype-form-profile', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/profile/main.css', array (), '1.1', 'all');
+//        wp_enqueue_style('growtype-form-profile', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/profile/main.css', array (), '1.1', 'all');
     }
 
     /**
