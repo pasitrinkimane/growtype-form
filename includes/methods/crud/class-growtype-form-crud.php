@@ -116,7 +116,13 @@ class Growtype_Form_Crud
 
             if (str_contains($form_name, 'signup')) {
                 $child_user = isset($form_data['child_user']) && $form_data['child_user'] ? true : false;
-                $submit_data = $this->save_submitted_signup_data($submitted_data, $child_user);
+
+                $signup_params = [
+                    'child_user' => $child_user,
+                    'username_prefix' => $form_data['username_prefix'] ?? null,
+                ];
+
+                $submit_data = $this->save_submitted_signup_data($submitted_data, $signup_params);
 
                 if (isset($submit_data['success']) && $submit_data['success']) {
                     $user_id = $submit_data['user_id'];
@@ -290,7 +296,7 @@ class Growtype_Form_Crud
      * @param $data
      * @return array
      */
-    public function save_submitted_signup_data($data, $child_user)
+    public function save_submitted_signup_data($data, $signup_params)
     {
         $email = isset($data['email']) ? sanitize_text_field($data['email']) : null;
         $username = isset($data['username']) ? sanitize_text_field($data['username']) : null;
@@ -298,9 +304,18 @@ class Growtype_Form_Crud
         $password = isset($data['password']) ? sanitize_text_field($_REQUEST['password']) : null;
         $repeat_password = isset($data['repeat_password']) ? sanitize_text_field($_REQUEST['repeat_password']) : null;
 
+        if (!empty($signup_params['username_prefix'])) {
+            $username = $signup_params['username_prefix'] . date_timestamp_get(date_create());
+        }
+
+        if (empty($email) && is_user_logged_in()) {
+            $current_user = wp_get_current_user();
+            $email = $current_user->user_email;
+        }
+
         if (empty($username) || empty($password) || empty($email)) {
             $response['success'] = false;
-            $response['message'] = __("Missing required values", "growtype-form");
+            $response['message'] = __("Missing values required for login.", "growtype-form");
             return $response;
         }
 
@@ -342,7 +357,7 @@ class Growtype_Form_Crud
             /**
              * Save child user parameters
              */
-            if ($child_user) {
+            if ($signup_params['child_user']) {
                 /**
                  * Set parent users
                  */
