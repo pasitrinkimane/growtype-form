@@ -18,6 +18,20 @@ class Growtype_Form_Login
 
         add_action('init', array ($this, 'custom_url'), 1);
         add_action('template_redirect', array ($this, 'custom_url_template'));
+        add_filter('document_title_parts', array ($this, 'custom_document_title_parts'));
+    }
+
+    /**
+     * @param $title
+     * @return string
+     */
+    function custom_document_title_parts($title_parts)
+    {
+        if (growtype_form_login_page_is_active() && growtype_form_login_page_ID() === 'default') {
+            $title_parts['title'] = __('Sign in', 'growtype-form');
+        }
+
+        return $title_parts;
     }
 
     /**
@@ -26,7 +40,7 @@ class Growtype_Form_Login
     function custom_url()
     {
         if (growtype_form_login_page_ID() === 'default') {
-            add_rewrite_endpoint(self::URL_SLUG, EP_ALL);
+            add_rewrite_endpoint(self::URL_SLUG, EP_ROOT);
         }
     }
 
@@ -36,8 +50,6 @@ class Growtype_Form_Login
     function custom_url_template()
     {
         if (!empty($_SERVER['REQUEST_URI'])) {
-            $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
-
             if (growtype_form_login_page_is_active() && growtype_form_login_page_ID() === 'default') {
                 echo growtype_form_include_view('login/default');
                 exit;

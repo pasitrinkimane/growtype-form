@@ -11,6 +11,20 @@ class Growtype_Form_Signup
     {
         add_action('init', array ($this, 'custom_url'), 1);
         add_action('template_redirect', array ($this, 'custom_url_template'));
+        add_filter('document_title_parts', array ($this, 'custom_document_title_parts'));
+    }
+
+    /**
+     * @param $title
+     * @return string
+     */
+    function custom_document_title_parts($title_parts)
+    {
+        if (growtype_form_signup_page_is_active() && growtype_form_signup_page_ID() === 'default') {
+            $title_parts['title'] = __('Sign up', 'growtype-form');
+        }
+
+        return $title_parts;
     }
 
     /**
@@ -19,7 +33,7 @@ class Growtype_Form_Signup
     function custom_url()
     {
         if (growtype_form_signup_page_ID() === 'default') {
-            add_rewrite_endpoint(self::CUSTOM_SLUG, EP_ALL);
+            add_rewrite_endpoint(self::CUSTOM_SLUG, EP_ROOT);
         }
     }
 
@@ -29,9 +43,7 @@ class Growtype_Form_Signup
     function custom_url_template()
     {
         if (!empty($_SERVER['REQUEST_URI'])) {
-            $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
-
-            if (growtype_form_signup_page_is_active() && growtype_form_signup_page_ID() === 'default' && $page_slug === self::CUSTOM_SLUG) {
+            if (growtype_form_signup_page_is_active() && growtype_form_signup_page_ID() === 'default') {
                 echo growtype_form_include_view('signup/default');
                 exit;
             }
