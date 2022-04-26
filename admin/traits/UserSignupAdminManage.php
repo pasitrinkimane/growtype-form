@@ -128,7 +128,6 @@ trait UserSignupAdminManage
                         $last_notified = mysql2date('Y/m/d g:i:s a', $signup->date_sent);
 
                         $signup_data = Growtype_Form_Signup::get_signup_data($signup->ID);
-
                         ?>
 
                         <li>
@@ -152,9 +151,9 @@ trait UserSignupAdminManage
                                     </tr>
 
                                     <?php
-                                    foreach ($signup_data as $data) { ?>
+                                    foreach ($signup_data as $key => $data) { ?>
                                         <tr>
-                                            <td class="column-fields"><?= __($data['label'], 'growtype-form') ?></td>
+                                            <td class="column-fields"><?= __($data['label'], 'growtype-form') ?> (key: <?php echo $key ?>)</td>
                                             <td><?= $data['value'] ?></td>
                                         </tr>
                                     <?php } ?>
