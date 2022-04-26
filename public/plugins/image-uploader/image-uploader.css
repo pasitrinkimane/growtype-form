@@ -193,3 +193,9 @@
         margin: .2rem;
     }
 }
+
+.image-uploader .input-fallback {
+    opacity: 1 !important;
+    z-index: 1 !important;
+    min-height: 160px !important;
+}

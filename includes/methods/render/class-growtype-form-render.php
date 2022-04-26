@@ -120,7 +120,7 @@ class Growtype_Form_Render
      */
     function growtype_form_enqueue_render_scripts()
     {
-        wp_enqueue_script('growtype-form-render', GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form-render.js', array ('jquery'), '1.1', true);
+        wp_enqueue_script('growtype-form-render', GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form-render.js', array ('jquery'), '1.3', true);
 
         wp_localize_script('growtype-form-render', 'growtype_form_date_time_data', self::DATE_TIME_DATA);
 
@@ -136,6 +136,13 @@ class Growtype_Form_Render
          */
         if (!wp_script_is('image-uploader', 'enqueued')) {
             wp_enqueue_script('image-uploader', GROWTYPE_FORM_URL_PUBLIC . 'plugins/image-uploader/image-uploader.js', array ('jquery'), '1.1', true);
+        }
+
+        /**
+         * Jquery multifile
+         */
+        if (!wp_script_is('jquery-multifile', 'enqueued')) {
+            wp_enqueue_script('image-multifile', GROWTYPE_FORM_URL_PUBLIC . 'plugins/jquery-multifile/jquery.MultiFile.min.js', array ('jquery'), '1.1', true);
         }
 
         /**

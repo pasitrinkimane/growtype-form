@@ -154,25 +154,53 @@ $('document').ready(function () {
     /**
      * Image uploader setup
      */
-    $('.image-uploader').each(function () {
-        let image_upload_data = typeof (growtype_form_image_upload_data) !== 'undefined' ? growtype_form_image_upload_data : [];
-        let preloaded = [];
+    let defaultGallerySupported = true;
 
-        if (Object.entries(image_upload_data).length > 0) {
-            let preloaded_data = JSON.parse(image_upload_data.preloaded);
+    try {
+        let dataTransfer = new DataTransfer();
+    } catch (err) {
+        defaultGallerySupported = false;
+    }
 
-            if (Object.entries(preloaded_data).length > 0) {
-                preloaded = preloaded_data;
-            }
+    let imageUploaderInitial = $('.image-uploader-init');
+
+    let imageUploaderInitialName = imageUploaderInitial.attr('data-name');
+    let imageUploaderInitialExtension = imageUploaderInitial.attr('data-extensions').split(",");
+    let imageUploaderInitialMaxSize = imageUploaderInitial.attr('data-max-size');
+
+    if (defaultGallerySupported) {
+        if (typeof $.fn.imageUploader !== 'undefined') {
+            imageUploaderInitial.addClass('image-uploader');
+
+            $('.image-uploader').each(function () {
+                let image_upload_data = typeof (growtype_form_image_upload_data) !== 'undefined' ? growtype_form_image_upload_data : [];
+                let preloaded = [];
+
+                if (Object.entries(image_upload_data).length > 0) {
+                    let preloaded_data = JSON.parse(image_upload_data.preloaded);
+
+                    if (Object.entries(preloaded_data).length > 0) {
+                        preloaded = preloaded_data;
+                    }
+                }
+
+                $(this).imageUploader({
+                    preloaded: preloaded,
+                    imagesInputName: imageUploaderInitialName,
+                    extensions: imageUploaderInitialExtension,
+                    maxSize: imageUploaderInitialMaxSize,
+                });
+            });
         }
+    } else {
+        $('<input multiple type="file" class="upload-multifile with-preview" className="multi" name="' + imageUploaderInitialName + '[]"/>').insertAfter('.image-uploader-init');
 
-        $(this).imageUploader({
-            preloaded: preloaded,
-            imagesInputName: $(this).attr('data-name'),
-            extensions: $(this).attr('data-extensions').split(","),
-            maxSize: $(this).attr('data-max-size'),
+        $('.upload-multifile').MultiFile({
+            max: 10,
+            accept: imageUploaderInitialExtension.join([separator = ',']),
+            max_size: imageUploaderInitialMaxSize,
         });
-    });
+    }
 
     /**
      * Set date
