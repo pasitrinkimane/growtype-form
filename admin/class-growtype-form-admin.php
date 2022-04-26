@@ -195,7 +195,7 @@ class Growtype_Form_Admin
         $tabs['signup'] = 'Signup';
         $tabs['post'] = 'Post';
 
-        if (class_exists('woocompress')) {
+        if (class_exists('woocommerce')) {
             $tabs['woocommerce'] = 'Woocommerce';
         }
 

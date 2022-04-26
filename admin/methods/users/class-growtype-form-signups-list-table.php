@@ -48,10 +48,16 @@ class Growtype_Form_Signups_List_Table extends WP_Users_List_Table
     public function prepare_items()
     {
         $search_value = isset($_REQUEST['s']) ? $_REQUEST['s'] : '';
-        $signups_per_page = $this->get_items_per_page(str_replace('-', '_', "{$this->screen->id}_per_page"));
+
+        if (isset($_REQUEST['wp_screen_options'])) {
+            $signups_per_page = $_REQUEST['wp_screen_options']["value"];
+        } else {
+            $signups_per_page = $this->get_items_per_page('gf_records_per_page', 50);
+        }
+
         $paged = $this->get_pagenum();
 
-        $user_roles = !empty(get_option('growtype_form_default_user_role')) ? [get_option('growtype_form_default_user_role')] : ['subscriber'];
+        $required_user_roles = !empty(get_option('growtype_form_default_user_role')) ? [get_option('growtype_form_default_user_role')] : ['subscriber'];
 
         $args = array (
             'offset' => ($paged - 1) * $signups_per_page,
@@ -59,7 +65,7 @@ class Growtype_Form_Signups_List_Table extends WP_Users_List_Table
             'search' => $search_value,
             'orderby' => 'registered',
             'order' => 'DESC',
-            'role__in' => $user_roles,
+            'role__in' => $required_user_roles,
 //            'meta_key' => 'paying_customer',
 //            'meta_value' => '1',
         );
@@ -90,8 +96,16 @@ class Growtype_Form_Signups_List_Table extends WP_Users_List_Table
             }
         }
 
+        $avail_roles = count_users()["avail_roles"];
+
+        $this->signup_counts = 0;
+        foreach ($avail_roles as $role => $amount) {
+            if (in_array($role, $required_user_roles)) {
+                $this->signup_counts = $this->signup_counts + $amount;
+            }
+        }
+
         $this->items = $signups;
-        $this->signup_counts = count($signups);
 
         $this->set_pagination_args(array (
             'total_items' => $this->signup_counts,
@@ -166,12 +180,12 @@ class Growtype_Form_Signups_List_Table extends WP_Users_List_Table
          */
         return apply_filters('bp_members_signup_columns', array (
             'cb' => '<input type="checkbox" />',
+//            'user_id' => __('User ID', 'growtype-form'),
             'username' => __('Username', 'growtype-form'),
             'name' => __('Name', 'growtype-form'),
             'email' => __('Email', 'growtype-form'),
-            'registered' => __('Registered', 'growtype-form'),
-            'date_sent' => __('Last Sent', 'growtype-form'),
-            'count_sent' => __('Emails Sent', 'growtype-form')
+            'registered' => __('Registration date', 'growtype-form'),
+//            'count_sent' => __('Emails Sent', 'growtype-form')
         ));
     }
 
@@ -183,8 +197,10 @@ class Growtype_Form_Signups_List_Table extends WP_Users_List_Table
     public function get_bulk_actions()
     {
         $actions = array (
-            'activate' => _x('Evaluate', 'Pending signup action', 'growtype-form'),
-            'resend' => _x('Email', 'Pending signup action', 'growtype-form'),
+            'activate' => _x('Evaluate', 'Registrations', 'growtype-form'),
+            'resend' => _x('Email', 'Registrations', 'growtype-form'),
+            'export_selected' => _x('Export selected', 'Registrations', 'growtype-form'),
+            'export_all' => _x('Export all', 'Registrations', 'growtype-form'),
         );
 
         if (current_user_can('delete_users')) {
@@ -346,7 +362,10 @@ class Growtype_Form_Signups_List_Table extends WP_Users_List_Table
      */
     public function column_name($signup_object = null)
     {
-        echo esc_html($signup_object->user_name);
+        $name = isset(Growtype_Form_Signup::get_signup_data($signup_object->ID)['first_and_last_name']) ?
+            Growtype_Form_Signup::get_signup_data($signup_object->ID)['first_and_last_name']['value'] : $signup_object->user_name;
+
+        echo esc_html($name);
     }
 
     /**
@@ -380,9 +399,9 @@ class Growtype_Form_Signups_List_Table extends WP_Users_List_Table
      * @since 2.0.0
      *
      */
-    public function column_date_sent($signup_object = null)
+    public function column_user_id($signup_object = null)
     {
-        echo mysql2date('Y/m/d', $signup_object->date_sent);
+        echo $signup_object->ID;
     }
 
     /**
