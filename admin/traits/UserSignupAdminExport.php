@@ -123,6 +123,9 @@ trait UserSignupAdminExport
         foreach ($users as $user_key => $signup) {
             $signup_data = $this->get_user_data($signup->ID);
 
+//            echo '<pre>' . var_export($signup_data, true) . '</pre>';
+//            die();
+
             $profile_data_clean = [];
             foreach ($signup_data['signup_data'] as $field_key => $field_value) {
                 $profile_data_clean[$field_key] = $field_value['value'];
@@ -133,6 +136,7 @@ trait UserSignupAdminExport
             foreach ($export_fields as $export_key => $field) {
                 if ($index === 0) {
                     $export_data[$index][$export_key] = $field;
+                    $export_data[$index + 1][$export_key] = isset($signup_details[$export_key]) ? $signup_details[$export_key] : '';
                 } else {
                     $export_data[$index][$export_key] = isset($signup_details[$export_key]) ? $signup_details[$export_key] : '';
                 }
@@ -160,6 +164,7 @@ trait UserSignupAdminExport
     {
         $export_fields = [];
         $export_fields['ID'] = 'ID';
+        $export_fields['display_name'] = 'Username'; //user_nicename
         $export_fields['user_email'] = 'Email';
         $export_fields['user_registered'] = 'Registration date';
 
