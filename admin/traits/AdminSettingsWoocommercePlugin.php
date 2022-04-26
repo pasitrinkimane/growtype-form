@@ -183,7 +183,7 @@ trait AdminSettingsWoocommercePlugin
     {
         $selected = growtype_form_default_product_type();
         $options = [];
-        if (class_exists('woocompress')) {
+        if (class_exists('woocommerce')) {
             $options = wc_get_product_types();
         }
         ?>
