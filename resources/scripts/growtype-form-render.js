@@ -165,7 +165,7 @@ $('document').ready(function () {
     let imageUploaderInitial = $('.image-uploader-init');
 
     let imageUploaderInitialName = imageUploaderInitial.attr('data-name');
-    let imageUploaderInitialExtension = imageUploaderInitial.attr('data-extensions').split(",");
+    let imageUploaderInitialExtension = imageUploaderInitial.attr('data-extensions') !== undefined ? imageUploaderInitial.attr('data-extensions').split(",") : '';
     let imageUploaderInitialMaxSize = imageUploaderInitial.attr('data-max-size');
 
     if (defaultGallerySupported) {
