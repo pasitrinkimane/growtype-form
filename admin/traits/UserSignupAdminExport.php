@@ -150,6 +150,8 @@ trait UserSignupAdminExport
             }
         }
 
+        $export_data = apply_filters('growtype_form_alter_export_data', $export_data);
+
 //        echo '<pre>' . var_export($export_data, true) . '</pre>';
 //        die();
 
