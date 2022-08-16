@@ -253,7 +253,7 @@ class Growtype_Form_Render
         }
 
         if (empty($form_data)) {
-            return __('Form is not configured. Please contact site admin.', 'growtype-form');
+            return '<p>' . __('Form is not configured. Please contact site admin.', 'growtype-form') . '</p>';
         }
 
         /**

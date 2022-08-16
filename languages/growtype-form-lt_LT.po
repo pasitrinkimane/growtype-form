@@ -402,13 +402,13 @@ msgstr "Prisiregistravimai"
 
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:355
 msgid "Something went wrong."
-msgstr "Kažkas nutiko."
+msgstr "Įvyko klaida."
 
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:110
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wc-crud.php:390
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wp-crud.php:53
 msgid "Something went wrong. Please contact administrator."
-msgstr "Kažkas nutiko. Susisiekite su administratoriumi."
+msgstr "Įvyko klaida. Susisiekite su puslapio administratoriumi."
 
 #: ../../../../../../packages/plugins/growtype-form/resources/views/modals/confirmation.blade.php:5
 #: ../../../../../../packages/plugins/growtype-form/resources/views/modals/terms.blade.php:5

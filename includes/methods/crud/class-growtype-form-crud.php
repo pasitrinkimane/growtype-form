@@ -196,13 +196,18 @@ class Growtype_Form_Crud
                     }
                 }
             } elseif ($form_name === 'post') {
-                $submit_data = $this->upload_post($form_data, $submitted_values);
 
-                /**
-                 * Attach featured image
-                 */
-                if (isset($submitted_values['files']) && isset($submitted_values['files']['featured_image'])) {
-                    $featured_image = $this->post_attach_featured_image($submit_data['post_id'], $submitted_values['files']['featured_image']);
+                if ($form_data['type'] === 'custom') {
+                    $submit_data = apply_filters('growtype_form_upload_post_custom', $form_data, $submitted_values);
+                } else {
+                    $submit_data = $this->upload_post($form_data, $submitted_values);
+
+                    /**
+                     * Attach featured image
+                     */
+                    if (isset($submitted_values['files']) && isset($submitted_values['files']['featured_image'])) {
+                        $featured_image = $this->post_attach_featured_image($submit_data['post_id'], $submitted_values['files']['featured_image']);
+                    }
                 }
 
                 /**
@@ -210,7 +215,7 @@ class Growtype_Form_Crud
                  */
                 if ($submit_data['success']) {
                     $submit_data['success'] = true;
-                    $submit_data['message'] = $success_message ?? __('Record created successfully.', 'growtype-form');
+                    $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : __('Record created successfully.', 'growtype-form');
                 }
             } else {
                 $submit_data['success'] = false;
@@ -238,7 +243,7 @@ class Growtype_Form_Crud
         /**
          * Prepare session redirect details
          */
-        $this->growtype_form_set_notice($submit_data['message'], ($submit_data['success'] ? 'success' : 'error'));
+        $this->growtype_form_set_notice($submit_data['message'] ?? __("Something went wrong. Please contact administrator.", "growtype-form"), ($submit_data['success'] ? 'success' : 'error'));
 
         /**
          * Redirect url

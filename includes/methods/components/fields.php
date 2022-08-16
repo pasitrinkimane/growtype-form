@@ -58,7 +58,7 @@ if (!empty($field_options) && !is_array($field_options) && (str_contains($field_
 }
 
 $field_label = $field['label'] ?? null;
-$field_label = $field_required && !str_contains($field_label, '*') ? $field_label . '<span class="required">*</span>' : $field_label;
+$field_label = !empty($field_label) && $field_required && !str_contains($field_label, '*') ? $field_label . '<span class="required">*</span>' : $field_label;
 $field_description = $field['description'] ?? null;
 $placeholder = $field['placeholder'] ?? null;
 $field_accept = $field['accept'] ?? null;
@@ -77,7 +77,7 @@ $field_price = $field['price'] ?? null;
 $field_group = $field['group'] ?? null;
 $field_autocomplete = isset($field['autocomplete']) && $field['autocomplete'] === 'true' ? 'on' : 'off';
 
-if (!in_array($field_type, self::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {
+if (!in_array($field_type, Growtype_Form_Render::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {
     return null;
 }
 

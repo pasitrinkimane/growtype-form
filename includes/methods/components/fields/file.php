@@ -22,6 +22,26 @@
             <?php } ?>
         </div>
     <?php } else { ?>
-        <input type="<?= $field_type ?>" id="<?= $field_name ?>" class="<?= $field_input_class ?>" data-placeholder="<?= $placeholder ?>" <?= !empty($field_cta_text) ? 'data-text="' . $field_cta_text . '"' : '' ?> data-buttonBefore="true" name="<?= $field_name ?>" accept="<?= $field_accept ?>" <?= $field_required ? 'required' : '' ?>>
+        <input
+            type="<?= $field_type ?>"
+            id="<?= $field_name ?>"
+            class="form-control <?= $field_input_class ?>"
+            data-placeholder="<?= $placeholder ?>"
+            data-selected-placeholder-single="<?= isset($field['selected_placeholder_single']) ? $field['selected_placeholder_single'] : '' ?>"
+            data-selected-placeholder-multiple="<?= isset($field['selected_placeholder_multiple']) ? $field['selected_placeholder_multiple'] : '' ?>"
+            <?= !empty($field_cta_text) ? 'data-text="' . $field_cta_text . '"' : '' ?>
+            data-buttonBefore="true"
+            name="<?= $field_name ?>"
+            accept="<?= $field_accept ?>"
+            <?= $field_required ? 'required' : '' ?>
+            <?= $field_multiple ? 'multiple' : '' ?>
+            max-size="<?= isset($field['max_size']) ? $field['max_size'] : '' ?>"
+            max-size-error-message="<?= isset($field['max_size_error_message']) ? $field['max_size_error_message'] : '' ?>"
+        >
+        <?php if (!empty($placeholder)) { ?>
+            <div class="form-label-placeholder">
+                <?php echo $placeholder ?>
+            </div>
+        <?php } ?>
     <?php } ?>
 </div>
