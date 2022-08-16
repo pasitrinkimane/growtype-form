@@ -330,7 +330,10 @@ $('document').ready(function () {
         let selectedPlaceholderMultiple = $(this).attr('data-selected-placeholder-multiple');
         let filesAmount = e.target.files.length;
 
-        $(this).closest('.input-file-wrapper').find('.form-label-placeholder').text($(this).attr('data-placeholder'))
+        $(this).closest('.input-file-wrapper')
+            .find('.form-label-placeholder')
+            .removeClass('is-active')
+            .text($(this).attr('data-placeholder'))
 
         if (filesAmount > 0 && (selectedPlaceholderSingle.length > 0 || selectedPlaceholderMultiple.length > 0)) {
 
@@ -340,7 +343,10 @@ $('document').ready(function () {
                 selectedPlaceholder = selectedPlaceholderMultiple.replace(':nr', filesAmount)
             }
 
-            $(this).closest('.input-file-wrapper').find('.form-label-placeholder').text(selectedPlaceholder)
+            $(this).closest('.input-file-wrapper')
+                .find('.form-label-placeholder')
+                .addClass('is-active')
+                .text(selectedPlaceholder)
         }
     });
 });
