@@ -152,8 +152,7 @@ class Growtype_Form_Login
                 <?php } ?>
 
                 <div class="form-wrapper">
-                    <?php
-                    if (!empty($login_form_args['title'])) { ?>
+                    <?php if (!empty($login_form_args['title'])) { ?>
                         <h2 class="e-title-intro"><?= $login_form_args['title'] ?></h2>
                     <?php } ?>
 

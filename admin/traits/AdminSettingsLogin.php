@@ -108,7 +108,13 @@ trait AdminSettingsLogin
         $json_content = get_option('growtype_form_login_json_content');
 
         if (empty($json_content)) {
-            $json_content = file_get_contents(plugin_dir_url(__DIR__) . 'examples/login.json');
+            $context_options = array (
+                "ssl" => array (
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ),
+            );
+            $json_content = file_get_contents(plugin_dir_url(__DIR__) . 'examples/login.json', false, stream_context_create($context_options));
         }
         ?>
         <textarea id="growtype_form_login_json_content" class="growtype_form_json_content" name="growtype_form_login_json_content" rows="40" cols="100" style="width: 100%;"><?= $json_content ?></textarea>

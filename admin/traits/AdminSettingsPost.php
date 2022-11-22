@@ -41,7 +41,13 @@ trait AdminSettingsPost
         $json_content = get_option('growtype_form_post_json_content');
 
         if (empty($json_content)) {
-            $json_content = file_get_contents(plugin_dir_url(__DIR__) . 'examples/post.json');
+            $context_options = array (
+                "ssl" => array (
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ),
+            );
+            $json_content = file_get_contents(plugin_dir_url(__DIR__) . 'examples/post.json', false, stream_context_create($context_options));
         }
 
         ?>

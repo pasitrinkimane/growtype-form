@@ -282,7 +282,7 @@ class Growtype_Form_Admin
                         case 'examples' :
                             settings_fields('growtype_form_settings_examples');
 
-                            echo '</br></br>';
+                            echo '</br>';
                             echo '<b>Shortcode:</b> [growtype_form name="signup"] ' . "</br>";
                             echo '<b>Allowed input types:</b> ' . implode(',', Growtype_Form_Render::GROWTYPE_FORM_ALLOWED_FIELD_TYPES);
 
