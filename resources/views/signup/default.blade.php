@@ -5,11 +5,7 @@
 @endsection
 
 @section('content')
-    <main class="main">
-        <div class="container">
-            {!! do_shortcode('[growtype_form name="signup"]') !!}
-        </div>
-    </main>
+    {!! do_shortcode('[growtype_form name="signup"]') !!}
 @endsection
 
 @section('footer')

@@ -24,7 +24,6 @@
 
   form {
     padding: 30px;
-    border-top: 2px solid #efefef;
     @include bp-phone-xl() {
       padding: 30px 20px;
     }
@@ -32,11 +31,11 @@
 
   .btn-recover-password {
     position: absolute;
-    bottom: 190px;
     right: 30px;
     font-size: 14px;
     text-decoration: none;
     border: none;
+    bottom: 118px;
     @include bp-phone-xl() {
       right: 20px;
     }

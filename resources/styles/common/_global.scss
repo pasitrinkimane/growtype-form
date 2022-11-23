@@ -109,6 +109,8 @@
     .growtype-form-container {
       margin: auto;
       margin-bottom: 80px;
+      padding-left: 15px;
+      padding-right: 15px;
     }
 
     .alert {
@@ -118,15 +120,6 @@
     }
 
     .form-wrapper {
-      .b-actions {
-        margin-top: 10px;
-
-        label {
-          position: relative;
-          bottom: -1px;
-        }
-      }
-
       .login-username, .login-password {
         margin-bottom: 15px;
       }
@@ -140,6 +133,10 @@
           align-items: center;
         }
       }
+    }
+
+    .form-inner-wrapper {
+      position: relative;
     }
 
     .logo-wrapper {
@@ -184,6 +181,130 @@
       #lostpassword {
         max-width: 430px;
         padding-top: 50px;
+      }
+    }
+
+    .growtype-form-header {
+      .nav {
+        margin: 0;
+
+        .nav-item {
+          width: 50%;
+          margin: 0;
+          text-align: center;
+        }
+      }
+
+      .nav {
+        margin: auto;
+        max-width: initial;
+        padding-top: 10px;
+
+        .nav-item {
+          width: 50%;
+          margin: 0;
+          text-align: center;
+
+          &.is-active {
+            a {
+              color: $color-active;
+            }
+          }
+        }
+
+        .nav-link {
+          padding: 20px 10px;
+          font-size: 22px;
+          color: $color-pasive;
+        }
+      }
+
+      .growtype-form-header-top {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding-bottom: 20px;
+        padding-top: 20px;
+        gap: 5px;
+        border-top: 1px solid #efefef;
+      }
+
+      .growtype-form-header-bottom {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding-bottom: 20px;
+        padding-top: 20px;
+        gap: 5px;
+        border-top: 1px solid #efefef;
+        margin-top: 5px;
+      }
+    }
+
+    .growtype-form-footer {
+      .nav {
+        max-width: 500px;
+        margin: auto;
+        padding-bottom: 25px;
+
+        .nav-item {
+          width: 50%;
+          margin: 0;
+          text-align: center;
+          padding: 20px;
+        }
+
+        .nav-link {
+          padding: 20px;
+          border: 1px solid #0d6efd;
+          border-radius: 5px;
+
+          &.is-active {
+            a {
+              color: $color-active;
+            }
+          }
+        }
+      }
+
+      .growtype-form-footer-top {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding-bottom: 10px;
+        padding-top: 0;
+        gap: 5px;
+        font-size: 16px;
+        position: relative;
+
+        &:before {
+          content: "";
+          border-top: 1px solid #efefef;
+          width: 100%;
+          position: absolute;
+          top: 12px;
+          max-width: 80%;
+        }
+
+        p {
+          font-size: 16px;
+          background: white;
+          position: relative;
+          z-index: 1;
+          padding: 0px 20px;
+          color: $color-pasive;
+        }
+      }
+
+      .growtype-form-footer-bottom {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding-bottom: 20px;
+        padding-top: 20px;
+        gap: 5px;
+        border-top: 1px solid #efefef;
+        margin-top: 5px;
       }
     }
   }

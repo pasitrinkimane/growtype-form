@@ -191,6 +191,7 @@ class Growtype_Form
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/url.php';
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/wc.php';
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/profile.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/helpers/formating.php';
 
         $this->loader = new Growtype_Form_Loader();
 

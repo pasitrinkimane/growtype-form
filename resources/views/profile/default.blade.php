@@ -5,12 +5,10 @@
 @endsection
 
 @section('content')
-    <main class="main">
-        <div class="container">
-            <h2>{!! $data['user']['profile_data']->display_name !!}</h2>
-            <a href="{!! wp_logout_url() !!}">Log out</a>
-        </div>
-    </main>
+    <div class="container">
+        <h2>{!! $data['user']['profile_data']->display_name !!}</h2>
+        <a href="{!! wp_logout_url() !!}">Log out</a>
+    </div>
 @endsection
 
 @section('footer')
