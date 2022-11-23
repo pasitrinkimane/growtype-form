@@ -130,7 +130,7 @@ trait AdminSettingsSignup
 
         add_settings_field(
             'growtype_form_allow_simple_password',
-            'Allow simple password',
+            'Allow Simple Password',
             array ($this, 'growtype_form_allow_simple_password_callback'),
             'growtype-form-settings',
             'growtype_form_settings_signup'

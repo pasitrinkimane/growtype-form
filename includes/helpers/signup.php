@@ -61,6 +61,8 @@ function growtype_form_redirect_url_after_signup()
         $redirect_url = get_dashboard_url();
     } elseif ($redirect_page === 'default-profile') {
         $redirect_url = home_url(Growtype_Form_Profile::URL_SLUG);
+    } elseif ($redirect_page === 'none') {
+        $redirect_url = home_url(Growtype_Form_Profile::URL_SLUG);
     } else {
         $redirect_url = get_permalink($redirect_page);
     }

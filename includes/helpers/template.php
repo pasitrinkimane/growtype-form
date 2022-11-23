@@ -15,6 +15,10 @@ function growtype_form_include_view($path, $data = [], $view_path = null)
         $view_path = $plugin_root . 'resources/views/';
     }
 
+    if (!function_exists('App\sage')) {
+        return '';
+    }
+
     $full_path = $view_path . str_replace('.', '/', $path) . '.blade.php';
 
     return sage('blade')->render($full_path, ['data' => $data]);
