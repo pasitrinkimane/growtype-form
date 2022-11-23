@@ -111,8 +111,8 @@ class Growtype_Form_Login
      */
     public static function render_growtype_login_form($form_data)
     {
-        $login_form_args = self::get_growtype_login_form_args($form_data);
-        $wp_login_form_args = $login_form_args['wp_login_form'];
+        $form_args = growtype_form_extract_form_args($form_data);
+        $wp_login_form_args = $form_args['wp_login_form'];
 
         $message = "";
 
@@ -131,10 +131,10 @@ class Growtype_Form_Login
         <div class="growtype-form-wrapper">
             <div class="growtype-form-container">
                 <?php
-                if (isset($login_form_args['logo']) && isset($login_form_args['logo']['url']) && !empty($login_form_args['logo']['url'])) { ?>
+                if (isset($form_args['logo']) && isset($form_args['logo']['url']) && !empty($form_args['logo']['url'])) { ?>
                     <div class="logo-wrapper">
-                        <a href="<?php echo isset($login_form_args['logo']['external_url']) ? growtype_form_string_replace_custom_variable($login_form_args['logo']['external_url']) : '#' ?>" class="e-logo">
-                            <img src="<?php echo growtype_form_string_replace_custom_variable($login_form_args['logo']['url']) ?>" class="img-fluid" width="<?php echo $login_form_args['logo']['width'] ?? '' ?>" height="<?php echo $login_form_args['logo']['height'] ?? '' ?>"/>
+                        <a href="<?php echo isset($form_args['logo']['external_url']) ? growtype_form_string_replace_custom_variable($form_args['logo']['external_url']) : '#' ?>" class="e-logo">
+                            <img src="<?php echo growtype_form_string_replace_custom_variable($form_args['logo']['url']) ?>" class="img-fluid" width="<?php echo $form_args['logo']['width'] ?? '' ?>" height="<?php echo $form_args['logo']['height'] ?? '' ?>"/>
                         </a>
                     </div>
                 <?php } ?>
@@ -152,29 +152,41 @@ class Growtype_Form_Login
                 <?php } ?>
 
                 <div class="form-wrapper">
-                    <?php if (!empty($login_form_args['title'])) { ?>
-                        <h2 class="e-title-intro"><?= $login_form_args['title'] ?></h2>
-                    <?php } ?>
-
-                    <?php if ($login_form_args['header']) { ?>
+                    <?php if ($form_args['header']) { ?>
                         <div class="growtype-form-header">
-                            <?php if (isset($login_form_args['header']['top'])) { ?>
+                            <?php if (isset($form_args['header']['top'])) { ?>
                                 <div class="growtype-form-header-top">
-                                    <?php echo growtype_form_string_replace_custom_variable($login_form_args['header']['top']) ?>
+                                    <?php if ($form_args['header']['top']['back_btn']) { ?>
+                                        <a href="<?= isset($form_args['header']['top']['back_btn']['url']) ? growtype_form_string_replace_custom_variable($form_args['header']['top']['back_btn']['url']) : growtype_form_login_page_url() ?>" class="btn-back"></a>
+                                    <?php } ?>
+                                    <?php if (isset($form_args['header']['top']['title']) && !empty($form_args['header']['top']['title'])) { ?>
+                                        <h2 class="e-title-intro"><?php echo $form_args['header']['top']['title'] ?></h2>
+                                    <?php } ?>
+                                    <div class="growtype-form-header-html">
+                                        <?php echo growtype_form_string_replace_custom_variable($form_args['header']['top']['html']) ?>
+                                    </div>
                                 </div>
                             <?php } ?>
-                            <?php if ($login_form_args['header']['nav']) { ?>
+                            <?php if ($form_args['header']['nav']) { ?>
                                 <ul class="nav">
-                                    <?php foreach ($login_form_args['header']['nav'] as $nav) { ?>
+                                    <?php foreach ($form_args['header']['nav'] as $nav) { ?>
                                         <li class="nav-item <?php echo $nav['class'] ?? '' ?>">
                                             <a href="<?php echo growtype_form_string_replace_custom_variable($nav['url']) ?>" class="nav-link"><?php echo $nav['label'] ?></a>
                                         </li>
                                     <?php } ?>
                                 </ul>
                             <?php } ?>
-                            <?php if (isset($login_form_args['header']['bottom'])) { ?>
+                            <?php if (isset($form_args['header']['bottom'])) { ?>
                                 <div class="growtype-form-header-bottom">
-                                    <?php echo growtype_form_string_replace_custom_variable($login_form_args['header']['bottom']) ?>
+                                    <?php if ($form_args['header']['bottom']['back_btn']) { ?>
+                                        <a href="<?= isset($form_args['header']['bottom']['back_btn']['url']) ? growtype_form_string_replace_custom_variable($form_args['header']['bottom']['back_btn']['url']) : growtype_form_login_page_url() ?>" class="btn-back"></a>
+                                    <?php } ?>
+                                    <?php if (isset($form_args['header']['bottom']['title']) && !empty($form_args['header']['bottom']['title'])) { ?>
+                                        <h2 class="e-title-intro"><?php echo $form_args['header']['bottom']['title'] ?></h2>
+                                    <?php } ?>
+                                    <div class="growtype-form-header-html">
+                                        <?php echo growtype_form_string_replace_custom_variable($form_args['header']['bottom']['html']) ?>
+                                    </div>
                                 </div>
                             <?php } ?>
                         </div>
@@ -184,101 +196,63 @@ class Growtype_Form_Login
                         <?= wp_login_form($wp_login_form_args) ?>
 
                         <?php
-                        if ($login_form_args['lost_password_btn']) { ?>
-                            <a class="btn btn-link btn-recover-password" href="<?= growtype_form_lost_password_page_url() ?>"><?= isset($login_form_args['lost_password_label']) ? __($login_form_args['lost_password_label'], "growtype-form") : __("Lost your password?", "growtype-form") ?></a>
+                        if ($form_args['lost_password_btn']) { ?>
+                            <a class="btn btn-link btn-recover-password" href="<?= growtype_form_lost_password_page_url() ?>"><?= isset($form_args['lost_password_label']) ? __($form_args['lost_password_label'], "growtype-form") : __("Lost your password?", "growtype-form") ?></a>
                         <?php } ?>
                     </div>
 
-                    <?php if ($login_form_args['footer']) { ?>
+                    <?php if ($form_args['footer']) { ?>
                         <div class="growtype-form-footer">
-                            <?php if (isset($login_form_args['footer']['top'])) { ?>
+                            <?php if (isset($form_args['footer']['top'])) { ?>
                                 <div class="growtype-form-footer-top">
-                                    <?php echo growtype_form_string_replace_custom_variable($login_form_args['footer']['top']) ?>
+                                    <?php echo growtype_form_string_replace_custom_variable($form_args['footer']['top']['html']) ?>
                                 </div>
                             <?php } ?>
-                            <?php if ($login_form_args['footer']['nav']) { ?>
+                            <?php if ($form_args['footer']['nav']) { ?>
                                 <ul class="nav">
-                                    <?php foreach ($login_form_args['footer']['nav'] as $nav) { ?>
+                                    <?php foreach ($form_args['footer']['nav'] as $nav) { ?>
                                         <li class="nav-item <?php echo $nav['class'] ?? '' ?>">
                                             <a href="<?php echo growtype_form_string_replace_custom_variable($nav['url']) ?>" class="nav-link"><?php echo $nav['label'] ?></a>
                                         </li>
                                     <?php } ?>
                                 </ul>
                             <?php } ?>
-                            <?php if (isset($login_form_args['footer']['bottom'])) { ?>
+                            <?php if (isset($form_args['footer']['bottom'])) { ?>
                                 <div class="growtype-form-footer-bottom">
-                                    <?php echo growtype_form_string_replace_custom_variable($login_form_args['footer']['bottom']) ?>
+                                    <?php echo growtype_form_string_replace_custom_variable($form_args['footer']['bottom']['html']) ?>
                                 </div>
                             <?php } ?>
                         </div>
                     <?php } ?>
+
                 </div>
             </div>
         </div>
 
         <?php
-        if (isset($login_form_args['username_placeholder'])) { ?>
+        if (isset($form_args['username_placeholder'])) { ?>
             <script>
                 var userLogin = document.getElementById("user_login");
-                userLogin.setAttribute("placeholder", "<?= $login_form_args['username_placeholder'] ?>");
+                userLogin.setAttribute("placeholder", "<?= $form_args['username_placeholder'] ?>");
             </script>
         <?php } ?>
 
         <?php
-        if (isset($login_form_args['password_placeholder'])) { ?>
+        if (isset($form_args['password_placeholder'])) { ?>
             <script>
                 var userPass = document.getElementById("user_pass");
-                userPass.setAttribute("placeholder", "<?= $login_form_args['password_placeholder'] ?>");
+                userPass.setAttribute("placeholder", "<?= $form_args['password_placeholder'] ?>");
             </script>
         <?php } ?>
+
+        <script>
+            document.querySelector('#user_login').setAttribute('required', 'required');
+            document.querySelector('#user_pass').setAttribute('required', 'required');
+        </script>
 
         <?php
 
         return ob_get_clean();
-    }
-
-    /**
-     * @param $form
-     * @return array
-     */
-    static function get_growtype_login_form_args($form)
-    {
-        $title = $form['title'] ?? null;
-        $logo = $form['logo'] ?? null;
-        $header = $form['header'] ?? null;
-        $footer = $form['footer'] ?? null;
-        $wp_login_form = $form['form'] ?? null;
-        $lost_password_btn = $wp_login_form['lost_password_btn'] ?? null;
-        $lost_password_label = $wp_login_form['lost_password_label'] ?? null;
-        $username_placeholder = $wp_login_form['username_placeholder'] ?? __('Your username...');
-        $password_placeholder = $wp_login_form['password_placeholder'] ?? __('Your password...');
-        $redirect = isset($wp_login_form['redirect']) && !empty($wp_login_form['redirect']) ? $wp_login_form['redirect'] : admin_url();
-        $wp_login_form_id = isset($wp_login_form['form_id']) && !empty($wp_login_form['form_id']) ? $wp_login_form['form_id'] : 'loginform-custom';
-        $label_username = isset($wp_login_form['label_username']) && !empty($wp_login_form['label_username']) ? $wp_login_form['label_username'] : __('Username', "growtype-form");
-        $label_password = isset($wp_login_form['label_password']) && !empty($wp_login_form['label_password']) ? $wp_login_form['label_password'] : __('Password', "growtype-form");
-        $label_remember = isset($wp_login_form['label_remember']) && !empty($wp_login_form['label_remember']) ? $wp_login_form['label_remember'] : __('Remember Me', "growtype-form");
-        $label_log_in = isset($wp_login_form['label_log_in']) && !empty($wp_login_form['label_log_in']) ? $wp_login_form['label_log_in'] : __('Log In', "growtype-form");
-        $remember = isset($wp_login_form['remember']) && !empty($wp_login_form['remember']) ? $wp_login_form['remember'] : true;
-
-        return [
-            'title' => $title,
-            'logo' => $logo,
-            'lost_password_btn' => $lost_password_btn,
-            'lost_password_label' => $lost_password_label,
-            'username_placeholder' => $username_placeholder,
-            'password_placeholder' => $password_placeholder,
-            'footer' => $footer,
-            'header' => $header,
-            'wp_login_form' => [
-                'redirect' => $redirect,
-                'form_id' => $wp_login_form_id,
-                'label_username' => $label_username,
-                'label_password' => $label_password,
-                'label_remember' => $label_remember,
-                'label_log_in' => $label_log_in,
-                'remember' => $remember
-            ]
-        ];
     }
 
     /**

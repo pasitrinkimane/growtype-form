@@ -1,9 +1,66 @@
 {
   "signup": {
-    "title": "[:en]Sign up[:lt]Registracija",
+    "logo": {
+      "url": "$logo_url",
+      "width": "100px",
+      "height": "100px",
+      "external_url": "$login_page_url"
+    },
+    "header": {
+      "top": {
+        "title": "[:en]Sign up[:lt]Registracija",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>Neturite paskyros?</p><a class='btn btn-link' href='$register_page_url'>Registruotis</a>"
+      },
+      "nav": [
+        {
+          "label": "Prisijungti",
+          "url": "$login_page_url",
+          "class": "is-active"
+        },
+        {
+          "label": "Registruotis",
+          "url": "$register_page_url",
+          "class": ""
+        }
+      ],
+      "bottom": {
+        "title": "[:en]Sign up[:lt]Registracija",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>Neturite paskyros?</p><a class='btn btn-link' href='$register_page_url'>Registruotis</a>"
+      }
+    },
+    "footer": {
+      "top": {
+        "title": "[:en]Sign up[:lt]Registracija",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>arba</p>"
+      },
+      "nav": [
+        {
+          "label": "Facebook",
+          "url": "$login_page_url"
+        },
+        {
+          "label": "Google",
+          "url": "$login_page_url"
+        }
+      ],
+      "bottom": {
+        "title": "[:en]Sign up[:lt]Registracija",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>Neturite paskyros?</p><a class='btn btn-link' href='$register_page_url'>Registruotis</a>"
+      }
+    },
     "recaptcha": [],
-    "login_btn": true,
-    "back_btn": true,
     "submit_row": {
       "class": "pt-2",
       "cta": [

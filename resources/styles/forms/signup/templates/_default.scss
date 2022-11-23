@@ -1,5 +1,4 @@
 .signup-template-default {
-
   .alert {
     max-width: 560px;
   }
@@ -32,42 +31,6 @@
       width: 100%;
       @include bp-phone-xl() {
         min-width: initial;
-      }
-    }
-
-    .b-intro {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      padding-top: 25px;
-      padding-bottom: 25px;
-      padding-left: 40px;
-      padding-right: 40px;
-      align-items: center;
-      min-height: 65px;
-      @include bp-phone-xl() {
-        padding-left: 25px;
-        padding-right: 25px;
-      }
-
-      .e-title-intro {
-        text-align: center;
-        font-size: 18px;
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        margin: auto;
-        height: 22px;
-
-        &:before {
-          content: none;
-        }
-      }
-
-      .btn-back {
-        margin-right: 15px;
       }
     }
 

@@ -1,14 +1,19 @@
 {
   "login": {
-    "title": "[:en]Sign in[:lt]Prisijungimas",
     "logo": {
-      "url": "$logo_url",
+      "url": "",
       "width": "100px",
       "height": "100px",
       "external_url": "$login_page_url"
     },
     "header": {
-      "top": "<p>Neturite paskyros?</p><a class='btn btn-link' href='$register_page_url'>Registruotis</a>",
+      "top": {
+        "title": "[:en]Sign up[:lt]Registracija",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>Neturite paskyros?</p><a class='btn btn-link' href='$register_page_url'>Registruotis</a>"
+      },
       "nav": [
         {
           "label": "Prisijungti",
@@ -21,10 +26,22 @@
           "class": ""
         }
       ],
-      "bottom": "<p>Neturite paskyros?</p><a class='btn btn-link' href='$register_page_url'>Registruotis</a>"
+      "bottom": {
+        "title": "[:en]Sign up[:lt]Registracija",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>Neturite paskyros?</p><a class='btn btn-link' href='$register_page_url'>Registruotis</a>"
+      }
     },
     "footer": {
-      "top": "<p>arba</p>",
+      "top": {
+        "title": "[:en]Sign up[:lt]Registracija",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>arba</p>"
+      },
       "nav": [
         {
           "label": "Facebook",
@@ -35,13 +52,20 @@
           "url": "$login_page_url"
         }
       ],
-      "bottom": "<p>Neturite paskyros?</p><a class='btn btn-link' href='$register_page_url'>Registruotis</a>"
+      "bottom": {
+        "title": "[:en]Sign up[:lt]Registracija",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>Neturite paskyros?</p><a class='btn btn-link' href='$register_page_url'>Registruotis</a>"
+      }
     },
     "form": {
       "redirect": "",
       "id": "loginform-custom",
-      "label_password": "[:en]Password[:lt]Slaptažodis",
+      "label_username": "[:en]Username[:lt]Vartotojo vardas",
       "label_remember": "[:en]Remember Me[:lt]Prisiminti",
+      "label_password": "[:en]Password[:lt]Slaptažodis",
       "label_log_in": "[:en]Continue[:lt]Prisijungti",
       "remember_login": true,
       "username_placeholder": "[:en]Your email[:lt]Jūsų el. paštas",
