@@ -44,7 +44,7 @@ class Growtype_Form_Signup
     {
         if (!empty($_SERVER['REQUEST_URI'])) {
             if (growtype_form_signup_page_is_active() && growtype_form_signup_page_ID() === 'default') {
-                echo growtype_form_include_view('signup/default');
+                echo growtype_form_include_view('signup.default');
                 exit;
             }
         }

@@ -1,91 +1,93 @@
 .signup-template-default {
-  .alert {
-    max-width: 560px;
-  }
-
-  .growtype-form-container {
-    max-width: 558px;
-    margin: auto;
-    @include bp-phone-xl() {
-      max-width: 100%;
-    }
-  }
-
-  .row-submit {
-    .d-grid {
-      justify-content: center;
-    }
-  }
-
-  .form-wrapper {
-    box-shadow: 0px 0px 16px 0px #e3e3e3;
-    border-radius: 10px;
-    position: relative;
-    background: white;
-    overflow: hidden;
-  }
-
   .growtype-form-wrapper {
-    form button[type=submit] {
-      min-width: 250px;
-      width: 100%;
+    .alert {
+      max-width: 560px;
+    }
+
+    .growtype-form-container {
+      max-width: 558px;
+      margin: auto;
       @include bp-phone-xl() {
-        min-width: initial;
+        max-width: 100%;
       }
     }
 
-    .b-actions {
-      margin: 0;
-      background: #F5F6F7;
-      color: #9A9EA7;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      .btn-link {
-        padding-left: 5px;
-      }
-
-      p {
-        margin: 0;
-        font-size: 14px;
+    .row-submit {
+      .d-grid {
+        justify-content: center;
       }
     }
-  }
 
-  .fields-confirmation {
-    margin-top: 5px;
-    max-width: 320px;
-    display: block;
-    margin-right: auto;
-    position: relative;
-    bottom: -5px;
-    margin-left: 0;
-    margin-bottom: 10px;
-
-    .col-auto {
-      padding-left: 0;
-    }
-
-    .form-label {
-      color: #9A9EA7;
-      margin: 0;
+    .form-wrapper {
+      box-shadow: 0px 0px 16px 0px #e3e3e3;
+      border-radius: 10px;
       position: relative;
-    }
-  }
-
-  .growtype-form {
-    padding: 30px;
-    border-top: 2px solid #efefef;
-    @include bp-phone-xl() {
-      padding-right: 20px;
-      padding-left: 20px;
+      background: white;
+      overflow: hidden;
     }
 
-    .btn-secondary {
-      @include bp-phone-xl() {
+    .growtype-form-wrapper {
+      form button[type=submit] {
+        min-width: 250px;
         width: 100%;
+        @include bp-phone-xl() {
+          min-width: initial;
+        }
+      }
+
+      .b-actions {
+        margin: 0;
+        background: #F5F6F7;
+        color: #9A9EA7;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .btn-link {
+          padding-left: 5px;
+        }
+
+        p {
+          margin: 0;
+          font-size: 14px;
+        }
+      }
+    }
+
+    .fields-confirmation {
+      margin-top: 5px;
+      max-width: 320px;
+      display: block;
+      margin-right: auto;
+      position: relative;
+      bottom: -5px;
+      margin-left: 0;
+      margin-bottom: 10px;
+
+      .col-auto {
+        padding-left: 0;
+      }
+
+      .form-label {
+        color: #9A9EA7;
+        margin: 0;
+        position: relative;
+      }
+    }
+
+    .growtype-form {
+      padding: 30px;
+      border-top: 2px solid #efefef;
+      @include bp-phone-xl() {
+        padding-right: 20px;
+        padding-left: 20px;
+      }
+
+      .btn-secondary {
+        @include bp-phone-xl() {
+          width: 100%;
+        }
       }
     }
   }

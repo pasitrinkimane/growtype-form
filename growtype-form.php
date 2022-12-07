@@ -40,7 +40,7 @@ define('GROWTYPE_FORM_VERSION', '1.0.0');
 /**
  * Plugin base name
  */
-define('GROWTYPE_FORM_BASE_NAME', 'growtype-form');
+define('GROWTYPE_FORM_TEXT_DOMAIN', 'growtype-form');
 
 /**
  * Plugin dir path

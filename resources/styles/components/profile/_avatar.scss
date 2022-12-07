@@ -1,0 +1,22 @@
+.growtype-form-avatar {
+  .growtype-form-avatar-inner {
+    display: flex;
+  }
+
+  .growtype-form-avatar-image {
+    border-radius: 100px;
+    overflow: hidden;
+    max-width: 70px;
+  }
+
+  .growtype-form-avatar-details {
+    padding-left: 20px;
+    display: flex;
+    align-items: center;
+
+    .e-title {
+      font-size: 21px;
+      font-weight: 600;
+    }
+  }
+}

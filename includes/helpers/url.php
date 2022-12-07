@@ -25,5 +25,5 @@ function growtype_form_redirect_url_after_product_creation()
  */
 function growtype_form_admin_url($path = '', $scheme = 'admin')
 {
-    return admin_url($path, $scheme);;
+    return admin_url($path, $scheme);
 }

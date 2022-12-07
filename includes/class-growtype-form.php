@@ -88,7 +88,12 @@ class Growtype_Form
 
         $this->load_dependencies();
         $this->set_locale();
-        $this->set_session();
+
+        /**
+         * Session
+         */
+        //        $this->set_session();
+
         $this->define_admin_hooks();
         $this->define_public_hooks();
     }

@@ -53,25 +53,15 @@ class Growtype_Form_Profile
                 add_filter('body_class', array ($this, 'growtype_form_profile_body_class'));
 
                 if (is_user_logged_in()) {
-
                     /**
                      * Add user data
                      */
                     $data['user'] = $this->get_user_data();
 
                     /**
-                     * Check if child template available
+                     * Template
                      */
-                    $child_template_path = get_stylesheet_directory() . '/views/growtype-form/';
-                    if (file_exists($child_template_path . 'profile/default.blade.php')) {
-                        echo growtype_form_include_view('profile/default', $data, $child_template_path);
-                        exit;
-                    }
-
-                    /**
-                     * Use default template
-                     */
-                    echo growtype_form_include_view('profile/default', $data);
+                    echo growtype_form_include_view('profile.default', ['data' => $data]);
                 } else {
                     wp_redirect(growtype_form_login_page_url());
                 }

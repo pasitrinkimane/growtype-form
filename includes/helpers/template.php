@@ -3,25 +3,35 @@
 use function App\sage;
 
 /**
- * @param $path
- * @param $data
- * @param $view_path
- * @return mixed
+ * Include custom view
  */
-function growtype_form_include_view($path, $data = [], $view_path = null)
-{
-    if (empty($view_path)) {
-        $plugin_root = plugin_dir_path(dirname(__DIR__));
-        $view_path = $plugin_root . 'resources/views/';
+if (!function_exists('growtype_form_include_view')) {
+    function growtype_form_include_view($file_path, $variables = array ())
+    {
+        $fallback_view = GROWTYPE_FORM_PATH . 'resources/views/' . str_replace('.', '/', $file_path) . '.php';
+        $fallback_blade_view = GROWTYPE_FORM_PATH . 'resources/views/' . str_replace('.', '/', $file_path) . '.blade.php';
+        $child_blade_view = get_stylesheet_directory() . '/views/' . GROWTYPE_FORM_TEXT_DOMAIN . '/' . str_replace('.', '/', $file_path) . '.blade.php';
+        $child_view = get_stylesheet_directory() . '/views/' . GROWTYPE_FORM_TEXT_DOMAIN . '/' . str_replace('.', '/', $file_path) . '.php';
+
+        $template_path = $fallback_view;
+
+        if (file_exists($child_blade_view) && function_exists('App\template')) {
+            return App\template($child_blade_view, $variables);
+        } elseif (file_exists($child_view)) {
+            $template_path = $child_view;
+        } elseif (file_exists($fallback_blade_view) && function_exists('App\template')) {
+            return App\template($fallback_blade_view, $variables);
+        }
+
+        if (file_exists($template_path)) {
+            extract($variables);
+            ob_start();
+            include $template_path;
+            $output = ob_get_clean();
+        }
+
+        return isset($output) ? $output : '';
     }
-
-    if (!function_exists('App\sage')) {
-        return '';
-    }
-
-    $full_path = $view_path . str_replace('.', '/', $path) . '.blade.php';
-
-    return sage('blade')->render($full_path, ['data' => $data]);
 }
 
 /**

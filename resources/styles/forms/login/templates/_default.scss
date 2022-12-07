@@ -1,63 +1,65 @@
 .login-template-default {
-  .growtype-form-container {
-    max-width: 558px;
-  }
-
-  .form-wrapper {
-    box-shadow: 0px 0px 16px 0px #e3e3e3;
-    border-radius: 10px;
-    position: relative;
-    background: white;
-    overflow: hidden;
-  }
-
-  form {
-    padding: 30px;
-    @include bp-phone-xl() {
-      padding: 30px 20px;
-    }
-  }
-
-  .btn-recover-password {
-    position: absolute;
-    right: 30px;
-    font-size: 14px;
-    text-decoration: none;
-    border: none;
-    bottom: 118px;
-    @include bp-phone-xl() {
-      right: 20px;
-    }
-  }
-
-  .login-submit {
-    padding-top: 5px;
-  }
-
-  input[type=submit] {
-    max-width: initial !important;
-  }
-
-  label {
-    line-height: 18px;
-  }
-
-  .b-actions {
-    margin: 0;
-    background: #F5F6F7;
-    color: #9A9EA7;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .btn-link {
-      padding-left: 5px;
+  .growtype-form-wrapper {
+    .growtype-form-container {
+      max-width: 558px;
     }
 
-    p {
-      margin: 0;
+    .form-wrapper {
+      box-shadow: 0px 0px 16px 0px #e3e3e3;
+      border-radius: 10px;
+      position: relative;
+      background: white;
+      overflow: hidden;
+    }
+
+    form {
+      padding: 30px;
+      @include bp-phone-xl() {
+        padding: 30px 20px;
+      }
+    }
+
+    .btn-recover-password {
+      position: absolute;
+      right: 30px;
       font-size: 14px;
+      text-decoration: none;
+      border: none;
+      bottom: 118px;
+      @include bp-phone-xl() {
+        right: 20px;
+      }
+    }
+
+    .login-submit {
+      padding-top: 5px;
+    }
+
+    input[type=submit] {
+      max-width: initial !important;
+    }
+
+    label {
+      line-height: 18px;
+    }
+
+    .b-actions {
+      margin: 0;
+      background: #F5F6F7;
+      color: #9A9EA7;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .btn-link {
+        padding-left: 5px;
+      }
+
+      p {
+        margin: 0;
+        font-size: 14px;
+      }
     }
   }
 }
