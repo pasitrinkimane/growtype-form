@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="container">
-        <h2>{!! $data['user']['profile_data']->display_name !!}</h2>
+        <h2>{!! $data['user']['profile']->display_name !!}</h2>
         <a href="{!! wp_logout_url() !!}">Log out</a>
     </div>
 @endsection

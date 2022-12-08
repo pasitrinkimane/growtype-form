@@ -123,15 +123,12 @@ trait UserSignupAdminExport
         foreach ($users as $user_key => $signup) {
             $signup_data = $this->get_user_data($signup->ID);
 
-//            echo '<pre>' . var_export($signup_data, true) . '</pre>';
-//            die();
-
             $profile_data_clean = [];
-            foreach ($signup_data['signup_data'] as $field_key => $field_value) {
+            foreach ($signup_data['signup'] as $field_key => $field_value) {
                 $profile_data_clean[$field_key] = $field_value['value'];
             }
 
-            $signup_details = array_merge((array)$signup_data['profile_data'], $profile_data_clean);
+            $signup_details = array_merge((array)$signup_data['profile'], $profile_data_clean);
 
             foreach ($export_fields as $export_key => $field) {
                 if ($index === 0) {
