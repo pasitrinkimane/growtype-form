@@ -29,6 +29,8 @@ function growtype_form_string_replace_custom_variable($url)
 function growtype_form_extract_form_args($form)
 {
     $type = $form['type'] ?? null;
+    $ajax = $form['ajax'] ?? 'false';
+    $ajax_action = $form['ajax_action'] ?? '';
     $logo = $form['logo'] ?? null;
     $header = $form['header'] ?? null;
     $footer = $form['footer'] ?? null;
@@ -53,6 +55,8 @@ function growtype_form_extract_form_args($form)
     return [
         'type' => $type,
         'class' => $class,
+        'ajax' => $ajax,
+        'ajax_action' => $ajax_action,
         'logo' => $logo,
         'lost_password_btn' => $lost_password_btn,
         'lost_password_label' => $lost_password_label,

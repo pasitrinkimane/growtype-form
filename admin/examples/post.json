@@ -3,7 +3,6 @@
     "type": "upload",
     "post_type": "projects",
     "title": "Dalintis iniciatyva",
-    "submit_label": "[:lt]Pateikti iniciatyvą[:en]Upload[:]",
     "success_message": "[:lt]Iniciatyva sėkmingai pasidalinta[:]",
     "main_fields": [
       {
@@ -55,6 +54,15 @@
         "value": "User uploaded post"
       }
     ],
+    "submit_row": {
+      "class": "pt-2",
+      "cta": [
+        {
+          "type": "submit",
+          "label": "[:en]Continue[:lt]Registruotis"
+        }
+      ]
+    },
     "confirmation_fields": [
       {
         "type": "checkbox",
