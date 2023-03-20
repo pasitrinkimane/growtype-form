@@ -1,11 +1,5 @@
-<?php if (!empty($field_label)) { ?>
-    <label for="<?= $field_name ?>" class="form-label">
-        <?= $field_label ?>
-    </label>
-<?php } ?>
-
 <div class="input-file-wrapper">
-    <?php if (!empty($field_value)) { ?>
+    <?php if (!empty($field_value) && isset($field_value['url'])) { ?>
         <div class="b-file-preview">
             <a href="<?= $field_value['url'] ?>" target="_blank">
                 <?php if (@is_array(getimagesize($field_value['url']))) {
@@ -35,7 +29,7 @@
             accept="<?= $field_accept ?>"
             <?= $field_required ? 'required' : '' ?>
             <?= $field_multiple ? 'multiple' : '' ?>
-            max-size="<?= isset($field['max_size']) ? $field['max_size'] : '' ?>"
+            max-size="<?= isset($field['max_size']) ? $field['max_size'] : '3000000' ?>"
             max-size-error-message="<?= isset($field['max_size_error_message']) ? $field['max_size_error_message'] : '' ?>"
         >
         <?php if (!empty($placeholder)) { ?>

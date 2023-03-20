@@ -1,13 +1,3 @@
-<?php if (!empty($field_label)) { ?>
-    <label for="<?= $field_name ?>" class="form-label">
-        <?= $field_label ?>
-    </label>
-<?php } ?>
-
-<?php if (!empty($field_description)) { ?>
-    <p class="form-description"><?= $field_description ?></p>
-<?php } ?>
-
 <input type="<?= $field_type ?>"
        class="form-control <?= $field_input_class ?> domain"
        name="<?= $field_name ?>"

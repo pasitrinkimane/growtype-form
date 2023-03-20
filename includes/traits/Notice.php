@@ -39,7 +39,7 @@ trait Notice
                             top: offsetPosition,
                             behavior: "smooth"
                         });
-                    }, 100)
+                    }, 500)
                 }
             </script>
         <?php }

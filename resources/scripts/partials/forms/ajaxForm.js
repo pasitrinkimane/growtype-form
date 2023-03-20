@@ -7,7 +7,7 @@ function ajaxForm() {
         let action = $(this).attr('data-ajax-action');
 
         $.ajax({
-            url: growtype_form_ajax_object.ajax_url,
+            url: growtype_form.ajax_url,
             type: "post",
             data: {
                 action: action,

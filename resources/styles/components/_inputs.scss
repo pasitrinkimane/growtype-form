@@ -56,6 +56,10 @@
 
     label {
       cursor: pointer;
+
+      a {
+        font-size: 14px;
+      }
     }
   }
 
@@ -79,5 +83,17 @@
   label.error-label {
     margin-top: 5px;
     font-size: 12px;
+  }
+
+  .chosen-container-single .chosen-single {
+    height: 48px !important;
+
+    span {
+      min-height: 45px;
+    }
+  }
+
+  .chosen-container-single .chosen-single div b {
+    top: 11px;
   }
 }

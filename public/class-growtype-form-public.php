@@ -73,9 +73,11 @@ class Growtype_Form_Public
     {
         wp_enqueue_script($this->Growtype_Form, GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form.js', array ('jquery'), $this->version, true);
 
-        wp_localize_script($this->Growtype_Form, 'growtype_form_ajax_object',
+        wp_localize_script($this->Growtype_Form, 'growtype_form',
             array (
                 'ajax_url' => admin_url('admin-ajax.php'),
+                'date' => Growtype_Form_Render::DATE_TIME_DATA,
+                'currency' => Growtype_Form_Render::get_currency_data()
             )
         );
     }

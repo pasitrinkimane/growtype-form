@@ -14,7 +14,7 @@ class Growtype_Form_Render
     const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['text', 'textarea', 'file', 'email', 'select', 'radio', 'checkbox', 'hidden', 'number', 'password', 'custom', 'repeater', 'shortcode'];
 
     const DATE_TIME_DATA = [
-        'date_format' => "yy-mm-dd"
+        'format' => "yy-mm-dd"
     ];
 
     protected $Growtype_Form_Login;
@@ -122,8 +122,6 @@ class Growtype_Form_Render
     {
         wp_enqueue_script('growtype-form-render', GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form-render.js', array ('jquery'), '1.3', true);
 
-        wp_localize_script('growtype-form-render', 'growtype_form_date_time_data', self::DATE_TIME_DATA);
-
         /**
          * File styles
          */
@@ -160,50 +158,50 @@ class Growtype_Form_Render
          * Autonumeric
          */
         if (!wp_script_is('autoNumeric', 'enqueued')) {
-
             wp_enqueue_script('autoNumeric', GROWTYPE_FORM_URL_PUBLIC . 'plugins/autoNumeric/autoNumeric.min.js', array ('jquery'), '1.1', true);
-
-            $currency_pos = 'left';
-            $currency_symbol = '&euro;';
-            $digitGroupSeparator = ',';
-            $decimalCharacter = '.';
-            $decimalPlacesOverride = 2;
-
-            if (class_exists('woocommerce')) {
-                $currency_pos = get_option('woocommerce_currency_pos');
-                $currency_symbol = get_woocommerce_currency_symbol();
-                $digitGroupSeparator = wc_get_price_thousand_separator();
-                $decimalCharacter = wc_get_price_decimal_separator();
-                $decimalPlacesOverride = wc_get_price_decimals();
-            }
-
-            switch ($currency_pos) {
-                case 'left':
-                    $currency_symbol_placement = 'p';
-                    break;
-                case 'right':
-                    $currency_symbol_placement = 's';
-                    break;
-                case 'left_space':
-                    $currency_symbol_placement = 'p';
-                    $currency_symbol = $currency_symbol . ' ';
-                    break;
-                case 'right_space':
-                    $currency_symbol_placement = 's';
-                    $currency_symbol = ' ' . $currency_symbol;
-                    break;
-            }
-
-            $currency_data = array (
-                'currencySymbolPlacement' => $currency_symbol_placement,
-                'digitGroupSeparator' => $digitGroupSeparator,
-                'decimalCharacter' => $decimalCharacter,
-                'currencySymbol' => $currency_symbol,
-                'decimalPlacesOverride' => $decimalPlacesOverride,
-            );
-
-            wp_localize_script('autoNumeric', 'autoNumericdata', $currency_data);
         }
+    }
+
+    public static function get_currency_data()
+    {
+        $currency_pos = 'left';
+        $currency_symbol = '&euro;';
+        $digitGroupSeparator = ',';
+        $decimalCharacter = '.';
+        $decimalPlacesOverride = 2;
+
+        if (class_exists('woocommerce')) {
+            $currency_pos = get_option('woocommerce_currency_pos');
+            $currency_symbol = get_woocommerce_currency_symbol();
+            $digitGroupSeparator = wc_get_price_thousand_separator();
+            $decimalCharacter = wc_get_price_decimal_separator();
+            $decimalPlacesOverride = wc_get_price_decimals();
+        }
+
+        switch ($currency_pos) {
+            case 'left':
+                $currency_symbol_placement = 'p';
+                break;
+            case 'right':
+                $currency_symbol_placement = 's';
+                break;
+            case 'left_space':
+                $currency_symbol_placement = 'p';
+                $currency_symbol = $currency_symbol . ' ';
+                break;
+            case 'right_space':
+                $currency_symbol_placement = 's';
+                $currency_symbol = ' ' . $currency_symbol;
+                break;
+        }
+
+        return array (
+            'currencySymbolPlacement' => $currency_symbol_placement,
+            'digitGroupSeparator' => $digitGroupSeparator,
+            'decimalCharacter' => $decimalCharacter,
+            'currencySymbol' => $currency_symbol,
+            'decimalPlacesOverride' => $decimalPlacesOverride,
+        );
     }
 
     /**
@@ -728,7 +726,7 @@ class Growtype_Form_Render
                     if ($('.datetimepicker').length > 0) {
                         $('.datetimepicker').each(function () {
                             try {
-                                $.datepicker.parseDate('<?= self::DATE_TIME_DATA['date_format'] ?>', $(this).val());
+                                $.datepicker.parseDate('<?= self::DATE_TIME_DATA['format'] ?>', $(this).val());
                             } catch (e) {
                                 $(this).closest('.e-wrapper').append('<label class="error"><?php echo $validation_message['wrong_date_format'] ?></label>');
                                 isValid = false;

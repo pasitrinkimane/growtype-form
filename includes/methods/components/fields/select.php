@@ -1,9 +1,3 @@
-<?php if (!empty($field_label)) { ?>
-    <label for="<?= $field_name ?>" class="form-label">
-        <?= $field_label ?>
-    </label>
-<?php } ?>
-
 <?php
 
 $selected_options = [];
@@ -28,8 +22,10 @@ if (!is_array($selected_options)) {
 ?>
 
 <select name="<?= $field_name ?>" id="<?= $field_name ?>" <?= $field_required ? 'required' : '' ?> <?= $field_multiple ? 'multiple' : '' ?>>
+    <?php if (isset($placeholder) && !empty($placeholder)) { ?>
+        <option value="" <?php echo empty($selected_options) ? 'selected' : '' ?> disabled hidden><?= $placeholder ?></option>
+    <?php } ?>
     <?php
-
     if (isset($select_type) && $select_type === 'custom') {
         foreach ($field_options as $key => $field_option) { ?>
             <option value="<?= $key ?>" <?= in_array($key, $selected_options) ? 'selected' : '' ?>><?= $field_option ?></option>

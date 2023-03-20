@@ -197,7 +197,7 @@ class Growtype_Form_Crud
                 }
             } elseif ($form_name === 'post') {
 
-                if ($form_data['type'] === 'custom') {
+                if (isset($form_data['type']) && $form_data['type'] === 'custom') {
                     $submit_data = apply_filters('growtype_form_upload_post_custom', $form_data, $submitted_values);
                 } else {
                     $submit_data = $this->upload_post($form_data, $submitted_values);
@@ -214,6 +214,8 @@ class Growtype_Form_Crud
                  * Success
                  */
                 if ($submit_data['success']) {
+                    self::send_email($submit_data['post_content']);
+
                     $submit_data['success'] = true;
                     $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : __('Record created successfully.', 'growtype-form');
                 }
@@ -258,6 +260,28 @@ class Growtype_Form_Crud
         }
 
         return $redirect_url;
+    }
+
+    public static function send_email($submitted_content)
+    {
+        $growtype_form_post_default_email_to = get_option('growtype_form_post_default_email_to');
+        $growtype_form_post_default_email_to_subject = get_option('growtype_form_post_default_email_to_subject');
+        $growtype_form_post_default_email_to_content = get_option('growtype_form_post_default_email_to_content');
+
+        if (empty($growtype_form_post_default_email_to)) {
+            return null;
+        }
+
+        $to = $growtype_form_post_default_email_to;
+        $subject = $growtype_form_post_default_email_to_subject;
+        $headers = array ('Content-Type: text/html; charset=UTF-8');
+        $admin_email = get_option('admin_email');
+
+        $email_body = str_replace('$post_content', $submitted_content, $growtype_form_post_default_email_to_content);
+
+        $headers[] = 'From: Admin <' . $admin_email . '>';
+
+        wp_mail($to, $subject, $email_body, $headers);
     }
 
     /**

@@ -57,25 +57,26 @@ if (!empty($field_options) && !is_array($field_options) && (str_contains($field_
     $field_options = array ('' => __('Select a country / region&hellip;', 'woocommerce')) + WC()->countries->get_allowed_countries();
 }
 
-$field_label = $field['label'] ?? null;
+$field_label = isset($field['label']) ? $field['label'] : null;
 $field_label = !empty($field_label) && $field_required && !str_contains($field_label, '*') ? $field_label . '<span class="required">*</span>' : $field_label;
-$field_description = $field['description'] ?? null;
-$placeholder = $field['placeholder'] ?? null;
-$field_accept = $field['accept'] ?? null;
-$field_cta_text = $field['cta_text'] ?? null;
-$field_min_value = $field['min'] ?? null;
-$field_max_value = $field['max'] ?? null;
-$field_col_class = $field['class'] ?? 'col-auto';
-$field_fields = $field['fields'] ?? null;
-$field_date = $field['date'] ?? null;
-$field_time = $field['time'] ?? null;
-$field_pattern = $field['pattern'] ?? null;
-$field_maxlength = $field['maxlength'] ?? null;
+$field_description = isset($field['description']) ? $field['description'] : null;
+$placeholder = isset($field['placeholder']) ? $field['placeholder'] : null;
+$field_accept = isset($field['accept']) ? $field['accept'] : null;
+$field_cta_text = isset($field['cta_text']) ? $field['cta_text'] : null;
+$field_min_value = isset($field['min']) ? $field['min'] : null;
+$field_max_value = isset($field['max']) ? $field['max'] : null;
+$field_col_class = isset($field['class']) ? $field['class'] : 'col-auto';
+$field_fields = isset($field['fields']) ? $field['fields'] : null;
+$field_date = isset($field['date']) ? $field['date'] : null;
+$field_time = isset($field['time']) ? $field['time'] : null; // time picker
+$field_pattern = isset($field['pattern']) ? $field['pattern'] : null; //regex pattern
+$field_maxlength = isset($field['maxlength']) ? $field['maxlength'] : null;
 $field_input_class = isset($field['input_class']) && !empty($field['input_class']) ? explode(' ', $field['input_class']) : [];
-$field_icon = $field['icon'] ?? null;
-$field_price = $field['price'] ?? null;
-$field_group = $field['group'] ?? null;
+$field_icon = isset($field['icon']) ? $field['icon'] : null;
+$field_price = isset($field['price']) ? $field['price'] : null;
+$field_group = isset($field['group']) ? $field['group'] : null; // inputs can be grouped together
 $field_autocomplete = isset($field['autocomplete']) && $field['autocomplete'] === 'true' ? 'on' : 'off';
+$conditions = isset($field['conditions']) ? json_encode($field['conditions']) : null;
 
 if (!in_array($field_type, Growtype_Form_Render::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {
     return null;
@@ -119,12 +120,29 @@ $field_input_class = implode(" ", $field_input_class);
 $block_cat_types = ['repeater', 'custom', 'shortcode', 'checkbox'];
 ?>
 
-<div class="<?= in_array($field_type, $block_cat_types) ? 'b-wrapper' : 'e-wrapper'; ?> <?= $field_col_class ?>" style="<?= $field_hidden ? 'display:none;' : '' ?>" data-name="<?= $field_name ?>" data-label="<?= !empty($field_label) ? 'true' : 'false' ?>" data-group="<?= $field_group ?>">
+<div class="<?= in_array($field_type, $block_cat_types) ? 'b-wrapper' : 'e-wrapper'; ?> <?= $field_col_class ?>"
+     style="<?= $field_hidden || !empty($conditions) ? 'display:none;' : '' ?>"
+     data-name="<?= $field_name ?>"
+     data-label="<?= !empty($field_label) ? 'true' : 'false' ?>"
+     data-group="<?= $field_group ?>"
+     data-conditions='<?= $conditions ?>'
+>
     <?php if (!empty($field_icon)) { ?>
         <div class="input-icon">
             <?= $field_icon ?>
         </div>
     <?php } ?>
+
+    <?php if (!empty($field_label)) { ?>
+        <label for="<?= $field_name ?>" class="form-label">
+            <?= $field_label ?>
+        </label>
+    <?php } ?>
+
+    <?php if (!empty($field_description)) { ?>
+        <p class="form-description"><?= $field_description ?></p>
+    <?php } ?>
+
     <?php
     if ($field_type === 'select') {
         include 'fields/select.php';

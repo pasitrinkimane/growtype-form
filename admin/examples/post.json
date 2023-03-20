@@ -20,6 +20,28 @@
         "required": "true"
       },
       {
+        "type": "checkbox",
+        "class": "col-12",
+        "name": "kids",
+        "label": "Ar fotosesijoje dalyvaus vaikai?",
+        "required": "false"
+      },
+      {
+        "type": "textarea",
+        "name": "kids_info",
+        "class": "col-12",
+        "label": "[:lt]Informacija apie vaikus[:]",
+        "placeholder": "[:lt]Įrašykite vaikų skaičių, amžių bei poreikius.[:]",
+        "required": "false",
+        "conditions": [
+          {
+            "name": "kids",
+            "condition": "visible",
+            "value": "checked"
+          }
+        ]
+      },
+      {
         "type": "input",
         "name": "contact_person",
         "label": "[:lt]Kontaktinis asmuo[:]",

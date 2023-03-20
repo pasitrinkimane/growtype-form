@@ -162,12 +162,14 @@ class Growtype_Form_Login
                                     <?php if (isset($form_args['header']['top']['title']) && !empty($form_args['header']['top']['title'])) { ?>
                                         <h2 class="e-title-intro"><?php echo $form_args['header']['top']['title'] ?></h2>
                                     <?php } ?>
-                                    <div class="growtype-form-header-html">
-                                        <?php echo growtype_form_string_replace_custom_variable($form_args['header']['top']['html']) ?>
-                                    </div>
+                                    <?php if (isset($form_args['header']['top']['html']) && !empty($form_args['header']['top']['html'])) { ?>
+                                        <div class="growtype-form-header-html">
+                                            <?php echo growtype_form_string_replace_custom_variable($form_args['header']['top']['html']) ?>
+                                        </div>
+                                    <?php } ?>
                                 </div>
                             <?php } ?>
-                            <?php if ($form_args['header']['nav']) { ?>
+                            <?php if (isset($form_args['header']['nav'])) { ?>
                                 <ul class="nav">
                                     <?php foreach ($form_args['header']['nav'] as $nav) { ?>
                                         <li class="nav-item <?php echo $nav['class'] ?? '' ?>">
@@ -208,7 +210,7 @@ class Growtype_Form_Login
                                     <?php echo growtype_form_string_replace_custom_variable($form_args['footer']['top']['html']) ?>
                                 </div>
                             <?php } ?>
-                            <?php if ($form_args['footer']['nav']) { ?>
+                            <?php if (isset($form_args['footer']['nav'])) { ?>
                                 <ul class="nav">
                                     <?php foreach ($form_args['footer']['nav'] as $nav) { ?>
                                         <li class="nav-item <?php echo $nav['class'] ?? '' ?>">

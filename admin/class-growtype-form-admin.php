@@ -22,6 +22,7 @@
  */
 class Growtype_Form_Admin
 {
+    const GROWTYPE_FORM_SETTINGS_DEFAULT_TAB = 'login';
 
     /**
      * The ID of this plugin.
@@ -44,6 +45,7 @@ class Growtype_Form_Admin
     /**
      * Traits
      */
+    use AdminSettingGeneral;
     use AdminSettingsLogin;
     use AdminSettingsSignup;
     use AdminSettingsWoocommercePlugin;
@@ -65,6 +67,11 @@ class Growtype_Form_Admin
 
         if (is_admin()) {
             add_action('admin_menu', array ($this, 'add_custom_options_page'));
+
+            /**
+             * AdminGeneral
+             */
+            add_action('admin_init', array ($this, 'general_content'));
 
             /**
              * AdminSignup
@@ -189,7 +196,7 @@ class Growtype_Form_Admin
      * @param $current
      * @return void
      */
-    function growtype_form_settings_tabs($current = 'login')
+    function growtype_form_settings_tabs($current = self::GROWTYPE_FORM_SETTINGS_DEFAULT_TAB)
     {
         $tabs['login'] = 'Login';
         $tabs['signup'] = 'Signup';
@@ -243,10 +250,18 @@ class Growtype_Form_Admin
                     if (isset ($_GET['tab'])) {
                         $tab = $_GET['tab'];
                     } else {
-                        $tab = 'login';
+                        $tab = self::GROWTYPE_FORM_SETTINGS_DEFAULT_TAB;
                     }
 
                     switch ($tab) {
+                        case 'general':
+                            settings_fields('growtype_form_settings_general');
+
+                            echo '<table class="form-table">';
+                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_general');
+                            echo '</table>';
+
+                            break;
                         case 'login':
                             settings_fields('growtype_form_settings_login');
 
@@ -276,6 +291,20 @@ class Growtype_Form_Admin
 
                             echo '<table class="form-table">';
                             do_settings_fields('growtype-form-settings', 'growtype_form_settings_post');
+                            echo '</table>';
+
+                            echo '<h2 class="title">Saving settings</h2>';
+                            echo '<p>New post saving settings</p>';
+
+                            echo '<table class="form-table">';
+                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_post_saving');
+                            echo '</table>';
+
+                            echo '<h2 class="title">Email settings</h2>';
+                            echo '<p>Email is sent when the new post is submitted</p>';
+
+                            echo '<table class="form-table">';
+                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_post_email');
                             echo '</table>';
 
                             break;

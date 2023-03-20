@@ -13,9 +13,6 @@ if (isset($_REQUEST[$field_name])) {
 ?>
 
 <?php if (isset($field_options)) { ?>
-    <label class="form-label">
-        <?= $field_label ?>
-    </label>
     <div class="form-check-wrapper" aria-required="true">
         <?php
         foreach ($field_options as $field_option) { ?>

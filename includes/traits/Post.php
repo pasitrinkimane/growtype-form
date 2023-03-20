@@ -13,7 +13,8 @@ trait Post
     public function upload_post($form_data, $submitted_values)
     {
         $post_type = $form_data['post_type'] ?? null;
-        $post_title = $submitted_values['data']['title'] ?? null;
+        $growtype_form_settings_post_saving_post_title_name = get_option('growtype_form_settings_post_saving_post_title_name', 'title');
+        $post_title = isset($submitted_values['data'][$growtype_form_settings_post_saving_post_title_name]) ? $submitted_values['data'][$growtype_form_settings_post_saving_post_title_name] : null;
         $post_author = $submitted_values['data'][Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID] ?? null;
         $post_status = $submitted_values['data']['post_status'] ?? 'draft';
         $submitted_data = $submitted_values['data'];
@@ -26,10 +27,21 @@ trait Post
         unset($submitted_data[Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION]);
         unset($submitted_data['terms_and_conditions']);
 
+        ob_start();
+
+        foreach ($submitted_values['data'] as $key => $data) {
+            ?>
+            <h3><b><?= $key ?></b></h3>
+            <p><?= $data ?></p>
+            <?php
+        }
+
+        $formatted_content = ob_get_clean();
+
         /**
          * Format post content
          */
-        $post_content = $submitted_values['data']['post_content'] ?? implode(", ", $submitted_data);
+        $post_content = $submitted_values['data']['post_content'] ?? $formatted_content;
 
         /**
          * Create array
@@ -63,6 +75,8 @@ trait Post
 
         $response['post_id'] = $post;
         $response['success'] = true;
+        $response['post_content'] = $post_content;
+        $response['message'] = isset($form_data['success_message']) ? $form_data['success_message'] : __("Post has been submitted successfully.", "growtype-form");
 
         return $response;
     }
