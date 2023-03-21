@@ -97,3 +97,7 @@
     top: 11px;
   }
 }
+
+.growtype-form-wrapper input:not([type=checkbox]):not([type=radio]):not([type=submit]):not(.qty)[type="file"] {
+  padding-top: 13px;
+}

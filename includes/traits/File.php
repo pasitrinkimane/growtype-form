@@ -6,6 +6,31 @@
 trait File
 {
     /**
+     * @param $files
+     * @return void
+     * Multiple files upload
+     */
+    public function upload_files_to_media_library($files)
+    {
+        $uploaded_files = [];
+        $formatted_file = [];
+        $files_amount = count($files['name']);
+        for ($x = 0; $x < $files_amount; $x++) {
+            $formatted_file['name'] = $files['name'][$x];
+            $formatted_file['type'] = $files['type'][$x];
+            $formatted_file['tmp_name'] = $files['tmp_name'][$x];
+            $formatted_file['error'] = $files['error'][$x];
+            $formatted_file['size'] = $files['size'][$x];
+
+            $upload = $this->upload_file_to_media_library($formatted_file);
+
+            array_push($uploaded_files, $upload);
+        }
+
+        return $uploaded_files;
+    }
+
+    /**
      * @param $file
      * @return array
      */

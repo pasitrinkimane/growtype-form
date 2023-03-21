@@ -413,6 +413,10 @@ class Growtype_Form_Render
 
         <div class="growtype-form-wrapper">
 
+            <?php if (user_can(wp_get_current_user(), 'administrator')) { ?>
+                <a href="<?php echo admin_url() . 'options-general.php?page=growtype-form-settings&tab=' . $form_name; ?>" style="display: inline-block;margin-left: auto;position: relative;top: -20px;" target="_blank">Edit form (only visible for admin)</a>
+            <?php } ?>
+
             <?php $this->growtype_form_get_notice(); ?>
 
             <div class="growtype-form-container">
@@ -852,14 +856,14 @@ class Growtype_Form_Render
                 }
             }
 
-            $growtype_form_image_upload_data = [
+            $growtype_form_image_preload_data = [
                 'preloaded' => json_encode($gallery_images)
             ];
 
             /**
              * Add gallery data to js
              */
-            wp_localize_script('growtype-form-render', 'growtype_form_image_upload_data', $growtype_form_image_upload_data);
+            wp_localize_script('growtype-form-render', 'growtype_form_image_preload_data', $growtype_form_image_preload_data);
 
             /**
              * Update shipping details

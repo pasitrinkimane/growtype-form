@@ -37,7 +37,7 @@ class Growtype_Form_Crud
     ];
 
     /**
-     *
+     * Process data
      */
     public function __construct()
     {
@@ -196,17 +196,23 @@ class Growtype_Form_Crud
                     }
                 }
             } elseif ($form_name === 'post') {
-
                 if (isset($form_data['type']) && $form_data['type'] === 'custom') {
                     $submit_data = apply_filters('growtype_form_upload_post_custom', $form_data, $submitted_values);
                 } else {
                     $submit_data = $this->upload_post($form_data, $submitted_values);
 
                     /**
-                     * Attach featured image
+                     * Process files
                      */
-                    if (isset($submitted_values['files']) && isset($submitted_values['files']['featured_image'])) {
-                        $featured_image = $this->post_attach_featured_image($submit_data['post_id'], $submitted_values['files']['featured_image']);
+                    if (isset($submitted_values['files'])) {
+                        /**
+                         * Attach featured image
+                         */
+                        if (isset($submitted_values['files']['featured_image'])) {
+                            $this->post_attach_featured_image($submit_data['post_id'], $submitted_values['files']['featured_image']);
+                        } else {
+                            $this->post_attach_files($submit_data['post_id'], $submitted_values['files']);
+                        }
                     }
                 }
 
@@ -214,7 +220,12 @@ class Growtype_Form_Crud
                  * Success
                  */
                 if ($submit_data['success']) {
-                    self::send_email($submit_data['post_content']);
+
+                    if (isset($submit_data['post_id'])) {
+                        $post = get_post($submit_data['post_id']);
+
+                        self::send_email_to_admin($post->post_content);
+                    }
 
                     $submit_data['success'] = true;
                     $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : __('Record created successfully.', 'growtype-form');
@@ -262,7 +273,7 @@ class Growtype_Form_Crud
         return $redirect_url;
     }
 
-    public static function send_email($submitted_content)
+    public static function send_email_to_admin($submitted_content)
     {
         $growtype_form_post_default_email_to = get_option('growtype_form_post_default_email_to');
         $growtype_form_post_default_email_to_subject = get_option('growtype_form_post_default_email_to_subject');

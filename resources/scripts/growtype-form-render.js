@@ -31,16 +31,23 @@ $('document').ready(function () {
 
     let imageUploaderInitial = $('.image-uploader-init');
 
+    if (imageUploaderInitial.length === 0) {
+        return;
+    }
+
     let imageUploaderInitialName = imageUploaderInitial.attr('data-name');
     let imageUploaderInitialExtension = imageUploaderInitial.attr('data-extensions') !== undefined ? imageUploaderInitial.attr('data-extensions').split(",") : '';
     let imageUploaderInitialMaxSize = imageUploaderInitial.attr('data-max-size');
+    let imageUploaderInitialMaxFiles = imageUploaderInitial.attr('data-max-files');
+    let imageUploaderPreload = imageUploaderInitial.attr('data-preload');
+    let imageUploaderLabel = imageUploaderInitial.attr('data-label') !== undefined ? imageUploaderInitial.attr('data-label') : 'Drag & Drop files here or click to browse';
 
     if (defaultGallerySupported) {
         if (typeof $.fn.imageUploader !== 'undefined') {
             imageUploaderInitial.addClass('image-uploader');
 
             $('.image-uploader').each(function () {
-                let image_upload_data = typeof (growtype_form_image_upload_data) !== 'undefined' ? growtype_form_image_upload_data : [];
+                let image_upload_data = typeof (growtype_form_image_preload_data) !== 'undefined' && imageUploaderPreload ? growtype_form_image_preload_data : [];
                 let preloaded = [];
 
                 if (Object.entries(image_upload_data).length > 0) {
@@ -56,6 +63,8 @@ $('document').ready(function () {
                     imagesInputName: imageUploaderInitialName,
                     extensions: imageUploaderInitialExtension,
                     maxSize: imageUploaderInitialMaxSize,
+                    maxFiles: imageUploaderInitialMaxFiles ? imageUploaderInitialMaxFiles : 1,
+                    label: imageUploaderLabel,
                 });
             });
         }

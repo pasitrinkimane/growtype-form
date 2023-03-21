@@ -27,6 +27,9 @@ trait Post
         unset($submitted_data[Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION]);
         unset($submitted_data['terms_and_conditions']);
 
+        /**
+         * Format post content
+         */
         ob_start();
 
         foreach ($submitted_values['data'] as $key => $data) {
@@ -91,6 +94,46 @@ trait Post
 
             if (isset($featured_image['attachment_id'])) {
                 return set_post_thumbnail($post_id, $featured_image['attachment_id']);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Attach featured image
+     */
+    public function post_attach_files($post_id, $files)
+    {
+        if (!empty($post_id) && !empty($files)) {
+            $file_urls = [];
+            foreach ($files as $file) {
+                $uploaded_files = $this->upload_files_to_media_library($file);
+
+                if (!empty($uploaded_files)) {
+                    foreach ($uploaded_files as $uploaded_file) {
+
+                        wp_update_post(array (
+                            'ID' => $uploaded_file['attachment_id'],
+                            'post_parent' => $post_id,
+                        ), true);
+
+                        $file_url = wp_get_attachment_url($uploaded_file['attachment_id']);
+
+                        array_push($file_urls, $file_url);
+                    }
+                }
+            }
+
+            if (!empty($file_urls)) {
+                $post = get_post($post_id);
+                $post_content = $post->post_content;
+                $post_content .= '<br><br><h3>Files:</h3><br>' . implode('<br>', $file_urls);
+
+                return wp_update_post([
+                    'ID' => $post_id,
+                    'post_content' => $post_content
+                ]);
             }
         }
 

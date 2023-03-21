@@ -1,7 +1,7 @@
 function conditions() {
     window.growtype_form.conditions = [];
     $('.growtype-form .e-wrapper').each(function (index, element) {
-        if ($(element).attr('data-conditions').length > 0) {
+        if ($(element).attr('data-conditions') && $(element).attr('data-conditions').length > 0) {
             let conditions = JSON.parse($(element).attr('data-conditions'));
             let target = $(element).attr('data-name');
 

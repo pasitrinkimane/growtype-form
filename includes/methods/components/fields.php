@@ -139,7 +139,7 @@ $block_cat_types = ['repeater', 'custom', 'shortcode', 'checkbox'];
         </label>
     <?php } ?>
 
-    <?php if (!empty($field_description)) { ?>
+    <?php if (!empty($field_description) && $field_type !== 'custom') { ?>
         <p class="form-description"><?= $field_description ?></p>
     <?php } ?>
 

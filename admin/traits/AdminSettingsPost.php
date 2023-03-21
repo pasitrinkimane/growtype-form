@@ -43,7 +43,7 @@ trait AdminSettingsPost
 
         add_settings_field(
             'growtype_form_settings_post_saving_post_title_name',
-            'Post title name',
+            'Post title key',
             array ($this, 'growtype_form_settings_post_saving_post_title_name_callback'),
             'growtype-form-settings',
             'growtype_form_settings_post_saving'
