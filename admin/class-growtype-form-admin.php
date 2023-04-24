@@ -228,11 +228,11 @@ class Growtype_Form_Admin
 
             <div class="wrap">
 
-                <h1>Growtype - Form settings</h1>
+                <h1>Growtype Form - Settings</h1>
 
                 <?php
                 if (isset($_GET['updated']) && 'true' == esc_attr($_GET['updated'])) {
-                    echo '<div class="updated" ><p>Theme Settings updated.</p></div>';
+                    echo '<div class="updated" ><p>Settings updated.</p></div>';
                 }
 
                 if (isset ($_GET['tab'])) {
@@ -381,16 +381,22 @@ class Growtype_Form_Admin
     private function load_methods()
     {
         /**
-         * Load members
+         * Load users
          */
         if (!class_exists('WP_List_Table')) {
             require(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
         }
+
         require_once(ABSPATH . 'wp-admin/includes/class-wp-users-list-table.php');
 
         require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signup-details.php';
         require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signups-list-table.php';
 
-        $this->loader = new Growtype_Form_Signup_Details();
+        new Growtype_Form_Signup_Details();
+
+        /**
+         * Load meta fields
+         */
+//        require_once GROWTYPE_FORM_PATH . 'admin/methods/meta-fields/class-growtype-form-meta-fields.php';
     }
 }

@@ -488,6 +488,8 @@ class Growtype_Form_Render
                         <?php } ?>
 
                         <div>
+                            <input type="email" name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATOR ?>' value="" style="display: none;"/>
+
                             <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION ?>' value="submit"/>
                             <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
                             <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>

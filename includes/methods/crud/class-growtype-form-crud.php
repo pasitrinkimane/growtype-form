@@ -17,6 +17,7 @@ class Growtype_Form_Crud
         self::GROWTYPE_FORM_SUBMITTER_ID,
         self::GROWTYPE_FORM_NAME_IDENTIFICATOR,
         self::GROWTYPE_FORM_POST_IDENTIFICATOR,
+        self::GROWTYPE_FORM_SPAM_IDENTIFICATOR,
         'preloaded',
     ];
 
@@ -24,12 +25,23 @@ class Growtype_Form_Crud
 
     const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
     const GROWTYPE_FORM_POST_IDENTIFICATOR = 'growtype_form_post_id';
+    const GROWTYPE_FORM_SPAM_IDENTIFICATOR = 'email_spam';
 
     const GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS = ['submit', 'preview', 'save_as_draft', 'delete'];
 
     const GROWTYPE_FORM_SUBMIT_ACTION = 'growtype_form_submit_action';
 
-    const EXCLUDED_VALUES_FROM_SAVING = ['username', 'password', 'repeat_password', 'email', 'submit', self::GROWTYPE_FORM_SUBMIT_ACTION];
+    const EXCLUDED_VALUES_FROM_SAVING = [
+        'username',
+        'password',
+        'repeat_password',
+        'email',
+        'submit',
+        self::GROWTYPE_FORM_SUBMIT_ACTION,
+        self::GROWTYPE_FORM_SPAM_IDENTIFICATOR,
+        self::GROWTYPE_FORM_SUBMITTER_ID
+    ];
+
     const EXCLUDED_VALUES_FROM_RETURN = ['password', 'repeat_password'];
 
     const ALTERNATIVE_SUBMITTED_DATA_KEYS = [
@@ -56,7 +68,11 @@ class Growtype_Form_Crud
          */
         if (isset($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]) && in_array(sanitize_text_field($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]), self::GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS)) {
             if ($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION] === 'delete') {
-                $product_id = $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] ?? null;
+                $product_id = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
+
+                if (empty($product_id)) {
+                    exit();
+                }
 
                 if (class_exists('woocommerce')) {
                     $product = wc_get_product($product_id);
@@ -68,7 +84,22 @@ class Growtype_Form_Crud
 
                 $redirect_url = growtype_form_redirect_url_after_product_creation();
             } else {
-                $form_name = sanitize_text_field($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]);
+                $form_name = isset($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]) ? sanitize_text_field($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]) : null;
+                $post_identificator = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
+
+                /**
+                 * Check if main values are not empty
+                 */
+                if (empty($form_name) || empty($post_identificator)) {
+                    exit();
+                }
+
+                /**
+                 * Check if form is spam
+                 */
+                if (isset($_POST[Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATOR]) && !empty($_POST[Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATOR])) {
+                    exit();
+                }
 
                 $submitted_values = [
                     'files' => $_FILES,
@@ -94,11 +125,6 @@ class Growtype_Form_Crud
          * Get form data
          */
         $form_data = self::get_growtype_form_data($form_name);
-
-        /**
-         * Current post id
-         */
-        $post_id = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
 
         if (empty($form_data)) {
             return null;
@@ -195,7 +221,7 @@ class Growtype_Form_Crud
                         return $redirect_url;
                     }
                 }
-            } elseif ($form_name === 'post') {
+            } elseif (str_contains($form_name, 'post')) {
                 if (isset($form_data['type']) && $form_data['type'] === 'custom') {
                     $submit_data = apply_filters('growtype_form_upload_post_custom', $form_data, $submitted_values);
                 } else {
@@ -224,7 +250,10 @@ class Growtype_Form_Crud
                     if (isset($submit_data['post_id'])) {
                         $post = get_post($submit_data['post_id']);
 
-                        self::send_email_to_admin($post->post_content);
+                        $email_content = $post->post_content;
+                        $email_content = $email_content . '<br><br><p><a href="' . get_edit_post_link($post->ID) . '" target="_blank">View post</a></p>';
+
+                        self::send_email_to_admin($email_content);
                     }
 
                     $submit_data['success'] = true;
@@ -263,6 +292,11 @@ class Growtype_Form_Crud
          */
 
         $current_slug = isset($_SERVER['REQUEST_URI']) ? str_replace('/', '', $_SERVER['REQUEST_URI']) : '';
+
+        /**
+         * Current post id
+         */
+        $post_id = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
 
         $redirect_url = !empty($post_id) ? get_permalink($post_id) : home_url($current_slug);
 
@@ -527,15 +561,10 @@ class Growtype_Form_Crud
     function update_user_data($user_id, $data)
     {
         /**
-         * Skip values
-         */
-        $skipped_values = self::EXCLUDED_VALUES_FROM_SAVING;
-
-        /**
          * Save extra values
          */
         foreach ($data as $key => $value) {
-            if ((!is_array($value) && str_contains($value, 'password')) || empty($value) || in_array($key, $skipped_values)) {
+            if ((!is_array($value) && str_contains($value, 'password')) || empty($value) || in_array($key, self::EXCLUDED_VALUES_FROM_SAVING)) {
                 continue;
             }
 

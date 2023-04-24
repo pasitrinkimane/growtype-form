@@ -12,39 +12,64 @@ trait Post
      */
     public function upload_post($form_data, $submitted_values)
     {
+        /**
+         * Filter submitted values
+         */
+        $submitted_values = apply_filters('growtype_form_post_submitted_values', $submitted_values);
+        $submitted_data = $submitted_values['data'];
+
         $post_type = $form_data['post_type'] ?? null;
         $growtype_form_settings_post_saving_post_title_name = get_option('growtype_form_settings_post_saving_post_title_name', 'title');
-        $post_title = isset($submitted_values['data'][$growtype_form_settings_post_saving_post_title_name]) ? $submitted_values['data'][$growtype_form_settings_post_saving_post_title_name] : null;
-        $post_author = $submitted_values['data'][Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID] ?? null;
-        $post_status = $submitted_values['data']['post_status'] ?? 'draft';
-        $submitted_data = $submitted_values['data'];
-        $post_tags = $submitted_values['data']['tags'] ?? null;
+
+        $post_title = isset($submitted_data[$growtype_form_settings_post_saving_post_title_name]) ? $submitted_data[$growtype_form_settings_post_saving_post_title_name] : null;
+
+        /**
+         * Filter post title
+         */
+        $post_title = apply_filters('growtype_form_upload_post_post_title', $post_title, $submitted_values);
+
+        $post_author = $submitted_data[Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID] ?? null;
+        $post_status = $submitted_data['post_status'] ?? 'draft';
+        $post_tags = $submitted_data['tags'] ?? null;
 
         /**
          * Unset unnecessary values from submitted data
          */
-        unset($submitted_data[Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID]);
-        unset($submitted_data[Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION]);
-        unset($submitted_data['terms_and_conditions']);
+        foreach (Growtype_Form_Crud::EXCLUDED_VALUES_FROM_SAVING as $value) {
+            if (isset($submitted_data[$value])) {
+                unset($submitted_data[$value]);
+            }
+        }
+
+        /**
+         * Include IP details
+         */
+        $submitted_data['HTTP_X_FORWARDED_FOR'] = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+        $submitted_data['REMOTE_ADDR'] = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
 
         /**
          * Format post content
          */
         ob_start();
 
-        foreach ($submitted_values['data'] as $key => $data) {
+        foreach ($submitted_data as $key => $data) {
             ?>
             <h3><b><?= $key ?></b></h3>
-            <p><?= $data ?></p>
+            <p><?php echo is_array($data) ? json_encode($data) : $data ?></p>
             <?php
         }
+
+        ?>
+        <h3><b>Post url</b></h3>
+        <p><?php echo is_array($data) ? json_encode($data) : $data ?></p>
+        <?php
 
         $formatted_content = ob_get_clean();
 
         /**
          * Format post content
          */
-        $post_content = $submitted_values['data']['post_content'] ?? $formatted_content;
+        $post_content = $submitted_data['post_content'] ?? $formatted_content;
 
         /**
          * Create array
@@ -60,9 +85,9 @@ trait Post
         /**
          * Save post
          */
-        $post = wp_insert_post($post_arr);
+        $post_id = wp_insert_post($post_arr);
 
-        if (is_wp_error($post)) {
+        if (is_wp_error($post_id)) {
             $response['success'] = false;
             $response['message'] = __("Something went wrong. Please contact administrator.", "growtype-form");
 
@@ -73,10 +98,10 @@ trait Post
          * Add tags
          */
         if (!empty($post_tags)) {
-            wp_add_post_tags($post, $post_tags);
+            wp_add_post_tags($post_id, $post_tags);
         }
 
-        $response['post_id'] = $post;
+        $response['post_id'] = $post_id;
         $response['success'] = true;
         $response['post_content'] = $post_content;
         $response['message'] = isset($form_data['success_message']) ? $form_data['success_message'] : __("Post has been submitted successfully.", "growtype-form");
