@@ -18,71 +18,27 @@ conditions();
  * General
  */
 $('document').ready(function () {
+
     /**
-     * Image uploader setup
+     * Image uploader
      */
-    let defaultGallerySupported = true;
-
-    try {
-        let dataTransfer = new DataTransfer();
-    } catch (err) {
-        defaultGallerySupported = false;
-    }
-
-    let imageUploaderInitial = $('.image-uploader-init');
-
-    if (imageUploaderInitial.length === 0) {
-        return;
-    }
-
-    let imageUploaderInitialName = imageUploaderInitial.attr('data-name');
-    let imageUploaderInitialExtension = imageUploaderInitial.attr('data-extensions') !== undefined ? imageUploaderInitial.attr('data-extensions').split(",") : '';
-    let imageUploaderInitialMaxSize = imageUploaderInitial.attr('data-max-size');
-    let imageUploaderInitialMaxFiles = imageUploaderInitial.attr('data-max-files');
-    let imageUploaderPreload = imageUploaderInitial.attr('data-preload');
-    let imageUploaderLabel = imageUploaderInitial.attr('data-label') !== undefined ? imageUploaderInitial.attr('data-label') : 'Drag & Drop files here or click to browse';
-
-    if (defaultGallerySupported) {
-        if (typeof $.fn.imageUploader !== 'undefined') {
-            imageUploaderInitial.addClass('image-uploader');
-
-            $('.image-uploader').each(function () {
-                let image_upload_data = typeof (growtype_form_image_preload_data) !== 'undefined' && imageUploaderPreload ? growtype_form_image_preload_data : [];
-                let preloaded = [];
-
-                if (Object.entries(image_upload_data).length > 0) {
-                    let preloaded_data = JSON.parse(image_upload_data.preloaded);
-
-                    if (Object.entries(preloaded_data).length > 0) {
-                        preloaded = preloaded_data;
-                    }
-                }
-
-                $(this).imageUploader({
-                    preloaded: preloaded,
-                    imagesInputName: imageUploaderInitialName,
-                    extensions: imageUploaderInitialExtension,
-                    maxSize: imageUploaderInitialMaxSize,
-                    maxFiles: imageUploaderInitialMaxFiles ? imageUploaderInitialMaxFiles : 1,
-                    label: imageUploaderLabel,
-                });
-            });
-        }
-    } else {
-        $('<input multiple type="file" class="upload-multifile with-preview" className="multi" name="' + imageUploaderInitialName + '[]"/>').insertAfter('.image-uploader-init');
-
-        $('.upload-multifile').MultiFile({
-            max: 10,
-            accept: imageUploaderInitialExtension.join([separator = ',']),
-            max_size: imageUploaderInitialMaxSize,
-        });
-    }
+    setupImageUploader();
 
     /**
      * Set date
      */
     if ($(".datepicker").length > 0) {
-        $(".datepicker").datepicker();
+        $(".datepicker").each(function (index, element) {
+            let options = {
+                dateFormat: growtype_form.date.date_format_iso
+            };
+
+            if ($(element).attr('min-date') !== undefined) {
+                options.minDate = $(element).attr('min-date');
+            }
+
+            $(element).datepicker(options);
+        });
     }
 
     /**
@@ -100,7 +56,7 @@ $('document').ready(function () {
         let hour = date.getHours();
         let minute = date.getMinutes();
 
-        let dateFormat = growtype_form.date.format;
+        let dateFormat = growtype_form.date.date_format;
 
         function validateValue($this, dateText) {
             let parsedValue = Date.parse(dateText);
@@ -226,3 +182,66 @@ $('document').ready(function () {
         }
     });
 });
+
+
+function setupImageUploader() {
+    /**
+     * Image uploader setup
+     */
+    let defaultGallerySupported = true;
+
+    try {
+        let dataTransfer = new DataTransfer();
+    } catch (err) {
+        defaultGallerySupported = false;
+    }
+
+    let imageUploaderInitial = $('.image-uploader-init');
+
+    if (imageUploaderInitial.length === 0) {
+        return;
+    }
+
+    let imageUploaderInitialName = imageUploaderInitial.attr('data-name');
+    let imageUploaderInitialExtension = imageUploaderInitial.attr('data-extensions') !== undefined ? imageUploaderInitial.attr('data-extensions').split(",") : '';
+    let imageUploaderInitialMaxSize = imageUploaderInitial.attr('data-max-size');
+    let imageUploaderInitialMaxFiles = imageUploaderInitial.attr('data-max-files');
+    let imageUploaderPreload = imageUploaderInitial.attr('data-preload');
+    let imageUploaderLabel = imageUploaderInitial.attr('data-label') !== undefined ? imageUploaderInitial.attr('data-label') : 'Drag & Drop files here or click to browse';
+
+    if (defaultGallerySupported) {
+        if (typeof $.fn.imageUploader !== 'undefined') {
+            imageUploaderInitial.addClass('image-uploader');
+
+            $('.image-uploader').each(function () {
+                let image_upload_data = typeof (growtype_form_image_preload_data) !== 'undefined' && imageUploaderPreload ? growtype_form_image_preload_data : [];
+                let preloaded = [];
+
+                if (Object.entries(image_upload_data).length > 0) {
+                    let preloaded_data = JSON.parse(image_upload_data.preloaded);
+
+                    if (Object.entries(preloaded_data).length > 0) {
+                        preloaded = preloaded_data;
+                    }
+                }
+
+                $(this).imageUploader({
+                    preloaded: preloaded,
+                    imagesInputName: imageUploaderInitialName,
+                    extensions: imageUploaderInitialExtension,
+                    maxSize: imageUploaderInitialMaxSize,
+                    maxFiles: imageUploaderInitialMaxFiles ? imageUploaderInitialMaxFiles : 1,
+                    label: imageUploaderLabel,
+                });
+            });
+        }
+    } else {
+        $('<input multiple type="file" class="upload-multifile with-preview" className="multi" name="' + imageUploaderInitialName + '[]"/>').insertAfter('.image-uploader-init');
+
+        $('.upload-multifile').MultiFile({
+            max: 10,
+            accept: imageUploaderInitialExtension.join([separator = ',']),
+            max_size: imageUploaderInitialMaxSize,
+        });
+    }
+}

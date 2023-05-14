@@ -1,18 +1,4 @@
-<?php
-$selected_options = [];
-
-if (isset($_REQUEST[$field_name])) {
-    $selected_options = is_array($_REQUEST[$field_name]) ? $_REQUEST[$field_name] : explode(',', $_REQUEST[$field_name]);
-} elseif (str_contains($field_name, '[')) {
-    $cat_p = explode('[', $field_name)[0] ?? null;
-    $cat_c = explode('[', $field_name)[1] ?? null;
-    $cat_c = str_replace(']', '', $cat_c);
-    $selected_options = $_REQUEST[$cat_p][$cat_c] ?? [];
-}
-
-?>
-
-<?php if (isset($field_options)) { ?>
+<?php if (isset($field_options) && !empty($field_options)) { ?>
     <div class="form-check-wrapper" aria-required="true">
         <?php
         foreach ($field_options as $field_option) { ?>

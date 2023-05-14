@@ -76,7 +76,7 @@ class Growtype_Form_Public
         wp_localize_script($this->Growtype_Form, 'growtype_form',
             array (
                 'ajax_url' => admin_url('admin-ajax.php'),
-                'date' => Growtype_Form_Render::DATE_TIME_DATA,
+                'date' => Growtype_Form_Render::get_date_time_data(),
                 'currency' => Growtype_Form_Render::get_currency_data()
             )
         );

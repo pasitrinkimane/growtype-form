@@ -13,10 +13,6 @@ class Growtype_Form_Render
 
     const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['text', 'textarea', 'file', 'email', 'select', 'radio', 'checkbox', 'hidden', 'number', 'password', 'custom', 'repeater', 'shortcode'];
 
-    const DATE_TIME_DATA = [
-        'format' => "yy-mm-dd"
-    ];
-
     protected $Growtype_Form_Login;
     protected $Growtype_Form_Crud;
 
@@ -25,6 +21,19 @@ class Growtype_Form_Render
         if (!is_admin()) {
             add_shortcode(self::GROWTYPE_FORM_SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
         }
+    }
+
+    public static function get_date_time_data()
+    {
+        $iso_dates = [
+            'Y-m-d' => 'yy-mm-dd',
+            'd-m-Y' => 'dd-mm-yy'
+        ];
+
+        return [
+            'date_format' => get_option('date_format'),
+            'date_format_iso' => isset($iso_dates[get_option('date_format')]) ? $iso_dates[get_option('date_format')] : 'dd-mm-yy',
+        ];
     }
 
     /**
@@ -282,9 +291,7 @@ class Growtype_Form_Render
         /**
          * Initiate scripts
          */
-        add_action('wp_footer', function () {
-            $this->growtype_form_validation_scripts_init();
-        }, 99);
+        add_action('wp_footer', array (__CLASS__, 'growtype_form_validation_scripts_init'), 100);
 
         /**
          * Render forms
@@ -294,20 +301,16 @@ class Growtype_Form_Render
             /**
              * Initiate scripts
              */
-            add_action('wp_footer', function () {
-                $this->growtype_form_login_validation_scripts();
-            }, 99);
+            add_action('wp_footer', array (__CLASS__, 'growtype_form_login_validation_scripts'));
 
             return Growtype_Form_Login::render_growtype_login_form($form_data);
         } elseif ($form_type === 'fields') {
             return $this->render_growtype_fields($form_data, $form_name);
-        } else {
+        } elseif (str_contains($form_name, 'post')) {
             /**
              * Initiate scripts
              */
-            add_action('wp_footer', function () {
-                $this->growtype_form_submit_scripts_init();
-            }, 99);
+            add_action('wp_footer', array (__CLASS__, 'growtype_form_submit_scripts_init'));
 
             /**
              * Render form
@@ -390,9 +393,7 @@ class Growtype_Form_Render
         $recaptcha_key = $recaptcha['api_key'] ?? null;
 
         if (!empty($recaptcha_key) && !function_exists('recaptcha_setup')) {
-            add_action('wp_footer', function () use (&$recaptcha_key) {
-                $this->recaptcha_setup($recaptcha_key);
-            }, 99);
+            add_action('wp_footer', array (__CLASS__, 'recaptcha_setup'));
         }
 
         /**
@@ -477,8 +478,7 @@ class Growtype_Form_Render
 
                             <?php if (str_contains('confirmation_fields', $key)) { ?>
                                 <div class="row fields-confirmation">
-                                    <?php
-                                    foreach ($form_args['confirmation_fields'] as $field) {
+                                    <?php foreach ($form_args['confirmation_fields'] as $field) {
                                         self::render_growtype_form_field($field);
                                     }
                                     ?>
@@ -551,12 +551,15 @@ class Growtype_Form_Render
         </div>
 
         <?php
-
-        echo growtype_form_include_view('modals/terms');
-
-        echo growtype_form_include_view('modals/privacy');
+        add_action('wp_footer', array (__CLASS__, 'growtype_form_modals_render'));
 
         return ob_get_clean();
+    }
+
+    public static function growtype_form_modals_render()
+    {
+        echo growtype_form_include_view('modals/privacy');
+        echo growtype_form_include_view('modals/terms');
     }
 
     /**
@@ -628,7 +631,7 @@ class Growtype_Form_Render
     /**
      * Validate form
      */
-    function growtype_form_validation_scripts_init()
+    public static function growtype_form_validation_scripts_init()
     {
         ?>
         <script>
@@ -664,7 +667,7 @@ class Growtype_Form_Render
     /**
      * Validate form
      */
-    function growtype_form_login_validation_scripts()
+    public static function growtype_form_login_validation_scripts()
     {
         ?>
         <script>
@@ -676,7 +679,7 @@ class Growtype_Form_Render
     /**
      * @return void
      */
-    function growtype_form_submit_scripts_init()
+    public static function growtype_form_submit_scripts_init()
     {
         $validation_message = [
             'at_leas_one' => __('At least one selection is required.', 'growtype-form'),
@@ -684,6 +687,8 @@ class Growtype_Form_Render
         ];
         ?>
         <script>
+            $ = jQuery;
+
             $('.growtype-form button[type="submit"]').click(function () {
 
                 $(this).attr('disabled', false);
@@ -732,7 +737,7 @@ class Growtype_Form_Render
                     if ($('.datetimepicker').length > 0) {
                         $('.datetimepicker').each(function () {
                             try {
-                                $.datepicker.parseDate('<?= self::DATE_TIME_DATA['format'] ?>', $(this).val());
+                                $.datepicker.parseDate('<?= self::get_date_time_data()["date_format"] ?>', $(this).val());
                             } catch (e) {
                                 $(this).closest('.e-wrapper').append('<label class="error"><?php echo $validation_message['wrong_date_format'] ?></label>');
                                 isValid = false;
@@ -766,7 +771,7 @@ class Growtype_Form_Render
     /**
      * @param $recaptcha_key
      */
-    function recaptcha_setup($recaptcha_key)
+    public static function recaptcha_setup($recaptcha_key)
     {
         ?>
         <style>

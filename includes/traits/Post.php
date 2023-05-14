@@ -18,10 +18,15 @@ trait Post
         $submitted_values = apply_filters('growtype_form_post_submitted_values', $submitted_values);
         $submitted_data = $submitted_values['data'];
 
-        $post_type = $form_data['post_type'] ?? null;
+        $post_type = isset($form_data['post_type']) ? $form_data['post_type'] : null;
+
+        if (empty($post_type)) {
+            return null;
+        }
+
         $growtype_form_settings_post_saving_post_title_name = get_option('growtype_form_settings_post_saving_post_title_name', 'title');
 
-        $post_title = isset($submitted_data[$growtype_form_settings_post_saving_post_title_name]) ? $submitted_data[$growtype_form_settings_post_saving_post_title_name] : null;
+        $post_title = isset($submitted_data[$growtype_form_settings_post_saving_post_title_name]) ? $submitted_data[$growtype_form_settings_post_saving_post_title_name] : date('Y-m-d H:i:s');
 
         /**
          * Filter post title
@@ -29,8 +34,8 @@ trait Post
         $post_title = apply_filters('growtype_form_upload_post_post_title', $post_title, $submitted_values);
 
         $post_author = $submitted_data[Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID] ?? null;
-        $post_status = $submitted_data['post_status'] ?? 'draft';
-        $post_tags = $submitted_data['tags'] ?? null;
+        $post_status = isset($submitted_data['post_status']) ? $submitted_data['post_status'] : 'draft';
+        $post_tags = isset($submitted_data['tags']) ? $submitted_data['tags'] : null;
 
         /**
          * Unset unnecessary values from submitted data
@@ -69,7 +74,7 @@ trait Post
         /**
          * Format post content
          */
-        $post_content = $submitted_data['post_content'] ?? $formatted_content;
+        $post_content = isset($submitted_data['post_content']) ? $submitted_data['post_content'] : $formatted_content;
 
         /**
          * Create array

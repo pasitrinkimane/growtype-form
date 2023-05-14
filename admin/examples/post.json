@@ -81,7 +81,7 @@
       "cta": [
         {
           "type": "submit",
-          "label": "[:en]Continue[:lt]Registruotis"
+          "label": "[:en]Continue[:lt]Registruotis[:]"
         }
       ]
     },

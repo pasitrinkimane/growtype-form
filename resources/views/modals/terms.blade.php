@@ -7,9 +7,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @if(!empty(get_option('growtype_form_signup_terms_page')))
-                    {!! get_option('growtype_form_signup_terms_page') !!}
-                @endif
+                <?php if (!empty(get_option('growtype_form_signup_terms_page'))) {
+                    $post_id = get_option('growtype_form_signup_terms_page');
+                    if (!empty($post_id)) {
+                        $post = get_post($post_id);
+                        echo apply_filters('the_content', $post->post_content);
+                    }
+                } ?>
                 <div class="content-shadow"></div>
             </div>
             <div class="modal-footer justify-content-center" style="display: none;">

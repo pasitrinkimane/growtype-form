@@ -32,10 +32,8 @@ class Growtype_Form_Crud
     const GROWTYPE_FORM_SUBMIT_ACTION = 'growtype_form_submit_action';
 
     const EXCLUDED_VALUES_FROM_SAVING = [
-        'username',
         'password',
         'repeat_password',
-        'email',
         'submit',
         self::GROWTYPE_FORM_SUBMIT_ACTION,
         self::GROWTYPE_FORM_SPAM_IDENTIFICATOR,
@@ -90,15 +88,15 @@ class Growtype_Form_Crud
                 /**
                  * Check if main values are not empty
                  */
-                if (empty($form_name) || empty($post_identificator)) {
-                    exit();
+                if (empty($form_name)) {
+                    throw new Exception('Empty form name');
                 }
 
                 /**
                  * Check if form is spam
                  */
                 if (isset($_POST[Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATOR]) && !empty($_POST[Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATOR])) {
-                    exit();
+                    throw new Exception('Spam identification');
                 }
 
                 $submitted_values = [
@@ -138,7 +136,7 @@ class Growtype_Form_Crud
 
         if (!empty($submitted_values_sanitized)) {
 
-            $success_message = $form_data['success_message'] ?? null;
+            $success_message = isset($form_data['success_message']) ? $form_data['success_message'] : '';
 
             if (str_contains($form_name, 'signup')) {
                 $child_user = isset($form_data['child_user']) && $form_data['child_user'] ? true : false;
@@ -209,7 +207,7 @@ class Growtype_Form_Crud
 
                     $submit_data['product_id'] = $product_id;
                     $submit_data['success'] = true;
-                    $submit_data['message'] = $success_message ?? __('Product uploaded.', 'growtype-form');
+                    $submit_data['message'] = isset($success_message) ? $success_message : __('Product uploaded.', 'growtype-form');
 
                     $redirect_url = growtype_form_redirect_url_after_product_creation();
 
@@ -230,7 +228,7 @@ class Growtype_Form_Crud
                     /**
                      * Process files
                      */
-                    if (isset($submitted_values['files'])) {
+                    if (isset($submitted_values['files']) && isset($submit_data['post_id'])) {
                         /**
                          * Attach featured image
                          */
@@ -245,7 +243,7 @@ class Growtype_Form_Crud
                 /**
                  * Success
                  */
-                if ($submit_data['success']) {
+                if (isset($submit_data['success']) && $submit_data['success']) {
 
                     if (isset($submit_data['post_id'])) {
                         $post = get_post($submit_data['post_id']);
@@ -258,6 +256,9 @@ class Growtype_Form_Crud
 
                     $submit_data['success'] = true;
                     $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : __('Record created successfully.', 'growtype-form');
+                } else {
+                    $submit_data['success'] = false;
+                    $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : __('Something went wrong. Please contact site admin.', 'growtype-form');
                 }
             } else {
                 $submit_data['success'] = false;
@@ -285,7 +286,7 @@ class Growtype_Form_Crud
         /**
          * Prepare session redirect details
          */
-        $this->growtype_form_set_notice($submit_data['message'] ?? __("Something went wrong. Please contact administrator.", "growtype-form"), ($submit_data['success'] ? 'success' : 'error'));
+        $this->growtype_form_set_notice(isset($submit_data['message']) ? $submit_data['message'] : __("Something went wrong. Please contact administrator.", "growtype-form"), ($submit_data['success'] ? 'success' : 'error'));
 
         /**
          * Redirect url

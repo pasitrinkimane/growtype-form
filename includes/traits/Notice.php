@@ -19,12 +19,12 @@ trait Notice
      */
     public function growtype_form_get_notice()
     {
-        $message = $_COOKIE['notice_message'] ?? null;
-        $status = $_COOKIE['notice_status'] ?? null;
+        $message = isset($_COOKIE['notice_message']) ? $_COOKIE['notice_message'] : null;
+        $status = isset($_COOKIE['notice_status']) ? $_COOKIE['notice_status'] : null;
 
-        if (!empty($status)) { ?>
+        if (!empty($status) && !empty($message)) { ?>
             <div id="growtype-form-alert" class="alert alert-dismissible fade show <?= $status === 'success' ? 'alert-success' : 'alert-danger' ?>" role="alert">
-                <?= __($message, "growtype-form") ?>
+                <?php echo __($message, "growtype-form") ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             <script>

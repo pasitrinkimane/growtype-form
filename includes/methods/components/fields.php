@@ -1,4 +1,7 @@
 <?php
+
+$field = apply_filters('growtype_form_field', $field);
+
 $field_name = $field['name'] ?? false;
 $field_required = isset($field['required']) && $field['required'] === 'true' ? true : false;
 $field_multiple = isset($field['multiple']) && $field['multiple'] === 'true' ? true : false;
@@ -23,39 +26,8 @@ if (str_contains($field_name, 'password')) {
     $field_value = null;
 }
 
-$field_options = $field['options'] ?? null;
-
-/**
- * Advanced select options
- */
-if (!empty($field_options) && !is_array($field_options) && (str_contains($field_options, 'taxonomy=') || str_contains($field_options, 'product_cat='))) {
-    $select_type = 'custom';
-    $field_values = explode('&', $field_options);
-
-    $term_slug = 'alcohol-type';
-    $taxonomy_name = 'product_cat';
-
-    foreach ($field_values as $field_value) {
-        if (str_contains($field_value, 'taxonomy=')) {
-            $taxonomy_name = str_replace('taxonomy=', '', $field_value);
-        }
-        if (str_contains($field_value, 'product_cat=')) {
-            $term_slug = str_replace('product_cat=', '', $field_value);
-        }
-    }
-
-    $term = get_term_by('slug', $term_slug, $taxonomy_name);
-    $term_children = get_term_children($term->term_id, $taxonomy_name);
-
-    $field_options = array ('' => __('Select a value&hellip;', 'woocommerce')) + [];
-    foreach ($term_children as $child) {
-        $term = get_term_by('id', $child, $taxonomy_name);
-        $field_options[$term->slug] = $term->name;
-    }
-} elseif ($field_options === 'wc_countries') {
-    $select_type = 'custom';
-    $field_options = array ('' => __('Select a country / region&hellip;', 'woocommerce')) + WC()->countries->get_allowed_countries();
-}
+$field_options = isset($field['options']) ? $field['options'] : [];
+$selected_options = isset($field['selected_options']) ? $field['selected_options'] : [];
 
 $field_label = isset($field['label']) ? $field['label'] : null;
 $field_label = !empty($field_label) && $field_required && !str_contains($field_label, '*') ? $field_label . '<span class="required">*</span>' : $field_label;
@@ -64,10 +36,11 @@ $placeholder = isset($field['placeholder']) ? $field['placeholder'] : null;
 $field_accept = isset($field['accept']) ? $field['accept'] : null;
 $field_cta_text = isset($field['cta_text']) ? $field['cta_text'] : null;
 $field_min_value = isset($field['min']) ? $field['min'] : null;
+$field_min_date_value = isset($field['min_date']) ? $field['min_date'] : null;
 $field_max_value = isset($field['max']) ? $field['max'] : null;
 $field_col_class = isset($field['class']) ? $field['class'] : 'col-auto';
 $field_fields = isset($field['fields']) ? $field['fields'] : null;
-$field_date = isset($field['date']) ? $field['date'] : null;
+$field_date = isset($field['date']) ? $field['date'] : false;
 $field_time = isset($field['time']) ? $field['time'] : null; // time picker
 $field_pattern = isset($field['pattern']) ? $field['pattern'] : null; //regex pattern
 $field_maxlength = isset($field['maxlength']) ? $field['maxlength'] : null;
@@ -133,7 +106,7 @@ $block_cat_types = ['repeater', 'custom', 'shortcode', 'checkbox'];
         </div>
     <?php } ?>
 
-    <?php if (!empty($field_label)) { ?>
+    <?php if (!in_array($field_type, ['checkbox']) && !empty($field_label)) { ?>
         <label for="<?= $field_name ?>" class="form-label">
             <?= $field_label ?>
         </label>
