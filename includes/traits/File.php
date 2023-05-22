@@ -12,6 +12,10 @@ trait File
      */
     public function upload_files_to_media_library($files)
     {
+        if (count($files) === count($files, COUNT_RECURSIVE)) {
+            throw new Exception('Use multidimensional file input name in settings. F.e. files[].');
+        }
+
         $uploaded_files = [];
         $formatted_file = [];
         $files_amount = count($files['name']);

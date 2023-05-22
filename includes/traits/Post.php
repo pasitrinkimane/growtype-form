@@ -57,17 +57,10 @@ trait Post
          */
         ob_start();
 
-        foreach ($submitted_data as $key => $data) {
-            ?>
-            <h3><b><?= $key ?></b></h3>
-            <p><?php echo is_array($data) ? json_encode($data) : $data ?></p>
-            <?php
-        }
-
-        ?>
-        <h3><b>Post url</b></h3>
-        <p><?php echo is_array($data) ? json_encode($data) : $data ?></p>
-        <?php
+        echo growtype_form_include_view('post.content', [
+            'submitted_data' => $submitted_data,
+            'form_data' => $form_data
+        ]);
 
         $formatted_content = ob_get_clean();
 
@@ -158,7 +151,7 @@ trait Post
             if (!empty($file_urls)) {
                 $post = get_post($post_id);
                 $post_content = $post->post_content;
-                $post_content .= '<br><br><h3>Files:</h3><br>' . implode('<br>', $file_urls);
+                $post_content .= '<br><br><h3><b>Files:</b></h3><br>' . implode('<br>', $file_urls);
 
                 return wp_update_post([
                     'ID' => $post_id,
