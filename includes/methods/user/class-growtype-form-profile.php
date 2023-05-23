@@ -42,8 +42,9 @@ class Growtype_Form_Profile
      */
     function custom_url_template()
     {
-        if (!empty($_SERVER['REQUEST_URI'])) {
-            $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
+        if (isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI'])) {
+            $page_slug = parse_url($_SERVER['REQUEST_URI']);
+            $page_slug = isset($page_slug['path']) ? str_replace('/', '', $page_slug['path']) : '';
 
             if (growtype_form_profile_page_is_active() && growtype_form_profile_page_ID() === 'default' && $page_slug === self::URL_SLUG) {
 
