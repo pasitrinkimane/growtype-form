@@ -11,7 +11,9 @@
                     $post_id = get_option('growtype_form_signup_privacy_page');
                     if (!empty($post_id)) {
                         $post = get_post($post_id);
-                        echo apply_filters('the_content', $post->post_content);
+                        if (!empty($post)) {
+                            echo apply_filters('the_content', $post->post_content);
+                        }
                     }
                 } ?>
                 <div class="content-shadow"></div>

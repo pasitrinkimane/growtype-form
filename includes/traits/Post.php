@@ -113,7 +113,7 @@ trait Post
     public function post_attach_featured_image($post_id, $featured_image)
     {
         if (!empty($post_id) && !empty($featured_image)) {
-            $featured_image = $this->upload_file_to_media_library($featured_image);
+            $featured_image = self::upload_file_to_media_library($featured_image);
 
             if (isset($featured_image['attachment_id'])) {
                 return set_post_thumbnail($post_id, $featured_image['attachment_id']);

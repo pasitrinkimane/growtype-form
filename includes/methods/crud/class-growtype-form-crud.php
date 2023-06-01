@@ -212,7 +212,7 @@ class Growtype_Form_Crud
                     $redirect_url = growtype_form_redirect_url_after_product_creation();
 
                     if ($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION] === 'preview') {
-                        $redirect_url = Growtype_Product::preview_permalink($product_id);
+                        $redirect_url = Growtype_Wc_Product::preview_permalink($product_id);
                     }
 
                     if (!empty($redirect_url)) {
@@ -248,10 +248,12 @@ class Growtype_Form_Crud
                     if (isset($submit_data['post_id'])) {
                         $post = get_post($submit_data['post_id']);
 
-                        $email_content = $post->post_content;
-                        $email_content = $email_content . '<br><br><p><a href="' . get_edit_post_link($post->ID) . '" target="_blank">View post</a></p>';
+                        if (!empty($post)) {
+                            $email_content = $post->post_content;
+                            $email_content = $email_content . '<br><br><p><a href="' . get_edit_post_link($post->ID) . '" target="_blank">View post</a></p>';
 
-                        self::send_email_to_admin($email_content);
+                            self::send_email_to_admin($email_content);
+                        }
                     }
 
                     $submit_data['success'] = true;
@@ -265,6 +267,9 @@ class Growtype_Form_Crud
                 $submit_data['message'] = __('Wrong data submitted. Please contact site admin.', 'growtype-form');
             }
         } else {
+
+            error_log(print_r(sprintf("Growtype Form. VALIDATION FAILED. Empty response. Url: %s", isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : ''), true));
+
             $submit_data['success'] = false;
             $submit_data['message'] = __('Please fill all required fields.', 'growtype-form');
         }
@@ -302,7 +307,7 @@ class Growtype_Form_Crud
         $redirect_url = !empty($post_id) ? get_permalink($post_id) : home_url($current_slug);
 
         if ($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION] === 'preview' && class_exists('Growtype_Product')) {
-            $redirect_url = Growtype_Product::edit_permalink($post_id);
+            $redirect_url = Growtype_Wc_Product::edit_permalink($post_id);
         }
 
         return $redirect_url;

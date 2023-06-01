@@ -56,7 +56,7 @@ $('document').ready(function () {
         let hour = date.getHours();
         let minute = date.getMinutes();
 
-        let dateFormat = growtype_form.date.date_format;
+        let dateFormat = growtype_form.date.date_format_iso;
 
         function validateValue($this, dateText) {
             let parsedValue = Date.parse(dateText);
@@ -214,14 +214,14 @@ function setupImageUploader() {
             imageUploaderInitial.addClass('image-uploader');
 
             $('.image-uploader').each(function () {
-                let image_upload_data = typeof (growtype_form_image_preload_data) !== 'undefined' && imageUploaderPreload ? growtype_form_image_preload_data : [];
+                let galleryData = typeof (growtype_form_gallery) !== 'undefined' && imageUploaderPreload ? growtype_form_gallery : [];
                 let preloaded = [];
 
-                if (Object.entries(image_upload_data).length > 0) {
-                    let preloaded_data = JSON.parse(image_upload_data.preloaded);
+                if (Object.entries(galleryData).length > 0) {
+                    let imageUploader = JSON.parse(galleryData['images']);
 
-                    if (Object.entries(preloaded_data).length > 0) {
-                        preloaded = preloaded_data;
+                    if (Object.entries(imageUploader).length > 0) {
+                        preloaded = imageUploader;
                     }
                 }
 

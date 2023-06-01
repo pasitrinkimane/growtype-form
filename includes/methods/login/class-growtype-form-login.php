@@ -19,6 +19,17 @@ class Growtype_Form_Login
         add_action('init', array ($this, 'custom_url'), 1);
         add_action('template_redirect', array ($this, 'custom_url_template'));
         add_filter('document_title_parts', array ($this, 'custom_document_title_parts'));
+
+        add_filter('lostpassword_url', array ($this, 'lostpassword_url_rewrite'), 100, 2);
+    }
+
+    function lostpassword_url_rewrite($lostpassword_url, $redirect)
+    {
+        if (class_exists('woocommerce') && !is_user_logged_in()) {
+            return network_site_url('wp-login.php?action=lostpassword', 'login');
+        }
+
+        return $lostpassword_url;
     }
 
     /**
@@ -128,7 +139,7 @@ class Growtype_Form_Login
 
         ob_start();
         ?>
-        <div class="growtype-form-wrapper">
+        <div class="growtype-form-wrapper" data-type="login">
             <div class="growtype-form-container">
                 <?php
                 if (isset($form_args['logo']) && isset($form_args['logo']['url']) && !empty($form_args['logo']['url'])) { ?>

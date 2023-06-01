@@ -27,7 +27,9 @@ if (str_contains($field_name, 'password')) {
 }
 
 $field_options = isset($field['options']) ? $field['options'] : [];
+
 $selected_options = isset($field['selected_options']) ? $field['selected_options'] : [];
+$select_type = isset($field['select_type']) ? $field['select_type'] : null;
 
 $field_label = isset($field['label']) ? $field['label'] : null;
 $field_label = !empty($field_label) && $field_required && !str_contains($field_label, '*') ? $field_label . '<span class="required">*</span>' : $field_label;

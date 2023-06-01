@@ -26,7 +26,7 @@ trait File
             $formatted_file['error'] = $files['error'][$x];
             $formatted_file['size'] = $files['size'][$x];
 
-            $upload = $this->upload_file_to_media_library($formatted_file);
+            $upload = self::upload_file_to_media_library($formatted_file);
 
             array_push($uploaded_files, $upload);
         }
@@ -38,7 +38,7 @@ trait File
      * @param $file
      * @return array
      */
-    public function upload_file_to_media_library($file)
+    public static function upload_file_to_media_library($file)
     {
         $file_name = basename($file["name"]);
         $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);

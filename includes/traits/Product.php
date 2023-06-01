@@ -20,7 +20,6 @@ trait Product
     public function get_product_meta_keys($product_type = null)
     {
         $extra_meta_keys = [
-            '_regular_price',
             '_product_volume',
             '_amount_in_cases',
             '_cases_per_pallet',
@@ -28,25 +27,10 @@ trait Product
             '_amount_in_units',
             '_product_location_city',
             '_product_location_country',
-            '_price_per_unit',
-            '_price_per_unit_buy_now',
+            '_price_per_unit'
         ];
 
-        if ($product_type === 'auction') {
-            $auction_meta_keys = [
-                '_auction_dates_from',
-                '_auction_dates_to',
-                '_auction_bid_increment'
-            ];
-
-            $extra_meta_keys = array_merge($extra_meta_keys, $auction_meta_keys);
-        }
-
-        $external_extra_meta_keys = apply_filters('growtype_form_wc_crud_product_extra_meta_keys', '');
-
-        if (!empty($external_extra_meta_keys)) {
-            return array_merge($extra_meta_keys, $external_extra_meta_keys);
-        }
+        $extra_meta_keys = apply_filters('growtype_form_wc_crud_product_extra_meta_keys', $extra_meta_keys);
 
         return $extra_meta_keys;
     }
@@ -57,152 +41,50 @@ trait Product
      */
     public function create_or_update_product($product_data)
     {
-        /**
-         * Product title
-         */
-        $product_title = $product_data['data']['title'] ?? __('New product', 'growtype-form');
-
-        /**
-         * Get categories
-         */
-        $categories = $product_data['data']['categories'] ?? null;
-
-        if (!empty($categories)) {
-            $category_ids = $this->get_terms_ids($categories, 'product_cat');
+        if (!class_exists('Growtype_Wc_Product')) {
+            die('Class Growtype_Wc_Product not found');
         }
-
-        /**
-         * Get tags
-         */
-        $tags = $product_data['data']['tags'] ?? null;
-
-        if (!empty($tags)) {
-            $tag_ids = $this->get_terms_ids($tags, 'product_tag');
-        }
-
-        /**
-         * Status
-         */
-        $status = $product_data['data']['status'] ?? growtype_form_default_product_status();
-
-        /**
-         * Visibility
-         */
-        $visibility = growtype_form_default_product_catalog_visibility();
-
-        /**
-         * Price per unit
-         */
-        $price_per_unit = $product_data['data']['_price_per_unit'] ?? null;
 
         /**
          * Price per unit buy now
          */
-        $price_per_unit_buy_now = $product_data['data']['_price_per_unit_buy_now'] ?? null;
+        $price_per_unit_buy_now = isset($product_data['data']['_price_per_unit_buy_now']) ? $product_data['data']['_price_per_unit_buy_now'] : '';
 
         /**
          * Amount in units
          */
-        $amount_in_units = $product_data['data']['_amount_in_units'] ?? null;
+        $amount_in_units = isset($product_data['data']['_amount_in_units']) ? $product_data['data']['_amount_in_units'] : null;
 
         /**
          * Price
          */
-        $price = $product_data['data']['price'] ?? '';
+        $price = isset($product_data['data']['price']) ? $product_data['data']['price'] : '';
 
         /**
          * Regular price
          */
-        $regular_price = $product_data['data']['regular_price'] ?? '';
+        $regular_price = isset($product_data['data']['regular_price']) ? $product_data['data']['regular_price'] : '';
 
         if (!empty($price_per_unit_buy_now) && !empty($amount_in_units)) {
             $regular_price = $price_per_unit_buy_now * $amount_in_units;
         }
 
         /**
-         * Get descriptions
-         */
-        $short_description = $product_data['data']['short_description'] ?? '';
-        $description = $product_data['data']['description'] ?? '';
-
-        /**
-         * Auction start price
-         */
-        $auction_start_price = $product_data['data']['_auction_start_price'] ?? '';
-
-        /**
-         * Check if products exists
-         */
-        if (isset($product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR])) {
-            $product = wc_get_product($product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR]);
-
-            if (!empty($product)) {
-                wc_delete_product_transients($product->get_id());
-            }
-
-            if ($product && !$this->user_has_uploaded_product($product->get_id())) {
-                $product = null;
-            }
-        }
-
-        if (empty($product)) {
-            $product = new WC_Product_Simple();
-            if (growtype_form_default_product_type() === 'grouped') {
-                $product = new WC_Product_Grouped();
-            } elseif (growtype_form_default_product_type() === 'external') {
-                $product = new WC_Product_External();
-            } elseif (growtype_form_default_product_type() === 'variable') {
-                $product = new WC_Product_Variable();
-            } elseif (growtype_form_default_product_type() === 'auction') {
-                $product = new WC_Product_Auction($product);
-            }
-        }
-
-        $product->set_name($product_title);
-        $product->set_status($status);
-        $product->set_catalog_visibility($visibility);
-        $product->set_sold_individually(true);
-
-        /**
          * Meta keys to update
          */
+        $meta_details = [];
         $meta_keys_to_update = $this->get_product_meta_keys(growtype_form_default_product_type());
 
         foreach ($meta_keys_to_update as $meta_key) {
-            if (isset($product_data['data'][$meta_key])) {
-                $meta_data = $product_data['data'][$meta_key];
+            $meta_value = isset($product_data['data'][$meta_key]) ? $product_data['data'][$meta_key] : null;
 
-                if ($meta_key === '_auction_dates_from' || $meta_key === '_auction_dates_to') {
-                    if (!empty($meta_data)) {
-                        $meta_data = date('Y-m-d H:i', strtotime($meta_data));
-                    } else {
-                        if ($meta_key === '_auction_dates_from') {
-                            $meta_data = date('Y-m-d H:i', strtotime('+1 day'));
-                        } else {
-                            $meta_data = date('Y-m-d H:i', strtotime('+8 days'));
-                        }
-                    }
-                }
+            $meta_value = apply_filters('growtype_form_wc_crud_update_meta_data', $meta_value, $meta_key, $product_data);
 
-                if ($meta_key === '_auction_bid_increment') {
-                    $meta_data = Growtype_Auction::BID_INCREMENT;
-                }
-
-                $product->update_meta_data($meta_key, $meta_data);
-            }
+            $meta_details[$meta_key] = $meta_value;
         }
 
         /**
-         * Auction set start price
-         */
-        $auction_start_price = isset($auction_start_price) && !empty($auction_start_price) ? $auction_start_price : $price_per_unit * $amount_in_units;
-
-        if (!empty($auction_start_price)) {
-            $product->update_meta_data('_auction_start_price', $auction_start_price);
-        }
-
-        /**
-         * Save gallery
+         * Get gallery ids
          */
         $gallery_data = $product_data['files']['gallery'] ?? null;
         $gallery_ids = [];
@@ -213,7 +95,7 @@ trait Product
                 return !empty($value);
             });
 
-            $files_amount = count($filter_files) ?? null;
+            $files_amount = is_array($filter_files) ? count($filter_files) : null;
 
             if (!empty($files_amount)) {
                 $files_data = [];
@@ -221,13 +103,14 @@ trait Product
                     foreach ($gallery_data as $key => $file) {
                         $files_data[$index][$key] = $file[$index];
                     }
-                    $uploaded_attachment = $this->upload_file_to_media_library($files_data[$index]);
+
+                    $uploaded_attachment = self::upload_file_to_media_library($files_data[$index]);
                     array_push($gallery_ids, $uploaded_attachment['attachment_id']);
                 }
             }
         }
 
-        $gallery_preloaded = $product_data['data']['preloaded'] ?? null;
+        $gallery_preloaded = isset($product_data['data']['preloaded']) ? $product_data['data']['preloaded'] : null;
 
         $all_ids = $gallery_ids;
 
@@ -238,11 +121,10 @@ trait Product
         $gallery_ids = $all_ids;
 
         /**
-         * Set gallery ids
+         * Update gallery ids
          */
         if (isset($all_ids)) {
             unset($all_ids[0]);
-            $product->set_gallery_image_ids($all_ids);
         }
 
         /**
@@ -251,192 +133,84 @@ trait Product
         $featured_image_data = $product_data['files']['featured_image'] ?? null;
 
         if (!empty($featured_image_data)) {
-            $featured_image = $this->upload_file_to_media_library($featured_image_data);
+            $featured_image = self::upload_file_to_media_library($featured_image_data);
         }
 
         /**
          * Set featured image
          */
+        $image_id = null;
         if (isset($featured_image) && !empty($featured_image)) {
-            $product->set_image_id($featured_image['attachment_id']);
+            $image_id = $featured_image['attachment_id'];
         } elseif (isset($gallery_ids) && !empty($gallery_ids)) {
-            $product->set_image_id($gallery_ids[0]);
-        }
-
-        /**
-         * Set categories
-         */
-        if (!empty($category_ids)) {
-            $product->set_category_ids($category_ids);
-        }
-
-        if (!empty($description)) {
-            $product->set_description($description);
-        }
-
-        $product->set_short_description($short_description);
-
-        if (!empty($tag_ids)) {
-            $product->set_tag_ids($tag_ids);
+            $image_id = $gallery_ids[0];
         }
 
         /**
          * Save downloadable files
          */
-        $downloadable_file_data = $product_data['files']['downloadable_file'] ?? null;
+        $downloadable_files_data = isset($product_data['files']['downloadable_files']) ? $product_data['files']['downloadable_files'] : null;
 
-        if (!empty($downloadable_file_data)) {
-            $downloadable_file = $this->upload_file_to_media_library($downloadable_file_data);
-        }
-
-        if (isset($downloadable_file) && !empty($downloadable_file)) {
-            $product->set_virtual(true);
-            $product->set_downloadable(true);
-
-            $attachment_url = wp_get_attachment_url($downloadable_file['attachment_id']);
-            $file_md5 = md5($attachment_url);
-
-            $download = new WC_Product_Download();
-            $download->set_name(get_the_title($downloadable_file['attachment_id']));
-            $download->set_id($file_md5);
-            $download->set_file($attachment_url);
-            $downloads[$file_md5] = $download;
-
-            $product->set_downloads($downloads);
-        }
-
-        /**
-         * Src image
-         */
-        if (isset($featured_image) && !empty($featured_image)) {
-            $src_img = wp_get_attachment_image_src($featured_image['attachment_id'], 'full');
+        $downloadable_files = [];
+        if (!empty($downloadable_files_data)) {
+            foreach ($downloadable_files_data as $downloadable_file_data) {
+                $downloadable_file = self::upload_file_to_media_library($downloadable_file_data);
+                array_push($downloadable_files, $downloadable_file);
+            }
         }
 
         /**
          * Add product creator id
          */
-        $creator_id = $product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID] ?? null;
+        $creator_id = isset($product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID]) ? $product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID] : null;
 
         if (!empty($creator_id)) {
-            $product->update_meta_data('_product_creator_id', $creator_id);
+            $meta_details['_product_creator_id'] = $creator_id;
         }
 
         /**
          * Add product
          */
-        $extra_details = $product_data['data']['extra_details'] ?? null;
+        $extra_details = isset($product_data['data']['extra_details']) ? $product_data['data']['extra_details'] : null;
 
         if (!empty($extra_details)) {
-            $product->update_meta_data('_extra_details', implode(',', $extra_details));
+            $meta_details['_extra_details'] = implode(',', $extra_details);
         }
 
         /**
          * Enable image placeholder
          */
-        $product->update_meta_data('_img_placeholder_enabled', true);
+        $meta_details['_img_placeholder_enabled'] = true;
 
         /**
-         * Save shipping documents
+         * Create product
          */
-        $existing_shipping_documents = Growtype_Product::shipping_documents($product->get_id());
-        $shipping_documents = $product_data['files']['shipping_documents'] ?? null;
-        $shipping_documents_uploaded = [];
+        $product_class = new Growtype_Wc_Product;
 
-        if (!empty($shipping_documents)) {
+        $product_args = [
+            'post_id' => isset($product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR] : null,
+            'product_type' => growtype_form_default_product_type(),
+            'post_title' => isset($product_data['data']['title']) ? $product_data['data']['title'] : __('New product', 'growtype-form'),
+            'post_status' => isset($product_data['data']['status']) ? $product_data['data']['status'] : growtype_form_default_product_status(),
+            'categories' => isset($product_data['data']['categories']) ? $product_data['data']['categories'] : null,
+            'tags' => isset($product_data['data']['tags']) ? $product_data['data']['tags'] : '',
+            'catalog_visibility' => growtype_form_default_product_catalog_visibility(),
+            'short_description' => isset($product_data['data']['short_description']) ? $product_data['data']['short_description'] : '',
+            'description' => isset($product_data['data']['description']) ? $product_data['data']['description'] : '',
+            'gallery_image_ids' => $all_ids,
+            'image_id' => $image_id,
+            'downloadable_files' => $downloadable_files,
+            'meta_details' => $meta_details,
+            'regular_price' => !empty($regular_price) ? $regular_price : null,
+            'price' => !empty($price) ? $price : null,
+        ];
 
-            foreach ($existing_shipping_documents as $key => $document) {
-                if (in_array($document['key'], array_keys($shipping_documents['name'])) && empty($shipping_documents['name'][$document['key']])) {
-                    wp_delete_attachment($document['attachment_id']);
-                    unset($existing_shipping_documents[$key]);
-                }
-            }
-
-            $eisting_files = array_filter($shipping_documents['name'], function ($value) {
-                return !empty($value);
-            });
-
-            $files_data = [];
-            foreach ($eisting_files as $file_key => $file_name) {
-                foreach ($shipping_documents as $key => $file) {
-                    $files_data[$file_key][$key] = $file[$file_key];
-                }
-
-                if (!empty($files_data)) {
-                    $uploaded_attachment = $this->upload_file_to_media_library($files_data[$file_key]);
-                    $shipping_documents_uploaded[$file_key] = [
-                        'key' => $file_key,
-                        'attachment_id' => $uploaded_attachment['attachment_id'],
-                        'url' => wp_get_attachment_url($uploaded_attachment['attachment_id']),
-                        'name' => $file_name,
-                    ];
-                }
-            }
-        }
-
-        $product_shipping_documents = array_merge($existing_shipping_documents, $shipping_documents_uploaded);
-
-        /**
-         * Shipping documents
-         */
-        if (isset($product_shipping_documents) && !empty($product_shipping_documents)) {
-            $product->update_meta_data('_shipping_documents', array_values($product_shipping_documents));
-        }
-
-        /**
-         * Auction bid increment
-         */
-        if ($product->is_type('auction')) {
-            $auction_bid_increment = get_post_meta($product->get_id(), '_auction_bid_increment', true);
-
-            if (empty($auction_bid_increment)) {
-                $product->update_meta_data('_auction_bid_increment', Growtype_Auction::bid_increase_value());
-            }
-        }
-
-        /**
-         * Set regular price
-         */
-        if (!empty($regular_price)) {
-            if ($product->is_type('auction')) {
-                if (empty($product->get_id())) {
-                    $product->update_meta_data('_regular_price', wc_format_decimal(wc_clean($regular_price)));
-                } else {
-                    update_post_meta($product->get_id(), '_regular_price', wc_format_decimal(wc_clean($regular_price)));
-                }
-            } else {
-                $product->set_regular_price($regular_price);
-            }
-        }
-
-        /**
-         * Set price
-         */
-        if (empty($price)) {
-            $price = $regular_price;
-        }
-
-        if (!empty($price)) {
-            if (!$product->is_type('auction')) {
-                $product->set_price($price);
-            }
-        }
+        $product = $product_class->create($product_args);
 
         /**
          * Apply external changes
          */
-        $product = apply_filters('growtype_form_wc_crud_product_update', $product, $product_data);
-
-        /**
-         * Save product
-         */
-        $product->save();
-
-        /**
-         * Update price for auctions only
-         */
-        if ($product->is_type('auction')) {
-            update_post_meta($product->get_id(), '_price', $product->get_regular_price('edit'));
-        }
+        $product = apply_filters('growtype_form_wc_crud_product_after_save', $product, $product_data);
 
         /**
          * Response

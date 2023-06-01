@@ -7,7 +7,7 @@
     <?php if (!$field_multiple && isset($placeholder) && !empty($placeholder)) { ?>
         <option value="" <?php echo empty($selected_options) ? 'selected' : '' ?> disabled hidden><?= $placeholder ?></option>
     <?php } ?>
-    <?php if (isset($select_type) && $select_type === 'custom') {
+    <?php if (isset($select_type) && $select_type === 'key_value') {
         foreach ($field_options as $key => $field_option) { ?>
             <option value="<?= $key ?>" <?= in_array($key, $selected_options) ? 'selected' : '' ?>><?= $field_option ?></option>
         <?php }

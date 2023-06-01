@@ -187,6 +187,11 @@ class Growtype_Form_Render
             $decimalPlacesOverride = wc_get_price_decimals();
         }
 
+        /**
+         * Decode currency symbol
+         */
+        $currency_symbol = html_entity_decode($currency_symbol, ENT_QUOTES, "utf-8");
+
         switch ($currency_pos) {
             case 'left':
                 $currency_symbol_placement = 'p';
@@ -301,12 +306,12 @@ class Growtype_Form_Render
             /**
              * Initiate scripts
              */
-            add_action('wp_footer', array (__CLASS__, 'growtype_form_login_validation_scripts'));
+            add_action('wp_footer', array (__CLASS__, 'growtype_form_login_validation_scripts'), 100);
 
             return Growtype_Form_Login::render_growtype_login_form($form_data);
         } elseif ($form_type === 'fields') {
             return $this->render_growtype_fields($form_data, $form_name);
-        } elseif (str_contains($form_name, 'post')) {
+        } else {
             /**
              * Initiate scripts
              */
@@ -671,7 +676,7 @@ class Growtype_Form_Render
     {
         ?>
         <script>
-            $('form[name="loginform-custom"]').validate();
+            jQuery('form[name="loginform-custom"]').validate();
         </script>
         <?php
     }
@@ -737,8 +742,9 @@ class Growtype_Form_Render
                     if ($('.datetimepicker').length > 0) {
                         $('.datetimepicker').each(function () {
                             try {
-                                $.datepicker.parseDate('<?= self::get_date_time_data()["date_format"] ?>', $(this).val());
+                                $.datepicker.parseDate('<?= self::get_date_time_data()["date_format_iso"] ?>', $(this).val());
                             } catch (e) {
+                                $(this).closest('.e-wrapper').find('.error').remove();
                                 $(this).closest('.e-wrapper').append('<label class="error"><?php echo $validation_message['wrong_date_format'] ?></label>');
                                 isValid = false;
                             }
@@ -749,6 +755,12 @@ class Growtype_Form_Render
                      * Stop if is not valid
                      */
                     if (!isValid) {
+                        if ($('.error:visible').length > 0) {
+                            $([document.documentElement, document.body]).animate({
+                                scrollTop: $('.error:visible').last().offset().top - ($(window).height() / 2)
+                            }, 100);
+                        }
+
                         event.preventDefault();
                         return false;
                     }
@@ -863,20 +875,22 @@ class Growtype_Form_Render
                 }
             }
 
-            $growtype_form_image_preload_data = [
-                'preloaded' => json_encode($gallery_images)
+            $growtype_form_gallery = [
+                'images' => json_encode($gallery_images)
             ];
+
+            $_REQUEST['gallery_images'] = $gallery_images;
 
             /**
              * Add gallery data to js
              */
-            wp_localize_script('growtype-form-render', 'growtype_form_image_preload_data', $growtype_form_image_preload_data);
+            wp_localize_script('growtype-form-render', 'growtype_form_gallery', $growtype_form_gallery);
 
             /**
              * Update shipping details
              */
-            if (class_exists('Growtype_Product')) {
-                $shipping_documents = Growtype_Product::shipping_documents();
+            if (class_exists('Growtype_Wc_Product')) {
+                $shipping_documents = Growtype_Wc_Product::shipping_documents();
                 foreach ($shipping_documents as $document) {
                     if (isset($document['key']) && isset($document['url'])) {
                         $_REQUEST['shipping_documents[' . $document['key'] . ']'] = $document;
