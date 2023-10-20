@@ -15,6 +15,7 @@ mix
 
 mix
     .copyDirectory('resources/plugins', 'public/plugins')
+    .copyDirectory('resources/images', 'public/images')
 
 mix
     .sourceMaps()

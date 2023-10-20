@@ -21,16 +21,18 @@ class Growtype_Form_Crud
         'preloaded',
     ];
 
-    const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
+    const INCLUDED_VALUES_IN_VALIDATION = [
+        self::GROWTYPE_FORM_SUBMITTER_ID,
+        self::GROWTYPE_FORM_NAME_IDENTIFICATOR,
+        self::GROWTYPE_FORM_POST_IDENTIFICATOR
+    ];
 
+    const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
     const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
     const GROWTYPE_FORM_POST_IDENTIFICATOR = 'growtype_form_post_id';
     const GROWTYPE_FORM_SPAM_IDENTIFICATOR = 'email_spam';
-
-    const GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS = ['submit', 'preview', 'save_as_draft', 'delete'];
-
+    const GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS = ['submit', 'preview', 'save_as_draft', 'delete', 'update'];
     const GROWTYPE_FORM_SUBMIT_ACTION = 'growtype_form_submit_action';
-
     const EXCLUDED_VALUES_FROM_SAVING = [
         'password',
         'repeat_password',
@@ -54,6 +56,15 @@ class Growtype_Form_Crud
         if (!is_admin()) {
             add_filter('wp_loaded', array ($this, 'growtype_form_process_posted_data'));
         }
+
+        /**
+         * Partials
+         */
+        include_once GROWTYPE_FORM_PATH . 'includes/methods/crud/partials/class-growtype-form-facebook.php';
+        new Growtype_Form_Facebook();
+
+        include_once GROWTYPE_FORM_PATH . 'includes/methods/crud/partials/class-growtype-form-google.php';
+        new Growtype_Form_Google();
     }
 
     /**
@@ -61,6 +72,10 @@ class Growtype_Form_Crud
      */
     function growtype_form_process_posted_data()
     {
+        if (isset($_GET['redirect_after']) && !empty($_GET['redirect_after'])) {
+            setcookie('growtype_form_redirect_after', $_GET['redirect_after'], time() + 20, COOKIEPATH, COOKIE_DOMAIN);
+        }
+
         /**
          * Process posted values
          */
@@ -83,7 +98,6 @@ class Growtype_Form_Crud
                 $redirect_url = growtype_form_redirect_url_after_product_creation();
             } else {
                 $form_name = isset($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]) ? sanitize_text_field($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]) : null;
-                $post_identificator = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
 
                 /**
                  * Check if main values are not empty
@@ -105,6 +119,10 @@ class Growtype_Form_Crud
                 ];
 
                 $redirect_url = $this->process_form_submitted_values($form_name, $submitted_values);
+
+                if (empty($redirect_url)) {
+                    return __("Something went wrong. Please contact administrator.", "growtype-form");
+                }
             }
 
             wp_redirect($redirect_url);
@@ -132,40 +150,41 @@ class Growtype_Form_Crud
          * Validate if submitted values match available values
          */
         $submitted_values_sanitized = $this->sanitize_form_submitted_values($form_data, $submitted_values);
-        $submitted_data = $submitted_values['data'];
 
-        if (!empty($submitted_values_sanitized)) {
+        $submitted_data = $submitted_values_sanitized;
 
+        if (!empty($submitted_data)) {
             $success_message = isset($form_data['success_message']) ? $form_data['success_message'] : '';
+            $submit_action = isset($submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION]) ? $submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION] : 'submit';
 
             if (str_contains($form_name, 'signup')) {
                 $child_user = isset($form_data['child_user']) && $form_data['child_user'] ? true : false;
 
                 $signup_params = [
                     'child_user' => $child_user,
-                    'username_prefix' => $form_data['username_prefix'] ?? null,
+                    'username_prefix' => isset($form_data['username_prefix']) ? $form_data['username_prefix'] : '',
                 ];
 
-                $submit_data = $this->save_submitted_signup_data($submitted_data, $signup_params);
+                $submit_data = $this->save_submitted_signup_data($submitted_data, $signup_params, $submit_action);
 
                 if (isset($submit_data['success']) && $submit_data['success']) {
                     $user_id = $submit_data['user_id'];
                     $user = get_user_by('id', $user_id);
 
                     if ($user) {
-
-                        if (!$child_user) {
-                            wp_set_current_user($user_id, $user->user_login);
-                            wp_set_auth_cookie($user_id);
-                            do_action('wp_login', $user->user_login, $user);
+                        if (!$child_user && !is_user_logged_in()) {
+                            growtype_form_login_user($user_id);
                         }
 
-                        if (!growtype_form_redirect_url_after_signup()) {
-                            error_log('Redirect url is missing. growtype-form');
-                            return __("Something went wrong. Please contact administrator.", "growtype-form");
+                        if (isset($_GET['redirect_after']) && !empty($_GET['redirect_after'])) {
+                            $redirect_url = $_GET['redirect_after'];
+                        } else {
+                            if ($submit_action === 'update') {
+                                $redirect_url = home_url(growtype_form_get_url_path());
+                            } else {
+                                $redirect_url = growtype_form_redirect_url_after_signup();
+                            }
                         }
-
-                        return growtype_form_redirect_url_after_signup();
                     }
                 }
             } elseif (str_contains($form_name, 'wc_product')) {
@@ -285,7 +304,9 @@ class Growtype_Form_Crud
                 }
             }
 
-            setcookie('signup_data', json_encode($return_values), time() + 1, home_url());
+            if (!empty($return_values)) {
+                setcookie('signup_data', json_encode($return_values), time() + 2, home_url());
+            }
         }
 
         /**
@@ -296,15 +317,20 @@ class Growtype_Form_Crud
         /**
          * Redirect url
          */
+        $return_page_path = home_url();
 
-        $current_slug = isset($_SERVER['REQUEST_URI']) ? str_replace('/', '', $_SERVER['REQUEST_URI']) : '';
+        if (isset($_SERVER['REQUEST_URI'])) {
+            $return_page_path = growtype_form_get_url_path();
+        }
 
         /**
          * Current post id
          */
         $post_id = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
 
-        $redirect_url = !empty($post_id) ? get_permalink($post_id) : home_url($current_slug);
+        if (!isset($redirect_url)) {
+            $redirect_url = !empty($post_id) ? get_permalink($post_id) : home_url($return_page_path);
+        }
 
         if ($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION] === 'preview' && class_exists('Growtype_Product')) {
             $redirect_url = Growtype_Wc_Product::edit_permalink($post_id);
@@ -341,6 +367,11 @@ class Growtype_Form_Crud
      */
     public static function get_growtype_form_data($form_name)
     {
+
+        if (empty($form_name)) {
+            return null;
+        }
+
         /**
          * Form Settings
          */
@@ -376,7 +407,7 @@ class Growtype_Form_Crud
      * @param $data
      * @return array
      */
-    public function save_submitted_signup_data($data, $signup_params)
+    public function save_submitted_signup_data($data, $signup_params, $submit_action = 'submit')
     {
         $email = isset($data['email']) ? sanitize_text_field($data['email']) : null;
         $username = isset($data['username']) ? sanitize_text_field($data['username']) : null;
@@ -418,26 +449,103 @@ class Growtype_Form_Crud
         /**
          * Save with unique email. Check if username is provided and email already exists in database.
          */
-        if ($username !== $email && email_exists($email)) {
+        if (!empty($username) && $username !== $email && email_exists($email)) {
             $email_exploded = explode('@', $email);
             $username_formatted = urlencode(str_replace(' ', '', $username));
             $email = $email_exploded[0] . '+' . $username_formatted . '@' . $email_exploded[1];
+            $use_alternative_email = true;
         }
 
-        $user_id = wp_create_user($username, $password, $email);
+        if ($submit_action === 'submit') {
+            $create_user = Growtype_Form_Signup::create_user($username, $password, $email);
+        } elseif ($submit_action === 'update') {
+            $user_id = get_current_user_id();
+
+            if (empty($user_id)) {
+                $response['success'] = false;
+                $response['message'] = __("Please login to update your information.", "growtype-form");
+                return $response;
+            }
+
+            /**
+             * Update email
+             */
+            if (!empty($email)) {
+                $update_user = wp_update_user([
+                    'ID' => $user_id,
+                    'user_email' => $email
+                ]);
+
+                if (is_wp_error($update_user)) {
+                    $response['success'] = false;
+
+                    if (isset($update_user->errors['existing_user_email'])) {
+                        $response['message'] = __("Please use another email.", "growtype-form");
+                    } else {
+                        $response['message'] = __("Something went wrong.", "growtype-form");
+                    }
+
+                    return $response;
+                }
+            }
+
+            /**
+             * Update email
+             */
+            if (!empty($username)) {
+                if (username_exists($username)) {
+                    $user = get_user_by('login', $username);
+                    if ($user->ID !== $user_id) {
+                        $response['success'] = false;
+                        $response['message'] = __("Unfortunately, you cannot use this username.", "growtype-form");
+                        return $response;
+                    }
+                } else {
+                    global $wpdb;
+
+                    $wpdb->update(
+                        $wpdb->users,
+                        ['user_login' => $username],
+                        ['ID' => $user_id]
+                    );
+
+                    if (is_wp_error($update_user)) {
+                        $response['success'] = false;
+
+                        if (isset($update_user->errors['existing_user_email'])) {
+                            $response['message'] = __("Please use another email.", "growtype-form");
+                        } else {
+                            $response['message'] = __("Something went wrong.", "growtype-form");
+                        }
+
+                        return $response;
+                    }
+                }
+            }
+
+            $create_user = [
+                'user_id' => get_current_user_id(),
+                'success' => true
+            ];
+        }
 
         /**
          * Return response
          */
-        if (is_wp_error($user_id)) {
-            $response['success'] = false;
-            $response['message'] = __("Profile already registered.", "growtype-form");
+        if (empty($create_user) || $create_user['success'] === false) {
+            $response['success'] = $create_user['success'];
+            $response['message'] = $create_user['message'];
         } else {
+            $user_id = $create_user['user_id'];
+
+            if (isset($use_alternative_email) && $use_alternative_email) {
+                update_user_meta($user_id, 'use_alternative_email', true);
+            }
 
             /**
              * Save child user parameters
              */
-            if ($signup_params['child_user']) {
+            if (isset($signup_params['child_user']) && $signup_params['child_user']) {
                 /**
                  * Set parent users
                  */
@@ -465,12 +573,16 @@ class Growtype_Form_Crud
                 update_user_meta(get_current_user_id(), 'child_user_ids', $child_user_ids);
             }
 
-            $response = $this->update_user_data($user_id, $data);
+            $response = $this->update_user_meta($user_id, $data);
 
-            apply_filters('growtype_form_update_signup_user_data', $user_id, $data);
+            apply_filters('growtype_form_update_signup_user_data', $user_id, $data, $submit_action);
 
             if ($response['success']) {
                 $response['message'] = __("Sign up successful.", "growtype-form");
+
+                if ($submit_action === 'update') {
+                    $response['message'] = __("The information was successfully updated.", "growtype-form");
+                }
             } else {
                 $response['message'] = __("Something went wrong.", "growtype-form");
             }
@@ -511,7 +623,11 @@ class Growtype_Form_Crud
         $submitted_data = array_merge($submitted_values['data'], $submitted_values['files']);
         $submitted_values_sanitized = [];
         $submitted_values_notsanitized = [];
+
         foreach ($submitted_data as $key => $value) {
+            /**
+             * Exlude certain values
+             */
             if (in_array($key, self::EXCLUDED_VALUES_FROM_VALIDATION)) {
                 continue;
             }
@@ -529,6 +645,21 @@ class Growtype_Form_Crud
             }
 
             $submitted_values_sanitized[$key] = $value;
+        }
+
+        /**
+         * Set confirmation fields values
+         */
+        foreach ($form_data['confirmation_fields'] as $field) {
+            if (isset($submitted_values_sanitized[$field['name']])) {
+                if ($field['type'] === 'checkbox') {
+                    $submitted_values_sanitized[$field['name']] = 'true';
+                }
+            } else {
+                if ($field['type'] === 'checkbox') {
+                    $submitted_values_sanitized[$field['name']] = 'false';
+                }
+            }
         }
 
         /**
@@ -557,6 +688,15 @@ class Growtype_Form_Crud
             }
         }
 
+        /**
+         * Extra values included in validation
+         */
+        foreach (self::INCLUDED_VALUES_IN_VALIDATION as $value) {
+            if (isset($submitted_values['data'][$value]) && !isset($submitted_values_sanitized[$value])) {
+                $submitted_values_sanitized[$value] = $submitted_values['data'][$value];
+            }
+        }
+
         return $submitted_values_sanitized;
     }
 
@@ -564,13 +704,13 @@ class Growtype_Form_Crud
      * @param $data
      * @return array
      */
-    function update_user_data($user_id, $data)
+    public function update_user_meta($user_id, $data)
     {
         /**
          * Save extra values
          */
         foreach ($data as $key => $value) {
-            if ((!is_array($value) && str_contains($value, 'password')) || empty($value) || in_array($key, self::EXCLUDED_VALUES_FROM_SAVING)) {
+            if (in_array($key, self::EXCLUDED_VALUES_FROM_SAVING)) {
                 continue;
             }
 
@@ -640,7 +780,6 @@ class Growtype_Form_Crud
         $status['success'] = true;
 
         if (!empty($password)) {
-
             $allow_simple_password = get_option('growtype_form_allow_simple_password');
 
             if ($allow_simple_password) {

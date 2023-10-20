@@ -1,7 +1,6 @@
 <?php if (isset($field_options) && !empty($field_options)) { ?>
     <div class="form-check-wrapper" aria-required="true">
-        <?php
-        foreach ($field_options as $field_option) { ?>
+        <?php foreach ($field_options as $field_option) { ?>
             <div class="form-check">
                 <input type="<?php echo $field_type ?>"
                        class="form-check-input"
@@ -29,13 +28,12 @@
                placeholder="<?php echo $placeholder ?>"
             <?php echo $field_required ? 'required' : '' ?>
                value="<?php echo $field_value ?>"
+            <?php echo in_array('true', $selected_options) ? 'checked' : '' ?>
         >
-        <?php
-        if (!empty($field_label)) { ?>
+        <?php if (!empty($field_label)) { ?>
             <label for="<?php echo $field_name ?>" class="form-label">
                 <?php echo $field_label ?>
             </label>
-        <?php }
-        ?>
+        <?php } ?>
     </div>
 <?php }

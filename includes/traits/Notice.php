@@ -8,19 +8,26 @@ trait Notice
     /**
      * @return void
      */
-    public function growtype_form_set_notice($message, $status)
+    public function growtype_form_set_notice($message, $status, $time = null)
     {
-        setcookie('notice_message', $message, time() + 1);
-        setcookie('notice_status', $status, time() + 1);
+        $time = !empty($time) ? $time : time() + 5;
+
+        if (!empty($message)) {
+            setcookie('growtype_form_notice_message', $message, $time, COOKIEPATH, COOKIE_DOMAIN);
+        }
+
+        if (!empty($status)) {
+            setcookie('growtype_form_notice_status', $status, $time, COOKIEPATH, COOKIE_DOMAIN);
+        }
     }
 
     /**
      * @return void
      */
-    public function growtype_form_get_notice()
+    public static function growtype_form_get_notice()
     {
-        $message = isset($_COOKIE['notice_message']) ? $_COOKIE['notice_message'] : null;
-        $status = isset($_COOKIE['notice_status']) ? $_COOKIE['notice_status'] : null;
+        $message = isset($_COOKIE['growtype_form_notice_message']) ? $_COOKIE['growtype_form_notice_message'] : null;
+        $status = isset($_COOKIE['growtype_form_notice_status']) ? $_COOKIE['growtype_form_notice_status'] : null;
 
         if (!empty($status) && !empty($message)) { ?>
             <div id="growtype-form-alert" class="alert alert-dismissible fade show <?= $status === 'success' ? 'alert-success' : 'alert-danger' ?>" role="alert">
@@ -44,10 +51,10 @@ trait Notice
             </script>
         <?php }
 
-        unset($_COOKIE['notice_message']);
-        setcookie('notice_message', '', time() - (15 * 60));
+        unset($_COOKIE['growtype_form_notice_message']);
+        setcookie('notice_message', '', time());
 
-        unset($_COOKIE['notice_status']);
-        setcookie('notice_status', '', time() - (15 * 60));
+        unset($_COOKIE['growtype_form_notice_status']);
+        setcookie('notice_status', '', time());
     }
 }

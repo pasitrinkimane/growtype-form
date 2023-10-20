@@ -18,7 +18,7 @@ function growtype_form_signup_page_is_active()
     if (isset($_SERVER['REQUEST_URI']) && $page_ID === 'default') {
         $current_url_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
 
-        return strtok($current_url_slug, '?') === Growtype_Form_Signup::CUSTOM_SLUG;
+        return strtok($current_url_slug, '?') === Growtype_Form_Signup::URL_PATH;
     }
 
     $post = get_post($page_ID);
@@ -30,13 +30,37 @@ function growtype_form_signup_page_is_active()
  * @return false|string|WP_Error|null
  * Custom signup url
  */
-function growtype_form_signup_page_url()
+function growtype_form_signup_page_url($query_vars = [])
 {
+    $url = !empty(growtype_form_signup_page_ID()) ? get_permalink(growtype_form_signup_page_ID()) : null;
+
     if (!empty(growtype_form_signup_page_ID()) && growtype_form_signup_page_ID() === 'default') {
-        return home_url(Growtype_Form_Signup::CUSTOM_SLUG);
+        $url = home_url(Growtype_Form_Signup::URL_PATH);
     }
 
-    return !empty(growtype_form_signup_page_ID()) ? get_permalink(growtype_form_signup_page_ID()) : null;
+    if (!empty($query_vars)) {
+        $url .= '?' . http_build_query($query_vars);
+    }
+
+    return $url;
+}
+
+/**
+ * @return false|string|WP_Error|null
+ * Custom signup url
+ */
+function growtype_form_profile_page_url()
+{
+    return home_url(Growtype_Form_Profile::URL_PATH);
+}
+
+/**
+ * @return false|string|WP_Error|null
+ * Custom signup url
+ */
+function growtype_form_profile_settings_page_url()
+{
+    return home_url(Growtype_Form_Profile_Settings::URL_PATH);
 }
 
 /**
@@ -51,21 +75,27 @@ function growtype_form_redirect_after_signup_page()
  * @return false|string|WP_Error|null
  * Custom lost password url
  */
-function growtype_form_redirect_url_after_signup()
-{
-    $redirect_page = growtype_form_redirect_after_signup_page();
+if (!function_exists('growtype_form_redirect_url_after_signup')) {
+    function growtype_form_redirect_url_after_signup()
+    {
+        $redirect_page = growtype_form_redirect_after_signup_page();
 
-    if (isset($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], 'wp/wp-login')) {
-        $redirect_url = get_dashboard_url();
-    } elseif ($redirect_page === 'dashboard') {
-        $redirect_url = get_dashboard_url();
-    } elseif ($redirect_page === 'default-profile') {
-        $redirect_url = home_url(Growtype_Form_Profile::URL_SLUG);
-    } elseif ($redirect_page === 'none') {
-        $redirect_url = home_url(Growtype_Form_Profile::URL_SLUG);
-    } else {
-        $redirect_url = get_permalink($redirect_page);
+        if (isset($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], 'wp/wp-login')) {
+            $redirect_url = get_dashboard_url();
+        } elseif ($redirect_page === 'dashboard') {
+            $redirect_url = get_dashboard_url();
+        } elseif ($redirect_page === 'default-profile') {
+            $redirect_url = growtype_form_profile_page_url();
+        } elseif ($redirect_page === 'none') {
+            $redirect_url = growtype_form_profile_page_url();
+        } else {
+            $redirect_url = get_permalink($redirect_page);
+        }
+
+        if (empty($redirect_url) || !$redirect_url) {
+            error_log('Redirect url is missing. Growtype-form');
+        }
+
+        return $redirect_url;
     }
-
-    return $redirect_url;
 }

@@ -1,25 +1,23 @@
 <?php
-
 $field = apply_filters('growtype_form_field', $field);
 
 $field_name = $field['name'] ?? false;
 $field_required = isset($field['required']) && $field['required'] === 'true' ? true : false;
 $field_multiple = isset($field['multiple']) && $field['multiple'] === 'true' ? true : false;
-$field_type = $field['type'];
+$field_type = isset($field['type']) ? $field['type'] : 'text';
 $field_hidden = $field['hidden'] ?? false;
 
 if ($field_type === 'hidden') {
     $field_hidden = true;
 }
 
-$field_value = isset($field['value']) ? sanitize_text_field($field['value']) : null;
+$field_value = isset($field['value']) ? sanitize_text_field($field['value']) : '';
+
+$request_field_value = isset($_REQUEST[$field_name]) ? $_REQUEST[$field_name] : '';
+$request_field_value = $field_name === 'name' && isset($_REQUEST[Growtype_Form_Crud::ALTERNATIVE_SUBMITTED_DATA_KEYS[$field_name]]) ? $_REQUEST[Growtype_Form_Crud::ALTERNATIVE_SUBMITTED_DATA_KEYS[$field_name]] : $request_field_value;
 
 if (empty($field_value)) {
-    $field_value = isset($_REQUEST[$field_name]) && $field_type !== 'file' ? sanitize_text_field($_REQUEST[$field_name]) : $_REQUEST[$field_name] ?? null;
-}
-
-if ($field_name === 'name') {
-    $field_value = $_REQUEST[Growtype_Form_Crud::ALTERNATIVE_SUBMITTED_DATA_KEYS[$field_name]] ?? null;
+    $field_value = !empty($request_field_value) && $field_type !== 'file' ? sanitize_text_field($request_field_value) : '';
 }
 
 if (str_contains($field_name, 'password')) {
@@ -27,13 +25,12 @@ if (str_contains($field_name, 'password')) {
 }
 
 $field_options = isset($field['options']) ? $field['options'] : [];
-
-$selected_options = isset($field['selected_options']) ? $field['selected_options'] : [];
+$selected_options = isset($field['selected_options']) ? $field['selected_options'] : [$field_value];
 $select_type = isset($field['select_type']) ? $field['select_type'] : null;
-
 $field_label = isset($field['label']) ? $field['label'] : null;
 $field_label = !empty($field_label) && $field_required && !str_contains($field_label, '*') ? $field_label . '<span class="required">*</span>' : $field_label;
 $field_description = isset($field['description']) ? $field['description'] : null;
+$field_explanation = isset($field['explanation']) ? $field['explanation'] : null;
 $placeholder = isset($field['placeholder']) ? $field['placeholder'] : null;
 $field_accept = isset($field['accept']) ? $field['accept'] : null;
 $field_cta_text = isset($field['cta_text']) ? $field['cta_text'] : null;
@@ -51,7 +48,7 @@ $field_icon = isset($field['icon']) ? $field['icon'] : null;
 $field_price = isset($field['price']) ? $field['price'] : null;
 $field_group = isset($field['group']) ? $field['group'] : null; // inputs can be grouped together
 $field_autocomplete = isset($field['autocomplete']) && $field['autocomplete'] === 'true' ? 'on' : 'off';
-$conditions = isset($field['conditions']) ? json_encode($field['conditions']) : null;
+$conditions = isset($field['conditions']) && !empty($field['conditions']) ? json_encode($field['conditions']) : '';
 
 if (!in_array($field_type, Growtype_Form_Render::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {
     return null;
@@ -96,7 +93,7 @@ $block_cat_types = ['repeater', 'custom', 'shortcode', 'checkbox'];
 ?>
 
 <div class="<?= in_array($field_type, $block_cat_types) ? 'b-wrapper' : 'e-wrapper'; ?> <?= $field_col_class ?>"
-     style="<?= $field_hidden || !empty($conditions) ? 'display:none;' : '' ?>"
+     style="<?= $field_hidden ? 'display:none;' : '' ?>"
      data-name="<?= $field_name ?>"
      data-label="<?= !empty($field_label) ? 'true' : 'false' ?>"
      data-group="<?= $field_group ?>"
@@ -115,11 +112,10 @@ $block_cat_types = ['repeater', 'custom', 'shortcode', 'checkbox'];
     <?php } ?>
 
     <?php if (!empty($field_description) && $field_type !== 'custom') { ?>
-        <p class="form-description"><?= $field_description ?></p>
+        <p class="field-description"><?= $field_description ?></p>
     <?php } ?>
 
-    <?php
-    if ($field_type === 'select') {
+    <?php if ($field_type === 'select') {
         include 'fields/select.php';
     } elseif ($field_type === 'radio') {
         include 'fields/radio.php';
@@ -138,4 +134,8 @@ $block_cat_types = ['repeater', 'custom', 'shortcode', 'checkbox'];
     } else {
         include 'fields/general.php';
     } ?>
+
+    <?php if (!empty($field_explanation)) { ?>
+        <p class="field-explanation"><?= $field_explanation ?></p>
+    <?php } ?>
 </div>

@@ -1,0 +1,416 @@
+{
+  "signup": {
+    "header": {
+      "top": {
+        "title": "[:en]Sign up[:lt]Registracija[:]"
+      }
+    },
+    "footer": {
+      "top": {
+        "title": "[:en]Signup[:lt]Registracija[:]",
+        "back_btn": {
+          "url": "$login_page_url"
+        }
+      }
+    },
+    "recaptcha": [],
+    "submit_row": {
+      "class": "pt-2",
+      "cta": [
+        {
+          "type": "submit",
+          "label": "[:en]Continue[:lt]Registruotis[:]"
+        }
+      ]
+    },
+    "main_fields": [
+      {
+        "type": "select",
+        "name": "occupation",
+        "label": "[:en]Email[:lt]Kategorija[:]",
+        "placeholder": "[:en]Enter your email[:lt]Pasirinkite kategoriją[:]",
+        "required": "true",
+        "class": "col-12",
+        "options": [
+          {
+            "value": "teisinį_išsilavinimą_turintys_ar_teisę_studijuojantys_asmenys",
+            "label": "[:lt]Teisinį išsilavinimą turintys ar teisę studijuojantys asmenys[:]"
+          },
+          {
+            "value": "moksleivis",
+            "label": "[:lt]Moksleivis[:]"
+          },
+          {
+            "value": "moksleivis_(registracija_mokymo_įstaigos_atstovui)",
+            "label": "[:lt]Moksleivis (registracija mokymo įstaigos atstovui)[:]"
+          },
+          {
+            "value": "kiti",
+            "label": "[:lt]Kiti[:]"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "name": "gradegroup",
+        "label": "[:en]Email[:lt]Klasė[:]",
+        "placeholder": "[:en]Enter your email[:lt]Pasirinkite klasę[:]",
+        "required": "true",
+        "class": "col-12",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "moksleivis",
+            "target": "gradegroup"
+          },
+          {
+            "name": "occupation",
+            "value": "moksleivis_(registracija_mokymo_įstaigos_atstovui)",
+            "target": "gradegroup"
+          }
+        ],
+        "options": [
+          {
+            "value": "5-6_kl.",
+            "label": "[:lt]5-6 kl.[:]"
+          },
+          {
+            "value": "7-8_kl.",
+            "label": "[:lt]7-8 kl.[:]"
+          },
+          {
+            "value": "9-10_kl.",
+            "label": "[:lt]9-10 kl.[:]"
+          },
+          {
+            "value": "11-12_kl.",
+            "label": "[:lt]11-12_kl.[:]"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "name": "school",
+        "label": "[:en]Email[:lt]Mokymo įstaiga[:]",
+        "placeholder": "[:en]Enter your email[:lt]Pasirinkite mokyklą[:]",
+        "required": "true",
+        "class": "col-12",
+        "options": [],
+        "explanation": "Neradus reikalingos mokyklos, ją galima įrašyti rankiniu būdu",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "moksleivis",
+            "target": "school"
+          },
+          {
+            "name": "occupation",
+            "value": "moksleivis_(registracija_mokymo_įstaigos_atstovui)",
+            "target": "school"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "representative",
+        "label": "[:en]Email[:lt]Mokyklos atstovo vardas pavardė[:]",
+        "placeholder": "[:en]Enter your email[:lt][:]",
+        "required": "true",
+        "class": "col-12",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "moksleivis_(registracija_mokymo_įstaigos_atstovui)",
+            "target": "representative"
+          }
+        ]
+      },
+      {
+        "type": "email",
+        "name": "representative_email",
+        "label": "[:en]Email[:lt]Mokyklos atstovo el. paštas[:]",
+        "placeholder": "[:en]Enter your email[:lt][:]",
+        "required": "true",
+        "class": "col-12",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "moksleivis_(registracija_mokymo_įstaigos_atstovui)",
+            "target": "representative_email"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "first_and_last_name",
+        "label": "[:en]Email[:lt]Vardas pavardė[:]",
+        "placeholder": "[:en]Enter your email[:lt][:]",
+        "required": "true",
+        "class": "col-12",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "",
+            "target": "first_and_last_name"
+          },
+          {
+            "name": "occupation",
+            "value": "teisinį_išsilavinimą_turintys_ar_teisę_studijuojantys_asmenys",
+            "target": "first_and_last_name"
+          },
+          {
+            "name": "occupation",
+            "value": "moksleivis",
+            "target": "first_and_last_name",
+            "condition": "replace",
+            "label": "[:en]Enter your email[:lt]Mokytojo ar vieno iš tėvų/globėjų vardas pavardė[:]"
+          },
+          {
+            "name": "occupation",
+            "value": "kiti",
+            "target": "first_and_last_name",
+            "condition": "replace",
+            "label": "[:en]Enter your email[:lt]Vardas pavardė[:]"
+          }
+        ]
+      },
+      {
+        "type": "email",
+        "name": "email",
+        "label": "[:en]Email[:lt]El. paštas[:]",
+        "placeholder": "[:en]Enter your email[:lt][:]",
+        "required": "true",
+        "class": "col-12",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "",
+            "target": "email",
+            "condition": "replace",
+            "label": "[:en]Enter your email[:lt]El. paštas[:]"
+          },
+          {
+            "name": "occupation",
+            "value": "teisinį_išsilavinimą_turintys_ar_teisę_studijuojantys_asmenys",
+            "target": "email",
+            "condition": "replace",
+            "label": "[:en]Enter your email[:lt]El. paštas[:]"
+          },
+          {
+            "name": "occupation",
+            "value": "moksleivis",
+            "target": "email",
+            "condition": "replace",
+            "label": "[:en]Enter your email[:lt]Mokytojo ar vieno iš tėvų/globėjų el. paštas[:]"
+          },
+          {
+            "name": "occupation",
+            "value": "moksleivis_(registracija_mokymo_įstaigos_atstovui)",
+            "target": "email",
+            "condition": "replace",
+            "label": "[:en]Enter your email[:lt]Moksleivio el. paštas[:]"
+          },
+          {
+            "name": "occupation",
+            "value": "kiti",
+            "target": "email",
+            "condition": "replace",
+            "label": "[:en]Enter your email[:lt]El. paštas[:]"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "phone",
+        "label": "[:en]Email[:lt]Telefonas[:]",
+        "placeholder": "[:en]Enter your email[:lt][:]",
+        "required": "true",
+        "class": "col-12",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "",
+            "target": "phone"
+          },
+          {
+            "name": "occupation",
+            "value": "teisinį_išsilavinimą_turintys_ar_teisę_studijuojantys_asmenys",
+            "target": "phone"
+          },
+          {
+            "name": "occupation",
+            "value": "moksleivis",
+            "target": "phone",
+            "condition": "replace",
+            "label": "[:en]Enter your email[:lt]Mokytojo ar vieno iš tėvų/globėjų telefonas[:]"
+          },
+          {
+            "name": "occupation",
+            "value": "kiti",
+            "target": "phone"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "birthday",
+        "label": "[:en]Email[:lt]Gimimo metai[:]",
+        "placeholder": "[:en]Enter your email[:lt][:]",
+        "required": "true",
+        "class": "col-12",
+        "date": true,
+        "conditions": [
+          {
+            "name": "oldest_member_checkbox",
+            "value": "checked",
+            "target": "birthday"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "name": "country",
+        "label": "[:en]Email[:lt]Gyvenamoji vieta[:]",
+        "placeholder": "[:en]Enter your email[:lt]Pasirinkite gyvenamąją vietą[:]",
+        "required": "true",
+        "class": "col-12",
+        "options": [
+          {
+            "value": "gyvenu_lietuvoje",
+            "label": "[:lt]Gyvenu Lietuvoje[:]"
+          },
+          {
+            "value": "gyvenu_užsienyje",
+            "label": "[:lt]Gyvenu užsienyje[:]"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "child_first_and_last_name",
+        "label": "[:en]Email[:lt]Registruojamo moksleivio vardas pavardė[:]",
+        "placeholder": "[:en]Enter your email[:lt][:]",
+        "required": "true",
+        "class": "col-12",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "moksleivis",
+            "target": "child_first_and_last_name"
+          },
+          {
+            "name": "occupation",
+            "value": "moksleivis_(registracija_mokymo_įstaigos_atstovui)",
+            "target": "child_first_and_last_name"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "name": "username",
+        "label": "[:en]Email[:lt]Vartotojo vardas[:]",
+        "placeholder": "[:en]Enter your email[:lt][:]",
+        "required": "true",
+        "class": "col-12",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "moksleivis",
+            "target": "username"
+          },
+          {
+            "name": "occupation",
+            "value": "moksleivis_(registracija_mokymo_įstaigos_atstovui)",
+            "target": "username",
+            "condition": "replace",
+            "label": "[:en]Enter your email[:lt]Vartotojo (vaiko) vardas[:]"
+          }
+        ]
+      },
+      {
+        "type": "password",
+        "name": "password",
+        "label": "[:en]Password[:lt]Slaptažodis[:]",
+        "placeholder": "[:en]Enter your password[:lt][:]",
+        "required": "true",
+        "class": "col-12"
+      },
+      {
+        "type": "password",
+        "name": "repeat_password",
+        "label": "[:en]Confirm password[:lt]Pakartokite slaptažodį[:]",
+        "placeholder": "[:en]Confirm your password[:lt][:]",
+        "required": "true",
+        "class": "col-12"
+      }
+    ],
+    "confirmation_fields": [
+      {
+        "type": "checkbox",
+        "name": "terms_checkbox",
+        "label": "[:en]I agree with <a href='#' data-bs-toggle='modal' data-bs-target='#termsModal'>terms & conditions</a>[:lt]Susipažinau su <a href='/privatumo-politika' target='_blank' rel='noopener'>privatumo taisyklėmis</a>[:]",
+        "required": "true",
+        "class": "col-12"
+      },
+      {
+        "type": "checkbox",
+        "name": "promo_checkbox",
+        "label": "[:en]I agree with <a href='#' data-bs-toggle='modal' data-bs-target='#termsModal'>terms & conditions</a>[:lt]Sutinku el.paštu gauti pranešimus apie Konstitucijos egzaminą[:]",
+        "required": "false",
+        "class": "col-12"
+      },
+      {
+        "type": "checkbox",
+        "name": "representative_checkbox",
+        "label": "[:en]I agree with <a href='#' data-bs-toggle='modal' data-bs-target='#termsModal'>terms & conditions</a>[:lt]Patvirtinu, kad turiu vieno iš tėvų / globėjų sutikimą registruoti vaiką į Konstitucijos egzaminą[:]",
+        "required": "true",
+        "class": "col-12",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "moksleivis_(registracija_mokymo_įstaigos_atstovui)",
+            "target": "representative_checkbox"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "name": "confirm_checkbox",
+        "label": "[:en]I agree with <a href='#' data-bs-toggle='modal' data-bs-target='#termsModal'>terms & conditions</a>[:lt]Sutinku, kad mano užregistruotas vaikas dalyvautų Konstitucijos egzamine[:]",
+        "required": "true",
+        "class": "col-12",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "moksleivis",
+            "target": "confirm_checkbox"
+          },
+          {
+            "name": "occupation",
+            "value": "moksleivis_(registracija_mokymo_įstaigos_atstovui)",
+            "target": "confirm_checkbox"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "name": "oldest_member_checkbox",
+        "label": "[:en]I agree with <a href='#' data-bs-toggle='modal' data-bs-target='#termsModal'>terms & conditions</a>[:lt]Sutinku dalyvauti vyriausio dalyvio kategorijoje[:]",
+        "required": "false",
+        "class": "col-12",
+        "conditions": [
+          {
+            "name": "occupation",
+            "value": "teisinį_išsilavinimą_turintys_ar_teisę_studijuojantys_asmenys",
+            "target": "representative_checkbox"
+          },
+          {
+            "name": "occupation",
+            "value": "kiti",
+            "target": "representative_checkbox"
+          }
+        ]
+      }
+    ]
+  }
+}

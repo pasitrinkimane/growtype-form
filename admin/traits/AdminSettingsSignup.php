@@ -80,7 +80,7 @@ trait AdminSettingsSignup
 
         add_settings_field(
             'growtype_form_active_user_role',
-            '<span style="color: orange;">Active User Role</span>',
+            '<span style="color: orange;">Active User Role (when user requires validation)</span>',
             array ($this, 'growtype_form_active_user_role_callback'),
             'growtype-form-settings',
             'growtype_form_settings_signup'
@@ -249,7 +249,7 @@ trait AdminSettingsSignup
         $pages = get_pages();
         ?>
         <select name='growtype_form_signup_page'>
-            <option value='none' <?php selected($selected, 'none'); ?>>None - Growtype Form</option>
+            <option value='none' <?php selected($selected, 'none'); ?>>None</option>
             <option value='default' <?php selected($selected, 'default'); ?>>Default - Growtype Form</option>
             <?php
             foreach ($pages as $page) { ?>
@@ -268,7 +268,7 @@ trait AdminSettingsSignup
         $pages = get_pages();
         ?>
         <select name='growtype_form_signup_terms_page'>
-            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <option value='none' <?php selected($selected, 'none'); ?>>None</option>
             <?php
             foreach ($pages as $page) { ?>
                 <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>
@@ -286,7 +286,7 @@ trait AdminSettingsSignup
         $pages = get_pages();
         ?>
         <select name='growtype_form_signup_privacy_page'>
-            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <option value='none' <?php selected($selected, 'none'); ?>>None</option>
             <?php
             foreach ($pages as $page) { ?>
                 <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>
@@ -321,7 +321,7 @@ trait AdminSettingsSignup
         $pages = get_pages();
         ?>
         <select name='growtype_form_redirect_after_signup_page'>
-            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <option value='none' <?php selected($selected, 'none'); ?>>None</option>
             <option value='default-profile' <?php selected($selected, 'default-profile'); ?>>Default profile page - Growtype Form</option>
             <?php
             foreach ($pages as $page) { ?>
@@ -338,7 +338,8 @@ trait AdminSettingsSignup
     {
         global $wp_roles;
 
-        $selected = get_option('growtype_form_default_user_role');
+        $selected = get_option('growtype_form_default_user_role', 'subscriber');
+        $selected = !empty($selected) ? $selected : get_option('default_role');
         $roles = $wp_roles->roles;
         ?>
         <select name='growtype_form_default_user_role'>
@@ -357,7 +358,8 @@ trait AdminSettingsSignup
     {
         global $wp_roles;
 
-        $selected = get_option('growtype_form_active_user_role');
+        $selected = get_option('growtype_form_active_user_role', 'subscriber');
+        $selected = !empty($selected) ? $selected : get_option('default_role');
         $roles = $wp_roles->roles;
         ?>
         <select name='growtype_form_active_user_role'>
@@ -411,7 +413,7 @@ trait AdminSettingsSignup
         $pages = get_pages();
         ?>
         <select name='growtype_form_account_verification_platform_page'>
-            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <option value='none' <?php selected($selected, 'none'); ?>>None</option>
             <?php
             foreach ($pages as $page) { ?>
                 <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>

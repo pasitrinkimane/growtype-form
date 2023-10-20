@@ -130,7 +130,7 @@ trait AdminSettingsLogin
         $pages = get_pages();
         ?>
         <select name='growtype_form_login_page'>
-            <option value='none' <?php selected($selected, 'none'); ?>>None - Growtype form</option>
+            <option value='none' <?php selected($selected, 'none'); ?>>None</option>
             <option value='default' <?php selected($selected, 'default'); ?>>Default - Growtype form</option>
             <?php
             foreach ($pages as $page) { ?>
@@ -166,7 +166,7 @@ trait AdminSettingsLogin
         $pages = get_pages();
         ?>
         <select name='growtype_form_redirect_after_login_page'>
-            <option value='none' <?php selected($selected, 'none'); ?>>None - Growtype Form</option>
+            <option value='none' <?php selected($selected, 'none'); ?>>None</option>
             <option value='default-profile' <?php selected($selected, 'default-profile'); ?>>Default profile page - Growtype Form</option>
             <option value='dashboard' <?php selected($selected, 'dashboard'); ?>>Dashboard</option>
             <?php

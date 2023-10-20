@@ -205,7 +205,7 @@ trait AdminSettingsWoocommercePlugin
         $pages = get_pages();
         ?>
         <select name='growtype_form_product_upload_page'>
-            <option value='none' <?php selected($selected, 'none'); ?>>none</option>
+            <option value='none' <?php selected($selected, 'none'); ?>>None</option>
             <?php
             foreach ($pages as $page) { ?>
                 <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>

@@ -1,0 +1,76 @@
+{
+  "login": {
+    "logo": {
+      "url": "$logo_url",
+      "width": "100px",
+      "height": "100px",
+      "external_url": "$login_page_url"
+    },
+    "header": {
+      "top": {
+        "title": "[:en]Login[:lt]Prisijungti[:]",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>[:en]Do not have an account?[:lt]Neturite paskyros?[:]</p><a class='btn btn-link' href='$register_page_url'>[:en]Register[:lt]Registruotis[:]</a>"
+      },
+      "nav": [
+        {
+          "label": "[:en]Login[:lt]Prisijungti[:]",
+          "url": "$login_page_url",
+          "class": "is-active"
+        },
+        {
+          "label": "[:en]Register[:lt]Registruotis[:]",
+          "url": "$register_page_url",
+          "class": ""
+        }
+      ],
+      "bottom": {
+        "title": "[:en]Login[:lt]Prisijungti[:]",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>[:en]Do not have an account?[:lt]Neturite paskyros?[:]</p><a class='btn btn-link' href='$register_page_url'>[:en]Register[:lt]Registruotis[:]</a>"
+      }
+    },
+    "footer": {
+      "top": {
+        "title": "[:en]Sign up[:lt]Registracija[:]",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>[:en]Do not have an account?[:lt]Neturite paskyros?[:]</p><a class='btn btn-link' href='$register_page_url'>[:en]Register[:lt]Registruotis[:]</a>"
+      },
+      "nav": [
+        {
+          "label": "Facebook",
+          "url": "$login_page_url"
+        },
+        {
+          "label": "Google",
+          "url": "$login_page_url"
+        }
+      ],
+      "bottom": {
+        "title": "[:en]Sign up[:lt]Registracija[:]",
+        "back_btn": {
+          "url": "$login_page_url"
+        },
+        "html": "<p>[:en]Do not have an account?[:lt]Neturite paskyros?[:]</p><a class='btn btn-link' href='$register_page_url'>[:en]Register[:lt]Registruotis[:]</a>"
+      }
+    },
+    "form": {
+      "redirect": "",
+      "id": "loginform-custom",
+      "label_username": "[:en]Username[:lt]Vartotojo vardas[:]",
+      "label_remember": "[:en]Remember Me[:lt]Prisiminti[:]",
+      "label_password": "[:en]Password[:lt]Slaptažodis[:]",
+      "label_log_in": "[:en]Continue[:lt]Tęsti[:]",
+      "remember_login": true,
+      "username_placeholder": "[:en]Your email[:lt]Jūsų el. paštas[:]",
+      "password_placeholder": "[:en]Your password[:lt]Jūsų slaptažodis[:]",
+      "lost_password_btn": true
+    }
+  }
+}

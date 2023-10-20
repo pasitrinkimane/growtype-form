@@ -5,21 +5,66 @@
  * @return false|mixed|string|WP_Error|null
  * Custom url
  */
-function growtype_form_string_replace_custom_variable($url)
-{
-    $url_variables = [
-        '$login_page_url' => growtype_form_login_page_url(),
-        '$register_page_url' => growtype_form_signup_page_url(),
-        '$logo_url' => function_exists('growtype_get_login_logo') && growtype_get_login_logo()['url'] ?? ''
-    ];
+if (!function_exists('growtype_form_string_replace_custom_variable')) {
+    function growtype_form_string_replace_custom_variable($string)
+    {
+        global $wp;
 
-    foreach ($url_variables as $key => $variable) {
-        if (strpos($url, $key) > -1) {
-            $url = str_replace($key, $variable, $url);
+        $variables = [
+            '$login_page_url',
+            '$register_page_url',
+            '$logo_url',
+            '$btn_facebook_login',
+            '$btn_google_login',
+            '$home_url',
+        ];
+
+        $variable_to_replace = '';
+        foreach ($variables as $variable) {
+            if (strpos($string, $variable) !== false) {
+                $variable_to_replace = $variable;
+                break;
+            }
         }
-    }
 
-    return $url;
+        if (!empty($variable_to_replace)) {
+
+            $query_args = [];
+
+            if (isset($_SERVER['HTTPS']) && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI'])) {
+                $full_url = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+                $parts = parse_url($full_url);
+                $query_args = isset($parts['query']) ? parse_str($parts['query'], $query_args) : [];
+            }
+
+            switch ($variable_to_replace) {
+                case '$login_page_url':
+                    $replace = growtype_form_login_page_url($query_args);
+                    break;
+                case '$register_page_url':
+                    $replace = growtype_form_signup_page_url($query_args);
+                    break;
+                case '$logo_url':
+                    $replace = isset(growtype_get_login_logo()['url']) ? growtype_get_login_logo()['url'] : '';
+                    break;
+                case '$btn_facebook_login':
+                    $replace = growtype_form_facebook_login_btn();
+                    break;
+                case '$btn_google_login':
+                    $replace = growtype_form_google_login_btn();
+                    break;
+                case '$home_url':
+                    $replace = home_url();
+                    break;
+            }
+
+            if (isset($replace) && !empty($replace)) {
+                $string = str_replace($variable_to_replace, $replace, $string);
+            }
+        }
+
+        return $string;
+    }
 }
 
 /**
@@ -77,4 +122,59 @@ function growtype_form_extract_form_args($form)
             'remember' => $remember
         ]
     ];
+}
+
+/**
+ * @param $form_args
+ * @return mixed|null
+ */
+function growtype_form_fill_form_args_with_existing_data($form_args)
+{
+    $user_main_fields = Growtype_Form_Signup::get_signup_data(get_current_user_id());
+
+    if (isset($form_args['main_fields'])) {
+        foreach ($form_args['main_fields'] as $key => $field) {
+            if (isset($form_args['main_fields'][$key]) && isset($user_main_fields[$field['name']])) {
+                if ($field['type'] === 'select') {
+                    $form_args['main_fields'][$key]['selected_options'] = [$user_main_fields[$field['name']]['value']];
+                } else {
+                    $form_args['main_fields'][$key]['value'] = $user_main_fields[$field['name']]['value'];
+                }
+            }
+        }
+    }
+
+    if (isset($form_args['confirmation_fields'])) {
+        foreach ($form_args['confirmation_fields'] as $key => $field) {
+            if (isset($form_args['confirmation_fields'][$key]) && isset($user_main_fields[$field['name']])) {
+                $form_args['confirmation_fields'][$key]['selected_options'] = [$user_main_fields[$field['name']]['value']];
+            }
+        }
+    }
+
+    return apply_filters('growtype_form_fill_form_args_with_existing_data', $form_args);
+}
+
+/**
+ * @param $form_name
+ * @param $form_field
+ * @return mixed|null
+ */
+function growtype_form_get_form_field($form_name, $form_field)
+{
+    $form_data = Growtype_Form_Crud::get_growtype_form_data($form_name);
+
+    foreach ($form_data['main_fields'] as $field) {
+        if ($field['name'] === $form_field) {
+            return $field;
+        }
+    }
+
+    foreach ($form_data['confirmation_fields'] as $field) {
+        if ($field['name'] === $form_field) {
+            return $field;
+        }
+    }
+
+    return null;
 }

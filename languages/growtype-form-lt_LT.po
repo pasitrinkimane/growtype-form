@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Growtype - Form\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-08 14:01+0000\n"
-"PO-Revision-Date: 2022-03-26 20:01+0000\n"
-"Last-Translator: lvjc_user\n"
+"PO-Revision-Date: 2023-10-19 19:22+0000\n"
+"Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10 >= 2 "
@@ -13,10 +13,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/\n"
-"X-Loco-Version: 2.5.5; wp-5.8.2\n"
+"X-Loco-Version: 2.6.6; wp-6.3.2\n"
 "X-Domain: growtype-form"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:274
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:290
 msgid ""
 "\"Delete\" allows you to delete a pending account from your site. You will "
 "be asked to confirm this deletion."
@@ -24,7 +24,7 @@ msgstr ""
 "„Ištrinti“ leidžia iš svetainės ištrinti laukiančią paskyrą. Jūsų bus "
 "paprašyta patvirtinti šį ištrynimą."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:273
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:289
 msgid ""
 "\"Email\" takes you to the confirmation screen before being able to send the "
 "activation link to the desired pending account. You can only send the "
@@ -34,15 +34,15 @@ msgstr ""
 "aktyvinimo nuorodą į norimą laukiančią paskyrą. Aktyvinimo el. laišką galite "
 "siųsti tik kartą per dieną."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:941
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:220
 msgid "(less than 24 hours ago)"
 msgstr "(mažiau nei prieš 24 valandas)"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:282
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:298
 msgid "<a href=\"https://buddypress.org/support/\">Support Forums</a>"
 msgstr "<a href=\"https://buddypress.org/support/\">Palaikymo forumai</a>"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:270
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:286
 msgid "Actions"
 msgstr "Veiksmai"
 
@@ -50,17 +50,25 @@ msgstr "Veiksmai"
 msgid "Advanced form functionality for \"Growtype\" theme."
 msgstr "Išplėstinė formos funkcija „Growtype“ temai."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:612
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:652
 msgid "At least one selection is required."
 msgstr "Būtinas bent vienas pasirinkimas."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:276
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:79
+msgid "Below are multiple users signup details:"
+msgstr "Toliau pateikiama kelių naudotojų registracijos informacija:"
+
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:77
+msgid "Below are user signup details:"
+msgstr "Žemiau yra vartotojo registracijos informacija:"
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:292
 msgid ""
 "Bulk actions allow you to perform these 3 actions for the selected rows."
 msgstr ""
 "Masiniai veiksmai leidžia atlikti šiuos 3 veiksmus pasirinktose eilutėse."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:275
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:291
 msgid ""
 "By clicking on a Username you will be able to activate a pending account "
 "from the confirmation screen."
@@ -68,77 +76,70 @@ msgstr ""
 "Spustelėję vartotojo vardą patvirtinimo ekrane galėsite suaktyvinti "
 "laukiančią paskyrą."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:984
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:264
 msgid "Cancel"
 msgstr "Atšaukti"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:123
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:179
 msgid "Check your e-mail for login information."
 msgstr "Patikrinkite savo el. paštą prisijungimo informacijos."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:983
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:263
 msgid "Confirm"
 msgstr "Patvirtinti"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:177
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:310
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:207
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:340
 msgid "Delete"
 msgstr "Ištrinti"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:787
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:66
 msgid "Delete Pending Accounts"
 msgstr "Ištrinkite laukiančias paskyras"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:857
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:953
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:139
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:230
 msgid "Display Name"
 msgstr "Rodomas pavadinimas"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:485
-msgid "Do you already have an account?"
-msgstr "Ar jau turite paskyrą?"
-
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:157
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:862
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:958
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:144
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:235
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:186
 msgid "Email"
 msgstr "El. paštas"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:160
-msgid "Emails Sent"
-msgstr "Laiškai išsiųsti"
-
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:306
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:336
 msgid "Evaluate"
 msgstr "Įvertinti"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:796
-msgid "Evaluate Pending Accounts"
-msgstr "Įvertinkite laukiančias sąskaitas"
-
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:154
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:163
 msgid "Extended"
 msgstr "Prailgintas"
 
 #. accessibility text
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:288
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:304
 msgid "Filter users list"
 msgstr "Filtruoti vartotojų sąrašą"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:281
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:297
 msgid "For more information:"
 msgstr "Daugiau informacijos:"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:233
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:272
 msgid "Form is not configured. Please contact site admin."
 msgstr "Forma nesukonfigūruota. Susisiekite su svetainės administratoriumi."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:263
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:279
 msgid ""
 "From the screen options, you can customize the displayed columns and the "
 "pagination of this screen."
 msgstr ""
 "Ekrano parinktyse galite tinkinti rodomus stulpelius ir šio ekrano puslapius."
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:96
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:97
+msgid "GF Signups"
+msgstr "GF registracijas"
 
 #. Author of the plugin
 msgid "Growtype"
@@ -152,7 +153,11 @@ msgstr "Growtype - Form"
 msgid "Growtype Form"
 msgstr "Augimo tipo forma"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:345
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminIndex.php:58
+msgid "Growtype Form Signups"
+msgstr "Growtype formų registracija"
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:361
 #, php-format
 msgid ""
 "Hello, \n"
@@ -165,7 +170,7 @@ msgstr ""
 "Džiaugiamės galėdami pranešti, kad jūsų paskyra yra %s. Platformą galite "
 "pasiekti %s"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:272
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:288
 msgid ""
 "Hovering over a row in the pending accounts list will display action links "
 "that allow you to manage pending accounts. You can perform the following "
@@ -181,164 +186,202 @@ msgid "http://newcoolstudio.com/"
 msgstr "http://newcoolstudio.com/"
 
 #. %s: notification date
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:936
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:215
 #, php-format
 msgid "Last notified: %s"
 msgstr "Paskutinį kartą pranešta: %s"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:159
-msgid "Last Sent"
-msgstr "Paskutinį kartą išsiųstas"
-
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:217
-msgid "Log In"
-msgstr "Prisijungti"
-
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:162
 msgid "Lost your password?"
 msgstr "Pamiršote slaptažodį?"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:88
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:89
-msgid "GF Signups"
-msgstr "GF registracijas"
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:429
+msgid "Missing values required for login."
+msgstr "Trūksta prisijungimui reikalingų reikšmių."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:312
-msgid "Missing required values"
-msgstr "Trūksta būtinų verčių"
-
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:156
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:185
 msgid "Name"
 msgstr "vardas"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wc-crud.php:18
+#: ../../../../../../packages/plugins/growtype-form/includes/traits/Product.php:193
 msgid "New product"
 msgstr "Naujas produktas"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:192
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:222
 msgid "No pending accounts found."
 msgstr "Laukiančių paskyrų nerasta."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:260
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/signup/class-growtype-form-signup.php:132
+msgid ""
+"Not a valid username. </br></br> Please check the following criteria for a "
+"valid username: </br>\n"
+"- Your username must contain at least 3 characters. </br>\n"
+"- It may only consist of letters (a-z, A-Z), numbers (0-9), hyphens (-), and "
+"underscores (_). </br>\n"
+"- Special characters and spaces are not allowed. </br>\n"
+"- Ensure there are no consecutive hyphens or underscores.</br>\n"
+"- The username should not start or end with a hyphen or underscore. </br>\n"
+"</br>\n"
+"Please review your username and make the necessary corrections to meet these "
+"requirements."
+msgstr ""
+"Netinkamas vartotojo vardas. </br></br> Patikrinkite šiuos tinkamus "
+"naudotojo vardo kriterijus: </br>\n"
+"- Jūsų vartotojo vardą turi sudaryti bent 3 simboliai. </br>\n"
+"– Jį gali sudaryti tik raidės (a–z, A–Z), skaičiai (0–9), brūkšneliai (-) ir "
+"apatiniai brūkšniai (_). </br>\n"
+"- Specialieji simboliai ir tarpai neleidžiami. </br>\n"
+"– Įsitikinkite, kad nėra iš eilės brūkšnelių ar apatinių brūkšnių.</br>\n"
+"– Vartotojo vardas neturėtų prasidėti arba baigtis brūkšneliu ar pabraukimu. "
+"</br>\n"
+"</br>\n"
+"Peržiūrėkite savo vartotojo vardą ir atlikite reikiamus pataisymus, kad "
+"atitiktumėte šiuos reikalavimus."
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:276
 msgid "Overview"
 msgstr "Apžvalga"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:215
-msgid "Password"
-msgstr "Slaptažodis"
-
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:319
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:436
 msgid "Passwords do not match"
 msgstr "Slaptažodžiai nesutampa!"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:256
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:269
 msgctxt "Pending Accounts per page (screen options)"
-msgid "Pending Accounts"
-msgstr "Laukiančios sąskaitos"
-
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:173
-msgctxt "Pending signup action"
-msgid "Email"
-msgstr "El. paštas"
-
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:172
-msgctxt "Pending signup action"
-msgid "Evaluate"
-msgstr "Įvertinti"
+msgid "Amount per page"
+msgstr "Kiekis puslapyje"
 
 #. accessibility text
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:292
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:308
 msgid "Pending users list"
 msgstr "Laukiančių vartotojų sąrašas"
 
 #. accessibility text
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:290
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:306
 msgid "Pending users list navigation"
 msgstr "Laukiančių vartotojų sąrašo naršymas"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:550
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:799
 msgid "Please enter password."
 msgstr "Įveskite slaptažodį."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:202
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:293
 msgid "Please fill all required fields."
 msgstr "Prašome užpildyti visus būtinus laukus."
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:465
+msgid "Please login to update your information."
+msgstr "Norėdami atnaujinti informaciją, prisijunkite."
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:482
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:515
+msgid "Please use another email."
+msgstr "Prašome naudoti kitą el."
+
+#: ../../../../../../packages/plugins/growtype-form/includes/traits/Post.php:105
+msgid "Post has been submitted successfully."
+msgstr "Įrašas sėkmingai pateiktas."
 
 #: ../../../../../../packages/plugins/growtype-form/resources/views/modals/privacy.blade.php:5
 msgid "Privacy policy"
 msgstr "Privatumo politika"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wc-crud.php:397
+#: ../../../../../../packages/plugins/growtype-form/includes/traits/Product.php:227
 msgid "Product created."
 msgstr "Sukurtas produktas."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wc-crud.php:395
+#: ../../../../../../packages/plugins/growtype-form/includes/traits/Product.php:225
 msgid "Product updated."
 msgstr "Produktas atnaujintas."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:162
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:229
 msgid "Product uploaded."
 msgstr "Produktas įkeltas."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:348
-msgid "Profile already registered."
-msgstr "Toks profilis jau egzistuoja."
-
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:194
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:279
 msgid "Record created successfully."
 msgstr "Įrašas sėkmingai sukurtas."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:158
-msgid "Registered"
-msgstr "Registruotas"
-
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:867
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:963
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:149
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:240
 msgid "Registration Date"
 msgstr "Registracijos data"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:216
-msgid "Remember Me"
-msgstr "Prisimink mane"
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:187
+msgid "Registration date"
+msgstr "Registracijos data"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:805
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:201
+msgctxt "Registrations"
+msgid "Email"
+msgstr "El. paštas"
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:200
+msgctxt "Registrations"
+msgid "Evaluate"
+msgstr "Įvertinti"
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:203
+msgctxt "Registrations"
+msgid "Export all"
+msgstr "Eksportuoti viską"
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:202
+msgctxt "Registrations"
+msgid "Export selected"
+msgstr "Pasirinktas eksportas"
+
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:84
 msgid "Resend Activation Emails"
 msgstr "Iš naujo siųsti aktyvinimo el. laiškus"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:472
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:475
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:504
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:507
 msgid "Save"
 msgstr "Sutaupyti"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:723
-msgid "Search Pending Users"
-msgstr "Ieškoti laukiančių vartotojų"
-
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:712
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminIndex.php:67
 #, php-format
 msgid "Search results for &#8220;%s&#8221;"
 msgstr "Paieškos rezultatai pagal „%s“"
 
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminIndex.php:77
+msgid "Search Users"
+msgstr "Ieškoti vartotojų"
+
 #. accessibility text
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:255
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:285
 #, php-format
 msgid "Select user: %s"
 msgstr "Pasirinkite vartotoją: %s"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:486
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:70
 msgid "Sign in"
 msgstr "Prisijungti"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:169
+#: ../../../../../../packages/plugins/growtype-form/includes/helpers/login.php:99
+msgid "Sign In with Facebook"
+msgstr "Prisijunkite su Facebook"
+
+#: ../../../../../../packages/plugins/growtype-form/includes/helpers/login.php:111
+msgid "Sign In with Google"
+msgstr ""
+"Prisijunkite naudodami Google\n"
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/signup/class-growtype-form-signup.php:24
 msgid "Sign up"
 msgstr "Registruotis"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:353
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:576
 msgid "Sign up successful."
-msgstr "Sėkmingai užsiregistruoti."
+msgstr "Sėkmingai užsiregistruota."
+
+#: ../../../../../../packages/plugins/growtype-form/includes/helpers/login.php:109
+msgid "Sign Up with Google"
+msgstr "Prisiregistruokite su Google"
 
 #. %s: number of deleted signups
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:530
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:546
 #, php-format
 msgctxt "signup deleted"
 msgid "%s sign-up successfully deleted!"
@@ -347,7 +390,11 @@ msgstr[0] "%s registracija sėkmingai ištrinta!"
 msgstr[1] "%s registracija sėkmingai ištrinta!"
 msgstr[2] "%s registracija sėkmingai ištrinta!"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:542
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:75
+msgid "Signup details"
+msgstr "Registracijos informacija"
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:558
 #, php-format
 msgctxt "signup notdeleted"
 msgid "%s sign-up was not deleted."
@@ -357,7 +404,7 @@ msgstr[1] "%s prisijungimai nebuvo ištrinti."
 msgstr[2] "%s prisijungimai nebuvo ištrinti."
 
 #. %s: number of accounts not activated
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:506
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:522
 #, php-format
 msgctxt "signup notsent"
 msgid "%s account was not activated."
@@ -367,7 +414,7 @@ msgstr[1] "%s paskyros nebuvo suaktyvintos."
 msgstr[2] "%s paskyros nebuvo suaktyvintos."
 
 #. %s: number of unsent activation emails
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:470
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:486
 #, php-format
 msgctxt "signup notsent"
 msgid "%s activation email was not sent."
@@ -377,7 +424,7 @@ msgstr[1] "%s aktyvinimo el. laiškai nebuvo išsiųsti."
 msgstr[2] "%s aktyvinimo el. laiškai nebuvo išsiųsti."
 
 #. %s: number of activated accounts
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:494
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:510
 #, php-format
 msgctxt "signup resent"
 msgid "%s account successfully activated! "
@@ -387,7 +434,7 @@ msgstr[1] "%s paskyros sėkmingai suaktyvintos!"
 msgstr[2] "%s paskyros sėkmingai suaktyvintos!"
 
 #. %s: number of activation emails sent
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:458
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:474
 #, php-format
 msgctxt "signup resent"
 msgid "%s activation email successfully sent! "
@@ -396,67 +443,95 @@ msgstr[0] "%s aktyvinimo el. laiškas sėkmingai išsiųstas!"
 msgstr[1] "%s aktyvinimo el. laiškai sėkmingai išsiųsti!"
 msgstr[2] "%s aktyvinimo el. laiškai sėkmingai išsiųsti!"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:699
-msgid "Signups"
-msgstr "Prisiregistravimai"
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/signup/class-growtype-form-signup.php:153
+msgid "Something went wrong, please try again."
+msgstr "Kažkas ne taip, bandykite dar kartą."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:355
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:484
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:517
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:582
 msgid "Something went wrong."
 msgstr "Įvyko klaida."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:110
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wc-crud.php:390
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-wp-crud.php:53
+#: ../../../../../../packages/plugins/growtype-form/includes/traits/Product.php:220
+#: ../../../../../../packages/plugins/growtype-form/includes/traits/Post.php:90
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:124
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:315
 msgid "Something went wrong. Please contact administrator."
 msgstr "Įvyko klaida. Susisiekite su puslapio administratoriumi."
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:282
+msgid "Something went wrong. Please contact site admin."
+msgstr "Kažkas nutiko. Susisiekite su svetainės administratoriumi."
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/partials/class-growtype-form-google.php:83
+msgid "Something went wrong. Please try again or contact our support."
+msgstr ""
+"Kažkas nutiko. Bandykite dar kartą arba susisiekite su mūsų palaikymo "
+"komanda."
+
+#: ../../../../../../packages/plugins/growtype-form/resources/views/post/content.php:7
+msgid "Submitted data"
+msgstr "Pateikti duomenys"
 
 #: ../../../../../../packages/plugins/growtype-form/resources/views/modals/confirmation.blade.php:5
 #: ../../../../../../packages/plugins/growtype-form/resources/views/modals/terms.blade.php:5
 msgid "Terms & Conditions"
 msgstr "Sąlygos ir nuostatos"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:574
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:579
+msgid "The information was successfully updated."
+msgstr "Informacija sėkmingai atnaujinta."
+
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:590
 msgid "There was a problem activating accounts. Please try again."
 msgstr "Aktyvinant paskyras kilo problema. Prašau, pabandykite dar kartą."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:581
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:597
 msgid "There was a problem deleting sign-ups. Please try again."
 msgstr "Ištrinant registracijas kilo problema. Prašau, pabandykite dar kartą."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:567
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:583
 msgid "There was a problem sending the activation emails. Please try again."
 msgstr ""
 "Siunčiant aktyvinimo el. laiškus kilo problema. Prašau, pabandykite dar "
 "kartą."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:979
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:257
 msgid "This action cannot be undone."
 msgstr "Šio veiksmo anuliuoti negalima."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:262
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:278
 msgid "This is the administration screen for pending accounts on your site."
 msgstr "Tai laukiančių paskyrų jūsų svetainėje administravimo ekranas."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:707
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:499
+msgid "Unfortunately, you cannot use this username."
+msgstr "Deja, šio vartotojo vardo naudoti negalite."
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:417
+msgid "Update"
+msgstr "Atnaujinti"
+
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminIndex.php:63
 msgctxt "user"
 msgid "Add Existing"
 msgstr "Pridėti esamą"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:703
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminIndex.php:61
 msgctxt "user"
 msgid "Add New"
 msgstr "Pridėti naują"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:915
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:197
 msgid "User profile details"
 msgstr "Vartotojo profilio informacija"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:214
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members-list-table.php:155
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:184
 msgid "Username"
 msgstr "Vartotojo vardas"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:265
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:281
 msgid ""
 "Using the search form, you can find pending accounts more easily. The "
 "Username and Email fields will be included in the search."
@@ -464,48 +539,40 @@ msgstr ""
 "Naudodami paieškos formą galite lengviau rasti laukiančias paskyras. Laukai "
 "Vartotojo vardas ir El. pašto adresas bus įtraukti į paiešką."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:198
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:286
 msgid "Wrong data submitted. Please contact site admin."
 msgstr ""
 "Pateikti neteisingi duomenys. Susisiekite su svetainės administratoriumi."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/class-growtype-form-render.php:613
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:653
 msgid "Wrong date format. Please select again."
 msgstr "Neteisingas datos formatas. Pasirinkite dar kartą."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:119
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:175
 msgid "Wrong login details. Please try again."
 msgstr "Klaidingi prisijungimo duomenys. Prašau, pabandykite dar kartą."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:798
-msgid "You are about to activate the following account:"
-msgstr "Ketinate suaktyvinti šią paskyrą:"
-
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:800
-msgid "You are about to activate the following accounts:"
-msgstr "Ketinate suaktyvinti šias paskyras:"
-
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:789
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:68
 msgid "You are about to delete the following account:"
 msgstr "Ketinate ištrinti šią paskyrą:"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:791
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:70
 msgid "You are about to delete the following accounts:"
 msgstr "Ketinate ištrinti šias paskyras:"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:807
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:86
 msgid "You are about to resend an activation email to the following account:"
 msgstr "Ketinate dar kartą išsiųsti aktyvinimo el. laišką į šią paskyrą:"
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:809
+#: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:88
 msgid "You are about to resend an activation email to the following accounts:"
 msgstr "Ketinate dar kartą išsiųsti aktyvinimo el. laišką į šias paskyras:"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:121
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:177
 msgid "You are now logged out."
 msgstr "Dabar esate atsijungęs."
 
-#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-members.php:264
+#: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signup-details.php:280
 msgid ""
 "You can reorder the list of your pending accounts by clicking on the "
 "Username, Email or Registered column headers."
@@ -513,22 +580,18 @@ msgstr ""
 "Galite pertvarkyti laukiančių paskyrų sąrašą spustelėdami stulpelių "
 "antraštes Vartotojo vardas, El. paštas arba Registruotas."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:168
-msgid "You don’t have an account?"
-msgstr "Neturite paskyros?"
-
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:543
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:792
 msgid "Your Password Must Contain At Least 1 Capital Letter!"
 msgstr "Jūsų slaptažodyje turi būti bent 1 didžioji raidė!"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:546
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:795
 msgid "Your Password Must Contain At Least 1 Lowercase Letter!"
 msgstr "Jūsų slaptažodyje turi būti bent 1 mažoji raidė!"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:540
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:789
 msgid "Your Password Must Contain At Least 1 Number!"
 msgstr "Jūsų slaptažodyje turi būti bent 1 skaičius!"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:537
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:786
 msgid "Your Password Must Contain At Least 8 Characters!"
 msgstr "Jūsų slaptažodis turi būti sudarytas iš mažiausiai 8 simbolių!"

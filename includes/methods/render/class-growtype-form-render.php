@@ -13,14 +13,13 @@ class Growtype_Form_Render
 
     const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['text', 'textarea', 'file', 'email', 'select', 'radio', 'checkbox', 'hidden', 'number', 'password', 'custom', 'repeater', 'shortcode'];
 
-    protected $Growtype_Form_Login;
-    protected $Growtype_Form_Crud;
-
     public function __construct()
     {
         if (!is_admin()) {
             add_shortcode(self::GROWTYPE_FORM_SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
         }
+
+        add_action('wp_footer', array ($this, 'growtype_form_show_hide_password_button'));
     }
 
     public static function get_date_time_data()
@@ -122,6 +121,8 @@ class Growtype_Form_Render
         if (str_contains($form_name, 'login')) {
             wp_enqueue_style('growtype-form-login', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/login/main.css', array (), '1.1', 'all');
         }
+
+        do_action('growtype_form_render_styles');
     }
 
     /**
@@ -169,6 +170,8 @@ class Growtype_Form_Render
         if (!wp_script_is('autoNumeric', 'enqueued')) {
             wp_enqueue_script('autoNumeric', GROWTYPE_FORM_URL_PUBLIC . 'plugins/autoNumeric/autoNumeric.min.js', array ('jquery'), '1.1', true);
         }
+
+        do_action('growtype_form_render_scripts');
     }
 
     public static function get_currency_data()
@@ -224,8 +227,6 @@ class Growtype_Form_Render
      */
     function growtype_form_shortcode_function($args)
     {
-        global $wp_session;
-
         /**
          * If empty shortcode arguments, return empty
          */
@@ -242,7 +243,8 @@ class Growtype_Form_Render
          * Form name
          */
         $form_name = $args['name'];
-        $form_type = $args['type'] ?? null;
+        $form_type = isset($args['type']) ? $args['type'] : null;
+        $form_action = isset($args['action']) ? $args['action'] : 'submit';
 
         /**
          * Get form data
@@ -302,25 +304,26 @@ class Growtype_Form_Render
          * Render forms
          * $form_type Fields - plain fields with no extra features
          */
-        if (str_contains($form_name, 'login')) {
+
+        if ($form_type === 'fields') {
+            return $this->render_growtype_fields($form_data, $form_name);
+        } elseif (str_contains($form_name, 'login')) {
             /**
              * Initiate scripts
              */
             add_action('wp_footer', array (__CLASS__, 'growtype_form_login_validation_scripts'), 100);
 
             return Growtype_Form_Login::render_growtype_login_form($form_data);
-        } elseif ($form_type === 'fields') {
-            return $this->render_growtype_fields($form_data, $form_name);
         } else {
             /**
              * Initiate scripts
              */
-            add_action('wp_footer', array (__CLASS__, 'growtype_form_submit_scripts_init'));
+            add_action('wp_footer', array (__CLASS__, 'growtype_form_submit_scripts_init'), 101);
 
             /**
              * Render form
              */
-            return $this->render_growtype_general_form($form_data, $form_name);
+            return $this->render_growtype_general_form($form_name, $form_data, $form_action);
         }
     }
 
@@ -389,12 +392,12 @@ class Growtype_Form_Render
      * @param $form
      * @return false|string|null
      */
-    function render_growtype_general_form($form, $form_name)
+    function render_growtype_general_form($form_name, $form_data, $form_action = 'submit')
     {
         /**
          * Recaptcha setup
          */
-        $recaptcha = $form['recaptcha'] ?? null;
+        $recaptcha = $form_data['recaptcha'] ?? null;
         $recaptcha_key = $recaptcha['api_key'] ?? null;
 
         if (!empty($recaptcha_key) && !function_exists('recaptcha_setup')) {
@@ -404,7 +407,17 @@ class Growtype_Form_Render
         /**
          * Form main fields
          */
-        $form_args = growtype_form_extract_form_args($form);
+        $form_args = growtype_form_extract_form_args($form_data);
+
+        if ($form_action === 'update') {
+            foreach ($form_data['submit_row']['cta'] as $key => $cta) {
+                if ($cta['type'] = 'submit') {
+                    $form_args['submit_row']['cta'][$key]['label'] = __('Update', 'growtype-form');
+                }
+            }
+
+            $form_args = growtype_form_fill_form_args_with_existing_data($form_args);
+        }
 
         /**
          * Post data
@@ -419,138 +432,85 @@ class Growtype_Form_Render
 
         <div class="growtype-form-wrapper">
 
-            <?php if (user_can(wp_get_current_user(), 'administrator')) { ?>
-                <a href="<?php echo admin_url() . 'options-general.php?page=growtype-form-settings&tab=' . $form_name; ?>" style="display: inline-block;margin-left: auto;position: relative;top: -20px;" target="_blank">Edit form (only visible for admin)</a>
+            <?php if (isset($form_args['logo']) && isset($form_args['logo']['url']) && !empty($form_args['logo']['url'])) { ?>
+                <div class="logo-wrapper">
+                    <a href="<?php echo isset($form_args['logo']['external_url']) ? growtype_form_string_replace_custom_variable($form_args['logo']['external_url']) : '#' ?>" class="e-logo">
+                        <img src="<?php echo growtype_form_string_replace_custom_variable($form_args['logo']['url']) ?>" class="img-fluid" width="<?php echo $form_args['logo']['width'] ?? '' ?>" height="<?php echo $form_args['logo']['height'] ?? '' ?>"/>
+                    </a>
+                </div>
             <?php } ?>
 
-            <?php $this->growtype_form_get_notice(); ?>
+            <?php if (user_can(wp_get_current_user(), 'administrator')) { ?>
+                <div class="container">
+                    <a href="<?php echo admin_url() . 'options-general.php?page=growtype-form-settings&tab=' . $form_name; ?>" style="display: inline-block;margin-left: auto;position: relative;top: -20px;" target="_blank">Edit form (only visible for admin)</a>
+                </div>
+            <?php } ?>
+
+            <?php echo self::growtype_form_get_notice(); ?>
 
             <div class="growtype-form-container">
                 <div class="form-wrapper">
-                    <?php if ($form_args['header']) { ?>
-                        <div class="growtype-form-header">
-                            <?php if (isset($form_args['header']['top'])) { ?>
-                                <div class="growtype-form-header-top">
-                                    <?php if ($form_args['header']['top']['back_btn']) { ?>
-                                        <a href="<?= isset($form_args['header']['top']['back_btn']['url']) ? growtype_form_string_replace_custom_variable($form_args['header']['top']['back_btn']['url']) : growtype_form_login_page_url() ?>" class="btn-back"></a>
-                                    <?php } ?>
-                                    <?php if (isset($form_args['header']['top']['title']) && !empty($form_args['header']['top']['title'])) { ?>
-                                        <h2 class="e-title-intro"><?php echo $form_args['header']['top']['title'] ?></h2>
-                                    <?php } ?>
-                                    <div class="growtype-form-header-html">
-                                        <?php echo growtype_form_string_replace_custom_variable($form_args['header']['top']['html']) ?>
+                    <?php echo growtype_form_include_view('partials.forms.header', ['form_args' => $form_args]) ?>
+
+                    <div class="form-inner-wrapper">
+                        <form id="growtype-form-<?php echo $form_name ?>" enctype="multipart/form-data" class="growtype-form form <?php echo $form_args['class'] ?>" action="<?php echo self::growtype_form_get_action_url(); ?>" method="post" data-name="<?php echo $form_name ?>" data-ajax="<?php echo $form_args['ajax'] ?>" data-ajax-action="<?php echo $form_args['ajax_action'] ?>">
+                            <?php foreach ($form_data as $key => $form_fields) { ?>
+                                <?php if (str_contains('main_fields', $key)) { ?>
+                                    <div class="row g-3 main-fields">
+                                        <?php foreach ($form_args['main_fields'] as $field) {
+                                            self::render_growtype_form_field($field);
+                                        }
+                                        ?>
                                     </div>
-                                </div>
-                            <?php } ?>
-                            <?php if ($form_args['header']['nav']) { ?>
-                                <ul class="nav">
-                                    <?php foreach ($form_args['header']['nav'] as $nav) { ?>
-                                        <li class="nav-item <?php echo $nav['class'] ?? '' ?>">
-                                            <a href="<?php echo growtype_form_string_replace_custom_variable($nav['url']) ?>" class="nav-link"><?php echo $nav['label'] ?></a>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            <?php } ?>
-                            <?php if (isset($form_args['header']['bottom'])) { ?>
-                                <div class="growtype-form-header-bottom">
-                                    <?php if ($form_args['header']['bottom']['back_btn']) { ?>
-                                        <a href="<?= isset($form_args['header']['bottom']['back_btn']['url']) ? growtype_form_string_replace_custom_variable($form_args['header']['bottom']['back_btn']['url']) : growtype_form_login_page_url() ?>" class="btn-back"></a>
-                                    <?php } ?>
-                                    <?php if (isset($form_args['header']['bottom']['title']) && !empty($form_args['header']['bottom']['title'])) { ?>
-                                        <h2 class="e-title-intro"><?php echo $form_args['header']['bottom']['title'] ?></h2>
-                                    <?php } ?>
-                                    <div class="growtype-form-header-html">
-                                        <?php echo growtype_form_string_replace_custom_variable($form_args['header']['bottom']['html']) ?>
+                                <?php } ?>
+
+                                <?php if (str_contains('confirmation_fields', $key)) { ?>
+                                    <div class="row fields-confirmation">
+                                        <?php foreach ($form_args['confirmation_fields'] as $field) {
+                                            self::render_growtype_form_field($field);
+                                        }
+                                        ?>
                                     </div>
-                                </div>
-                            <?php } ?>
-                        </div>
-                    <?php } ?>
-
-                    <form id="growtype-form-<?php echo $form_name ?>" enctype="multipart/form-data" class="growtype-form form <?php echo $form_args['class'] ?>" action="<?php echo self::growtype_form_get_action_url(); ?>" method="post" data-name="<?php echo $form_name ?>" data-ajax="<?php echo $form_args['ajax'] ?>" data-ajax-action="<?php echo $form_args['ajax_action'] ?>">
-                        <?php
-                        foreach ($form as $key => $form_fields) { ?>
-
-                            <?php if (str_contains('main_fields', $key)) { ?>
-                                <div class="row g-3 main-fields">
-                                    <?php
-                                    foreach ($form_args['main_fields'] as $field) {
-                                        self::render_growtype_form_field($field);
-                                    }
-                                    ?>
-                                </div>
+                                <?php } ?>
                             <?php } ?>
 
-                            <?php if (str_contains('confirmation_fields', $key)) { ?>
-                                <div class="row fields-confirmation">
-                                    <?php foreach ($form_args['confirmation_fields'] as $field) {
-                                        self::render_growtype_form_field($field);
-                                    }
-                                    ?>
-                                </div>
-                            <?php } ?>
+                            <div>
+                                <input type="email" name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATOR ?>' value="" style="display: none;"/>
 
-                        <?php } ?>
-
-                        <div>
-                            <input type="email" name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATOR ?>' value="" style="display: none;"/>
-
-                            <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION ?>' value="submit"/>
-                            <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
-                            <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
-                            <?php if (!empty($post)) { ?>
-                                <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?= $post->ID ?>"/>
-                            <?php } ?>
-                        </div>
-
-                        <?php if (isset($form_args['submit_row']) && !empty($form_args['submit_row'])) { ?>
-                            <div class="row row-submit <?= isset($form_args['submit_row']['class']) ? $form_args['submit_row']['class'] : '' ?>">
-                                <div class="d-md-grid gap-2 d-md-flex">
-                                    <?php if (!empty($recaptchav3)) { ?>
-                                        <div class="g-recaptcha"
-                                             data-sitekey="<?= $recaptchav3 ?>"
-                                             data-size="invisible"
-                                             data-callback="recaptchaFormSubmit">
-                                        </div>
-                                    <?php } ?>
-
-                                    <?php
-                                    if (isset($form_args['submit_row']['cta'])) {
-                                        foreach ($form_args['submit_row']['cta'] as $cta) { ?>
-                                            <button type="<?php echo $cta['type']; ?>" class="<?php echo isset($cta['class']) ? $cta['class'] : 'btn btn-primary'; ?>" data-action="<?php echo isset($cta['action']) ? $cta['action'] : 'submit'; ?>"><?= $cta['label'] ?? __("Save", "growtype-form") ?></button>
-                                        <?php } ?>
-                                    <?php } else { ?>
-                                        <button type="submit" class="btn btn-primary" data-action="submit"><?= $form['submit_label'] ?? __("Save", "growtype-form") ?></button>
-                                    <?php } ?>
-                                </div>
+                                <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION ?>' value="<?php echo $form_action ?>"/>
+                                <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
+                                <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
+                                <?php if (!empty($post)) { ?>
+                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?= $post->ID ?>"/>
+                                <?php } ?>
                             </div>
-                        <?php } ?>
-                    </form>
 
-                    <?php if ($form_args['footer']) { ?>
-                        <div class="growtype-form-footer">
-                            <?php if (isset($form_args['footer']['top'])) { ?>
-                                <div class="growtype-form-footer-top">
-                                    <?php echo growtype_form_string_replace_custom_variable($form_args['footer']['top']['html']) ?>
+                            <?php if (isset($form_args['submit_row']) && !empty($form_args['submit_row'])) { ?>
+                                <div class="row row-submit <?= isset($form_args['submit_row']['class']) ? $form_args['submit_row']['class'] : '' ?>">
+                                    <div class="d-md-grid gap-2 d-md-flex">
+                                        <?php if (!empty($recaptchav3)) { ?>
+                                            <div class="g-recaptcha"
+                                                 data-sitekey="<?= $recaptchav3 ?>"
+                                                 data-size="invisible"
+                                                 data-callback="recaptchaFormSubmit">
+                                            </div>
+                                        <?php } ?>
+
+                                        <?php
+                                        if (isset($form_args['submit_row']['cta'])) {
+                                            foreach ($form_args['submit_row']['cta'] as $cta) { ?>
+                                                <button type="<?php echo $cta['type']; ?>" class="<?php echo isset($cta['class']) ? $cta['class'] : 'btn btn-primary'; ?>" data-action="<?php echo isset($cta['action']) ? $cta['action'] : $form_action; ?>"><?= $cta['label'] ?? __("Save", "growtype-form") ?></button>
+                                            <?php } ?>
+                                        <?php } else { ?>
+                                            <button type="submit" class="btn btn-primary" data-action="submit"><?= $form_data['submit_label'] ?? __("Save", "growtype-form") ?></button>
+                                        <?php } ?>
+                                    </div>
                                 </div>
                             <?php } ?>
-                            <?php if ($form_args['footer']['nav']) { ?>
-                                <ul class="nav">
-                                    <?php foreach ($form_args['footer']['nav'] as $nav) { ?>
-                                        <li class="nav-item <?php echo $nav['class'] ?? '' ?>">
-                                            <a href="<?php echo growtype_form_string_replace_custom_variable($nav['url']) ?>" class="nav-link"><?php echo $nav['label'] ?></a>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            <?php } ?>
-                            <?php if (isset($form_args['footer']['bottom'])) { ?>
-                                <div class="growtype-form-footer-bottom">
-                                    <?php echo growtype_form_string_replace_custom_variable($form_args['footer']['bottom']['html']) ?>
-                                </div>
-                            <?php } ?>
-                        </div>
-                    <?php } ?>
+                        </form>
+                    </div>
 
+                    <?php echo growtype_form_include_view('partials.forms.footer', ['form_args' => $form_args]) ?>
                 </div>
             </div>
         </div>
@@ -575,7 +535,7 @@ class Growtype_Form_Render
         if (!empty($_SERVER['REQUEST_URI'])) {
             $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
 
-            if ($page_slug === Growtype_Form_Signup::CUSTOM_SLUG || $page_slug === Growtype_Form_Login::URL_SLUG) {
+            if ($page_slug === Growtype_Form_Signup::URL_PATH || $page_slug === Growtype_Form_Login::URL_PATH) {
                 return '';
             }
         }
@@ -591,7 +551,7 @@ class Growtype_Form_Render
         if (!empty($_SERVER['REQUEST_URI'])) {
             $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
 
-            if ($page_slug === Growtype_Form_Signup::CUSTOM_SLUG || $page_slug === Growtype_Form_Login::URL_SLUG) {
+            if ($page_slug === Growtype_Form_Signup::URL_PATH || $page_slug === Growtype_Form_Login::URL_PATH) {
                 return $page_slug;
             }
         }
@@ -819,9 +779,18 @@ class Growtype_Form_Render
 
             if (!empty($signup_data)) {
                 foreach ($signup_data as $key => $field) {
-                    $_REQUEST[$key] = $field;
+                    $field_details = growtype_form_get_form_field($form_name, $key);
+
+                    if (!empty($field_details)) {
+                        if ($field_details['type'] === 'select') {
+                            $_REQUEST[$key] = $field;
+                        } else {
+                            $_REQUEST[$key] = $field;
+                        }
+                    }
                 }
             }
+
         } elseif (!empty($post) && $post->post_type === 'product') {
             $product = wc_get_product($post_id);
 
@@ -914,7 +883,44 @@ class Growtype_Form_Render
 
         if (isset($_COOKIE['signup_data'])) {
             unset($_COOKIE['signup_data']);
-            setcookie('signup_data', null, time(), home_url());
+            setcookie('signup_data', '', time(), home_url());
         }
+    }
+
+    function growtype_form_show_hide_password_button()
+    {
+        ?>
+        <script type="text/javascript">
+            jQuery(document).ready(function () {
+                var open = 'fa-eye';
+                var close = 'fa-eye-slash';
+                var ele = jQuery('.growtype-form-wrapper input[type="password"]');
+                jQuery('<button class="far fa-eye-slash show-hide-pw" type="button">&nbsp;</button>').insertAfter(ele);
+                jQuery('.growtype-form-wrapper .show-hide-pw').click(function () {
+                    if (jQuery(this).hasClass(close)) {
+                        jQuery(this).closest('.e-wrapper').find('input[type="password"]').prop('type', 'text');
+                        jQuery(this).removeClass(close);
+                        jQuery(this).addClass(open);
+                    } else {
+                        jQuery(this).closest('.e-wrapper').find('input[type="text"]').prop('type', 'password');
+                        jQuery(this).removeClass(open);
+                        jQuery(this).addClass(close);
+                    }
+                });
+            });
+        </script>
+        <style>
+            .growtype-form-wrapper .show-hide-pw {
+                background: none;
+                border: none;
+                position: absolute;
+                right: 7px;
+                top: 45px;
+                opacity: 0.8;
+                width: 40px;
+                text-align: center;
+            }
+        </style>
+        <?php
     }
 }
