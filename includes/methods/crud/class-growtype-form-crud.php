@@ -305,7 +305,7 @@ class Growtype_Form_Crud
             }
 
             if (!empty($return_values)) {
-                setcookie('signup_data', json_encode($return_values), time() + 2, home_url());
+                setcookie('signup_data', json_encode($return_values), time() + 2, COOKIEPATH, COOKIE_DOMAIN);
             }
         }
 

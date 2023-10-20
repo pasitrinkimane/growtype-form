@@ -52,9 +52,9 @@ trait Notice
         <?php }
 
         unset($_COOKIE['growtype_form_notice_message']);
-        setcookie('notice_message', '', time());
+        setcookie('notice_message', '', time(), COOKIEPATH, COOKIE_DOMAIN);
 
         unset($_COOKIE['growtype_form_notice_status']);
-        setcookie('notice_status', '', time());
+        setcookie('notice_status', '', time(), COOKIEPATH, COOKIE_DOMAIN);
     }
 }

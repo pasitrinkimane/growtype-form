@@ -883,7 +883,7 @@ class Growtype_Form_Render
 
         if (isset($_COOKIE['signup_data'])) {
             unset($_COOKIE['signup_data']);
-            setcookie('signup_data', '', time(), home_url());
+            setcookie('signup_data', '', time(), COOKIEPATH, COOKIE_DOMAIN);
         }
     }
 
