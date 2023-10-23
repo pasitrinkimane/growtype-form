@@ -33,7 +33,7 @@ if (isset($_REQUEST['repeater']) && !empty($_REQUEST['repeater'])) {
                     $single_field['value'] = $repeater[$name] ?? null;
                 }
 
-                Growtype_Form_Render::render_growtype_form_field($single_field);
+                Growtype_Form_General::render_growtype_form_field($single_field);
             }
             ?>
 
@@ -56,7 +56,7 @@ if (isset($_REQUEST['repeater']) && !empty($_REQUEST['repeater'])) {
 
         <?php
         foreach ($field_fields as $single_field) {
-            Growtype_Form_Render::render_growtype_form_field($single_field);
+            Growtype_Form_General::render_growtype_form_field($single_field);
         }
         ?>
 

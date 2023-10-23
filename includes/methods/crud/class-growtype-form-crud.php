@@ -419,15 +419,12 @@ class Growtype_Form_Crud
             $username = $signup_params['username_prefix'] . date_timestamp_get(date_create());
         }
 
-        if (empty($email) && is_user_logged_in()) {
-            $current_user = wp_get_current_user();
-            $email = $current_user->user_email;
-        }
-
-        if (empty($username) || empty($password) || empty($email)) {
-            $response['success'] = false;
-            $response['message'] = __("Missing values required for login.", "growtype-form");
-            return $response;
+        if ($submit_action === 'submit') {
+            if (empty($username) || empty($password) || empty($email)) {
+                $response['success'] = false;
+                $response['message'] = __("Missing values required for login.", "growtype-form");
+                return $response;
+            }
         }
 
         if (!empty($repeat_password)) {
@@ -438,12 +435,14 @@ class Growtype_Form_Crud
             }
         }
 
-        $validate_password = $this->validate_password($password);
+        if (!empty($password)) {
+            $validate_password = $this->validate_password($password);
 
-        if ($validate_password['success'] === false) {
-            $response['success'] = $validate_password['success'];
-            $response['message'] = $validate_password['message'];
-            return $response;
+            if ($validate_password['success'] === false) {
+                $response['success'] = $validate_password['success'];
+                $response['message'] = $validate_password['message'];
+                return $response;
+            }
         }
 
         /**
@@ -487,6 +486,13 @@ class Growtype_Form_Crud
 
                     return $response;
                 }
+            }
+
+            /**
+             * Update password
+             */
+            if (!empty($password)) {
+                wp_set_password($password, $user_id);
             }
 
             /**
@@ -573,7 +579,7 @@ class Growtype_Form_Crud
                 update_user_meta(get_current_user_id(), 'child_user_ids', $child_user_ids);
             }
 
-            $response = $this->update_user_meta($user_id, $data);
+            $response = $this->update_user_meta_details($user_id, $data);
 
             apply_filters('growtype_form_update_signup_user_data', $user_id, $data, $submit_action);
 
@@ -704,7 +710,7 @@ class Growtype_Form_Crud
      * @param $data
      * @return array
      */
-    public function update_user_meta($user_id, $data)
+    public function update_user_meta_details($user_id, $data)
     {
         /**
          * Save extra values

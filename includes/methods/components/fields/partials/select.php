@@ -5,7 +5,7 @@
     <?= $field_multiple ? 'multiple' : '' ?>
 >
     <?php if (!$field_multiple && isset($placeholder) && !empty($placeholder)) { ?>
-        <option value="" <?php echo empty($selected_options) ? 'selected' : '' ?> disabled hidden><?= $placeholder ?></option>
+        <option value="" <?php echo empty($selected_options) ? 'selected' : '' ?> disabled hidden <?= in_array('', $selected_options) ? 'selected' : '' ?>><?= $placeholder ?></option>
     <?php } ?>
     <?php if (isset($select_type) && $select_type === 'key_value') {
         foreach ($field_options as $key => $field_option) { ?>

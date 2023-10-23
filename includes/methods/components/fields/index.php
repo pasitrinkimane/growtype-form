@@ -50,7 +50,7 @@ $field_group = isset($field['group']) ? $field['group'] : null; // inputs can be
 $field_autocomplete = isset($field['autocomplete']) && $field['autocomplete'] === 'true' ? 'on' : 'off';
 $conditions = isset($field['conditions']) && !empty($field['conditions']) ? json_encode($field['conditions']) : '';
 
-if (!in_array($field_type, Growtype_Form_Render::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {
+if (!in_array($field_type, Growtype_Form_General::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {
     return null;
 }
 
@@ -116,23 +116,23 @@ $block_cat_types = ['repeater', 'custom', 'shortcode', 'checkbox'];
     <?php } ?>
 
     <?php if ($field_type === 'select') {
-        include 'fields/select.php';
+        include 'partials/select.php';
     } elseif ($field_type === 'radio') {
-        include 'fields/radio.php';
+        include 'partials/radio.php';
     } elseif ($field_type === 'checkbox') {
-        include 'fields/checkbox.php';
+        include 'partials/checkbox.php';
     } elseif ($field_type === 'textarea') {
-        include 'fields/textarea.php';
+        include 'partials/textarea.php';
     } elseif ($field_type === 'file') {
-        include 'fields/file.php';
+        include 'partials/file.php';
     } elseif ($field_type === 'custom') {
-        include 'fields/custom.php';
+        include 'partials/custom.php';
     } elseif ($field_type === 'shortcode') {
-        include 'fields/shortcode.php';
+        include 'partials/shortcode.php';
     } elseif ($field_type === 'repeater') {
-        include 'fields/repeater.php';
+        include 'partials/repeater.php';
     } else {
-        include 'fields/general.php';
+        include 'partials/general.php';
     } ?>
 
     <?php if (!empty($field_explanation)) { ?>

@@ -1,5 +1,7 @@
 $ = jQuery;
 
-import {ajaxForm} from './partials/forms/ajaxForm';
+import {formGeneral} from './partials/forms/general';
+import {formNewsletter} from './partials/forms/newsletter';
 
-ajaxForm();
+formGeneral();
+formNewsletter();

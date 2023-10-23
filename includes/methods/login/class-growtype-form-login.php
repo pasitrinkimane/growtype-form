@@ -14,7 +14,6 @@ class Growtype_Form_Login
         if (!is_admin()) {
             add_action('wp_login_failed', array ($this, 'custom_login_failed'), 10, 2);
             add_filter('authenticate', array ($this, 'custom_authenticate_username_password'), 30, 3);
-//            add_filter('login_redirect', array ($this, 'growtype_form_login_redirect'));
             add_filter('login_url', array ($this, 'change_default_login_url'), 10, 2);
         }
 
@@ -224,7 +223,7 @@ class Growtype_Form_Login
                 <?php } ?>
 
                 <div class="form-wrapper">
-                    <?php echo growtype_form_include_view('partials.forms.header', ['form_args' => $form_args]) ?>
+                    <?php echo growtype_form_include_view('components.forms.partials.header', ['form_args' => $form_args]) ?>
 
                     <div class="form-inner-wrapper">
                         <?= wp_login_form($wp_login_form_args) ?>
@@ -235,7 +234,7 @@ class Growtype_Form_Login
                         <?php } ?>
                     </div>
 
-                    <?php echo growtype_form_include_view('partials.forms.footer', ['form_args' => $form_args]) ?>
+                    <?php echo growtype_form_include_view('components.forms.partials.footer', ['form_args' => $form_args]) ?>
                 </div>
             </div>
         </div>

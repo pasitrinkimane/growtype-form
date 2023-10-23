@@ -313,7 +313,7 @@ class Growtype_Form_Admin
 
                             echo '</br>';
                             echo '<b>Shortcode:</b> [growtype_form name="signup"] ' . "</br>";
-                            echo '<b>Allowed input types:</b> ' . implode(',', Growtype_Form_Render::GROWTYPE_FORM_ALLOWED_FIELD_TYPES);
+                            echo '<b>Allowed input types:</b> ' . implode(',', Growtype_Form_General::GROWTYPE_FORM_ALLOWED_FIELD_TYPES);
 
                             echo '<table class="form-table">';
                             do_settings_fields('growtype-form-settings', 'growtype_form_settings_examples');
@@ -389,14 +389,18 @@ class Growtype_Form_Admin
 
         require_once(ABSPATH . 'wp-admin/includes/class-wp-users-list-table.php');
 
+        /**
+         * Accesses
+         */
+        require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-user-accesses.php';
+        new Growtype_Form_User_Accesses();
+
+        /**
+         * User details
+         */
         require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signup-details.php';
         require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signups-list-table.php';
 
         new Growtype_Form_Signup_Details();
-
-        /**
-         * Load meta fields
-         */
-//        require_once GROWTYPE_FORM_PATH . 'admin/methods/meta-fields/class-growtype-form-meta-fields.php';
     }
 }

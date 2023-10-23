@@ -1,6 +1,6 @@
 import {ajaxFormSuccessEvent} from "../events/ajaxForm";
 
-function ajaxForm() {
+function formGeneral() {
     window.growtype_form.postdata = {};
     $('.growtype-form[data-ajax="true"]').submit(function (event) {
         event.preventDefault();
@@ -24,4 +24,4 @@ function ajaxForm() {
     })
 }
 
-export {ajaxForm};
+export {formGeneral};
