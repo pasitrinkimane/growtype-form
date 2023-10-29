@@ -3,9 +3,9 @@ msgstr ""
 "Project-Id-Version: Growtype - Form\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-09-08 14:01+0000\n"
-"PO-Revision-Date: 2023-10-19 19:22+0000\n"
+"PO-Revision-Date: 2023-10-23 19:53+0000\n"
 "Last-Translator: \n"
-"Language-Team: Lithuanian\n"
+"Language-Team: Lietuvių kalba\n"
 "Language: lt_LT\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10 >= 2 "
 "&&(n%100<10||n%100 >= 20)? 1 : 2);\n"
@@ -50,7 +50,7 @@ msgstr "Veiksmai"
 msgid "Advanced form functionality for \"Growtype\" theme."
 msgstr "Išplėstinė formos funkcija „Growtype“ temai."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:652
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:652
 msgid "At least one selection is required."
 msgstr "Būtinas bent vienas pasirinkimas."
 
@@ -80,9 +80,14 @@ msgstr ""
 msgid "Cancel"
 msgstr "Atšaukti"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:179
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:220
 msgid "Check your e-mail for login information."
 msgstr "Patikrinkite savo el. paštą prisijungimo informacijos."
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:49
+msgid "Click on the following link to initiate the password reset process:"
+msgstr ""
+"Norėdami pradėti slaptažodžio atstatymo procesą, spustelėkite šią nuorodą:"
 
 #: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:263
 msgid "Confirm"
@@ -105,6 +110,7 @@ msgstr "Rodomas pavadinimas"
 #: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:144
 #: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:235
 #: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:186
+#: ../../../../../../packages/plugins/growtype-form/resources/views/components/forms/newsletter.php:5
 msgid "Email"
 msgstr "El. paštas"
 
@@ -125,7 +131,7 @@ msgstr "Filtruoti vartotojų sąrašą"
 msgid "For more information:"
 msgstr "Daugiau informacijos:"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:272
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:270
 msgid "Form is not configured. Please contact site admin."
 msgstr "Forma nesukonfigūruota. Susisiekite su svetainės administratoriumi."
 
@@ -185,17 +191,41 @@ msgstr ""
 msgid "http://newcoolstudio.com/"
 msgstr "http://newcoolstudio.com/"
 
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:51
+#, php-format
+#| msgid ""
+#| "If you didn't request this password reset, or if you have any concerns "
+#| "about the security of your account, please contact our support team at %s."
+msgid ""
+"If you didn't request this password reset, or if you have any questions "
+"about the security of your account, please contact our support at %s."
+msgstr ""
+"Jei neprašėte atstatyti slaptažodžio arba turite papildomų klausimų dėl "
+"paskyros saugumo, susisiekite su mumis adresu %s."
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:48
+msgid "It seems that you've requested a password reset for your account."
+msgstr "Panašu, kad paprašėte iš naujo nustatyti paskyros slaptažodį."
+
 #. %s: notification date
 #: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:215
 #, php-format
 msgid "Last notified: %s"
 msgstr "Paskutinį kartą pranešta: %s"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:217
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:258
 msgid "Lost your password?"
 msgstr "Pamiršote slaptažodį?"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:429
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:50
+msgid ""
+"Make sure that your new password is strong and unique for your account's "
+"security."
+msgstr ""
+"Įsitikinkite, kad naujas slaptažodis yra tvirtas ir unikalus paskyros "
+"saugumui užtikrinti."
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:425
 msgid "Missing values required for login."
 msgstr "Trūksta prisijungimui reikalingų reikšmių."
 
@@ -242,7 +272,7 @@ msgstr ""
 msgid "Overview"
 msgstr "Apžvalga"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:436
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:433
 msgid "Passwords do not match"
 msgstr "Slaptažodžiai nesutampa!"
 
@@ -261,7 +291,7 @@ msgstr "Laukiančių vartotojų sąrašas"
 msgid "Pending users list navigation"
 msgstr "Laukiančių vartotojų sąrašo naršymas"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:799
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:810
 msgid "Please enter password."
 msgstr "Įveskite slaptažodį."
 
@@ -274,7 +304,7 @@ msgid "Please login to update your information."
 msgstr "Norėdami atnaujinti informaciją, prisijunkite."
 
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:482
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:515
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:522
 msgid "Please use another email."
 msgstr "Prašome naudoti kitą el."
 
@@ -335,8 +365,8 @@ msgstr "Pasirinktas eksportas"
 msgid "Resend Activation Emails"
 msgstr "Iš naujo siųsti aktyvinimo el. laiškus"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:504
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:507
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:504
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:507
 msgid "Save"
 msgstr "Sutaupyti"
 
@@ -355,7 +385,7 @@ msgstr "Ieškoti vartotojų"
 msgid "Select user: %s"
 msgstr "Pasirinkite vartotoją: %s"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:70
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:111
 msgid "Sign in"
 msgstr "Prisijungti"
 
@@ -366,13 +396,13 @@ msgstr "Prisijunkite su Facebook"
 #: ../../../../../../packages/plugins/growtype-form/includes/helpers/login.php:111
 msgid "Sign In with Google"
 msgstr ""
-"Prisijunkite naudodami Google\n"
+"Prisijunkite su Google\n"
 
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/signup/class-growtype-form-signup.php:24
 msgid "Sign up"
 msgstr "Registruotis"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:576
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:587
 msgid "Sign up successful."
 msgstr "Sėkmingai užsiregistruota."
 
@@ -443,13 +473,13 @@ msgstr[0] "%s aktyvinimo el. laiškas sėkmingai išsiųstas!"
 msgstr[1] "%s aktyvinimo el. laiškai sėkmingai išsiųsti!"
 msgstr[2] "%s aktyvinimo el. laiškai sėkmingai išsiųsti!"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/signup/class-growtype-form-signup.php:153
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/signup/class-growtype-form-signup.php:151
 msgid "Something went wrong, please try again."
 msgstr "Kažkas ne taip, bandykite dar kartą."
 
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:484
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:517
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:582
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:524
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:593
 msgid "Something went wrong."
 msgstr "Įvyko klaida."
 
@@ -479,7 +509,7 @@ msgstr "Pateikti duomenys"
 msgid "Terms & Conditions"
 msgstr "Sąlygos ir nuostatos"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:579
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:590
 msgid "The information was successfully updated."
 msgstr "Informacija sėkmingai atnaujinta."
 
@@ -505,11 +535,11 @@ msgstr "Šio veiksmo anuliuoti negalima."
 msgid "This is the administration screen for pending accounts on your site."
 msgstr "Tai laukiančių paskyrų jūsų svetainėje administravimo ekranas."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:499
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:506
 msgid "Unfortunately, you cannot use this username."
 msgstr "Deja, šio vartotojo vardo naudoti negalite."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:417
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:417
 msgid "Update"
 msgstr "Atnaujinti"
 
@@ -544,11 +574,11 @@ msgid "Wrong data submitted. Please contact site admin."
 msgstr ""
 "Pateikti neteisingi duomenys. Susisiekite su svetainės administratoriumi."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:653
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:653
 msgid "Wrong date format. Please select again."
 msgstr "Neteisingas datos formatas. Pasirinkite dar kartą."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:175
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:216
 msgid "Wrong login details. Please try again."
 msgstr "Klaidingi prisijungimo duomenys. Prašau, pabandykite dar kartą."
 
@@ -568,7 +598,7 @@ msgstr "Ketinate dar kartą išsiųsti aktyvinimo el. laišką į šią paskyrą
 msgid "You are about to resend an activation email to the following accounts:"
 msgstr "Ketinate dar kartą išsiųsti aktyvinimo el. laišką į šias paskyras:"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:177
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:218
 msgid "You are now logged out."
 msgstr "Dabar esate atsijungęs."
 
@@ -580,18 +610,18 @@ msgstr ""
 "Galite pertvarkyti laukiančių paskyrų sąrašą spustelėdami stulpelių "
 "antraštes Vartotojo vardas, El. paštas arba Registruotas."
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:792
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:803
 msgid "Your Password Must Contain At Least 1 Capital Letter!"
 msgstr "Jūsų slaptažodyje turi būti bent 1 didžioji raidė!"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:795
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:806
 msgid "Your Password Must Contain At Least 1 Lowercase Letter!"
 msgstr "Jūsų slaptažodyje turi būti bent 1 mažoji raidė!"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:789
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:800
 msgid "Your Password Must Contain At Least 1 Number!"
 msgstr "Jūsų slaptažodyje turi būti bent 1 skaičius!"
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:786
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:797
 msgid "Your Password Must Contain At Least 8 Characters!"
 msgstr "Jūsų slaptažodis turi būti sudarytas iš mažiausiai 8 simbolių!"

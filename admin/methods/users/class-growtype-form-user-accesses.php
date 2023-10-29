@@ -29,14 +29,20 @@ class Growtype_Form_User_Accesses
         /**
          * Prevent admin access for basic roles
          */
-        if (
-            current_user_can('lead')
-            || current_user_can('subscriber')
-        ) {
-            if (is_user_logged_in()) {
-                wp_redirect(growtype_form_profile_page_url());
-            } else {
-                wp_redirect(growtype_form_login_page_url());
+        if (isset($_SERVER['REQUEST_URI']) && (strpos($_SERVER['REQUEST_URI'], '/wp-admin') !== false || strpos($_SERVER['REQUEST_URI'], '/wp-login.php') !== false)) {
+            if (
+                !defined('DOING_AJAX')
+                &&
+                (
+                    current_user_can('lead')
+                    || current_user_can('subscriber')
+                )
+            ) {
+                if (is_user_logged_in()) {
+                    wp_redirect(growtype_form_profile_page_url());
+                } else {
+                    wp_redirect(growtype_form_login_page_url());
+                }
             }
         }
     }

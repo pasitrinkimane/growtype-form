@@ -18,7 +18,9 @@ class Growtype_Form_Login
         }
 
         add_action('init', array ($this, 'custom_url'), 1);
+
         add_action('template_redirect', array ($this, 'custom_url_template'));
+
         add_filter('document_title_parts', array ($this, 'custom_document_title_parts'));
 
         add_filter('lostpassword_url', array ($this, 'lostpassword_url_rewrite'), 100, 2);
@@ -26,6 +28,32 @@ class Growtype_Form_Login
         add_filter('nav_menu_css_class', array ($this, 'nav_menu_css_class'), 100, 2);
 
         add_filter("retrieve_password_notification_email", array ($this, 'retrieve_password_notification_email_callback'), 99, 4);
+
+        /**
+         * Password reset
+         */
+        add_filter('retrieve_password_message', array ($this, 'retrieve_password_message_callback'), 10, 4);
+    }
+
+    /**
+     * @param $message
+     * @param $key
+     * @param $user_login
+     * @param $user_data
+     * @return string
+     * Password reset message
+     */
+    function retrieve_password_message_callback($message, $key, $user_login, $user_data)
+    {
+        $locale = get_user_locale($user_data);
+        $password_reset_url = network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'login') . '&wp_lang=' . $locale . "\r\n\r\n";
+
+        $message = __("It seems that you've requested a password reset for your account.", "growtype-form") . "\r\n\r\n";
+        $message .= __("Click on the following link to initiate the password reset process:", "growtype-form") . " " . $password_reset_url . "\r\n\r\n";
+        $message .= __("Make sure that your new password is strong and unique for your account's security.", "growtype-form") . "\r\n\r\n";
+        $message .= sprintf(__("If you didn't request this password reset, or if you have any questions about the security of your account, please contact our support at %s.", 'growtype-form'), get_option('admin_email')) . "\r\n\r\n";
+
+        return $message;
     }
 
     function retrieve_password_notification_email_callback($defaults, $key, $user_login, $user_data)

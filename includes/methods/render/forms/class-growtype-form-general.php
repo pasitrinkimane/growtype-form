@@ -304,7 +304,6 @@ class Growtype_Form_General
          * Render forms
          * $form_type Fields - plain fields with no extra features
          */
-
         if ($form_type === 'fields') {
             return $this->render_growtype_fields($form_data, $form_name);
         } elseif (str_contains($form_name, 'login')) {
@@ -330,22 +329,22 @@ class Growtype_Form_General
     /**
      * @return void
      */
-    function render_growtype_fields($form, $form_name)
+    public function render_growtype_fields($form, $form_name)
     {
         /**
          * Form main fields
          */
-        $main_fields = $form['main_fields'] ?? null;
+        $main_fields = isset($form['main_fields']) ? $form['main_fields'] : [];
 
         /**
          * Form confirmation fields
          */
-        $confirmation_fields = $form['confirmation_fields'] ?? null;
+        $confirmation_fields = isset($form['confirmation_fields']) ? $form['confirmation_fields'] : [];
 
         /**
          * Classes
          */
-        $form_class = $form['class'] ?? null;
+        $form_class = isset($form['class']) ? $form['class'] : '';
 
         ob_start();
         ?>
@@ -900,11 +899,11 @@ class Growtype_Form_General
                 jQuery('<button class="far fa-eye-slash show-hide-pw" type="button">&nbsp;</button>').insertAfter(ele);
                 jQuery('.growtype-form-wrapper .show-hide-pw').click(function () {
                     if (jQuery(this).hasClass(close)) {
-                        jQuery(this).closest('.e-wrapper').find('input[type="password"]').prop('type', 'text');
+                        jQuery(this).parent().find('input[type="password"]').prop('type', 'text');
                         jQuery(this).removeClass(close);
                         jQuery(this).addClass(open);
                     } else {
-                        jQuery(this).closest('.e-wrapper').find('input[type="text"]').prop('type', 'password');
+                        jQuery(this).parent().find('input[type="text"]').prop('type', 'password');
                         jQuery(this).removeClass(open);
                         jQuery(this).addClass(close);
                     }

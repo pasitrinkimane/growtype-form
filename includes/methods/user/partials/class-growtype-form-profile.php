@@ -78,6 +78,11 @@ class Growtype_Form_Profile
                 $data['user'] = $this->get_user_data();
 
                 /**
+                 * Add profile external data
+                 */
+                $data = apply_filters('growtype_form_profile_data', $data);
+
+                /**
                  * Template
                  */
                 echo growtype_form_include_view('profile.index', ['data' => $data]);

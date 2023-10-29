@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Growtype - Form\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-19 15:02+0000\n"
+"POT-Creation-Date: 2023-10-23 14:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -45,7 +45,7 @@ msgstr ""
 msgid "Advanced form functionality for \"Growtype\" theme."
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:652
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:652
 msgid "At least one selection is required."
 msgstr ""
 
@@ -72,8 +72,12 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:179
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:220
 msgid "Check your e-mail for login information."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:49
+msgid "Click on the following link to initiate the password reset process:"
 msgstr ""
 
 #: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:263
@@ -97,6 +101,7 @@ msgstr ""
 #: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:144
 #: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:235
 #: ../../../../../../packages/plugins/growtype-form/admin/methods/users/class-growtype-form-signups-list-table.php:186
+#: ../../../../../../packages/plugins/growtype-form/resources/views/components/forms/newsletter.php:5
 msgid "Email"
 msgstr ""
 
@@ -117,7 +122,7 @@ msgstr ""
 msgid "For more information:"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:272
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:270
 msgid "Form is not configured. Please contact site admin."
 msgstr ""
 
@@ -169,17 +174,34 @@ msgstr ""
 msgid "http://newcoolstudio.com/"
 msgstr ""
 
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:51
+#, php-format
+msgid ""
+"If you didn't request this password reset, or if you have any questions "
+"about the security of your account, please contact our support at %s."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:48
+msgid "It seems that you've requested a password reset for your account."
+msgstr ""
+
 #. %s: notification date
 #: ../../../../../../packages/plugins/growtype-form/admin/traits/UserSignupAdminManage.php:215
 #, php-format
 msgid "Last notified: %s"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:217
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:258
 msgid "Lost your password?"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:429
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:50
+msgid ""
+"Make sure that your new password is strong and unique for your account's "
+"security."
+msgstr ""
+
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:425
 msgid "Missing values required for login."
 msgstr ""
 
@@ -214,7 +236,7 @@ msgstr ""
 msgid "Overview"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:436
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:433
 msgid "Passwords do not match"
 msgstr ""
 
@@ -233,7 +255,7 @@ msgstr ""
 msgid "Pending users list navigation"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:799
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:810
 msgid "Please enter password."
 msgstr ""
 
@@ -246,7 +268,7 @@ msgid "Please login to update your information."
 msgstr ""
 
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:482
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:515
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:522
 msgid "Please use another email."
 msgstr ""
 
@@ -307,8 +329,8 @@ msgstr ""
 msgid "Resend Activation Emails"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:504
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:507
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:504
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:507
 msgid "Save"
 msgstr ""
 
@@ -327,7 +349,7 @@ msgstr ""
 msgid "Select user: %s"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:70
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:111
 msgid "Sign in"
 msgstr ""
 
@@ -343,7 +365,7 @@ msgstr ""
 msgid "Sign up"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:576
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:587
 msgid "Sign up successful."
 msgstr ""
 
@@ -408,13 +430,13 @@ msgid_plural "%s activation emails successfully sent! "
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/signup/class-growtype-form-signup.php:153
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/signup/class-growtype-form-signup.php:151
 msgid "Something went wrong, please try again."
 msgstr ""
 
 #: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:484
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:517
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:582
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:524
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:593
 msgid "Something went wrong."
 msgstr ""
 
@@ -442,7 +464,7 @@ msgstr ""
 msgid "Terms & Conditions"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:579
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:590
 msgid "The information was successfully updated."
 msgstr ""
 
@@ -466,11 +488,11 @@ msgstr ""
 msgid "This is the administration screen for pending accounts on your site."
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:499
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:506
 msgid "Unfortunately, you cannot use this username."
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:417
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:417
 msgid "Update"
 msgstr ""
 
@@ -502,11 +524,11 @@ msgstr ""
 msgid "Wrong data submitted. Please contact site admin."
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/class-growtype-form-render.php:653
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/render/forms/class-growtype-form-general.php:653
 msgid "Wrong date format. Please select again."
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:175
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:216
 msgid "Wrong login details. Please try again."
 msgstr ""
 
@@ -526,7 +548,7 @@ msgstr ""
 msgid "You are about to resend an activation email to the following accounts:"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:177
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/login/class-growtype-form-login.php:218
 msgid "You are now logged out."
 msgstr ""
 
@@ -536,18 +558,18 @@ msgid ""
 "Username, Email or Registered column headers."
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:792
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:803
 msgid "Your Password Must Contain At Least 1 Capital Letter!"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:795
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:806
 msgid "Your Password Must Contain At Least 1 Lowercase Letter!"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:789
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:800
 msgid "Your Password Must Contain At Least 1 Number!"
 msgstr ""
 
-#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:786
+#: ../../../../../../packages/plugins/growtype-form/includes/methods/crud/class-growtype-form-crud.php:797
 msgid "Your Password Must Contain At Least 8 Characters!"
 msgstr ""
