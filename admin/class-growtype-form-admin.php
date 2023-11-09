@@ -45,6 +45,7 @@ class Growtype_Form_Admin
     /**
      * Traits
      */
+    use AdminSettingCredentials;
     use AdminSettingGeneral;
     use AdminSettingsLogin;
     use AdminSettingsSignup;
@@ -67,6 +68,11 @@ class Growtype_Form_Admin
 
         if (is_admin()) {
             add_action('admin_menu', array ($this, 'add_custom_options_page'));
+
+            /**
+             * Credentials
+             */
+            add_action('admin_init', array ($this, 'credentials_content'));
 
             /**
              * AdminGeneral
@@ -113,6 +119,16 @@ class Growtype_Form_Admin
              */
             add_filter('walker_nav_menu_start_el', array ($this, 'update_growtype_form_frontend_menu_links'), 10, 4);
         }
+
+        /**
+         * Login Enqueue styles
+         */
+        add_action('login_enqueue_scripts', array ($this, 'login_enqueue_scripts_callback'));
+    }
+
+    function login_enqueue_scripts_callback()
+    {
+        wp_enqueue_style('growtype-form-login', plugin_dir_url(__FILE__) . 'css/growtype-form-login.css', array (), GROWTYPE_FORM_VERSION, 'all');
     }
 
     /**
@@ -136,21 +152,7 @@ class Growtype_Form_Admin
      */
     public function enqueue_styles()
     {
-
-        /**
-         * This function is provided for demonstration purposes only.
-         *
-         * An instance of this class should be passed to the run() function
-         * defined in Growtype_Form_Loader as all of the hooks are defined
-         * in that particular class.
-         *
-         * The Growtype_Form_Loader will then create the relationship
-         * between the defined hooks and the functions defined in this
-         * class.
-         */
-
-        wp_enqueue_style($this->Growtype_Form, plugin_dir_url(__FILE__) . 'css/growtype-form-admin.css', array (), $this->version, 'all');
-
+        wp_enqueue_style($this->Growtype_Form, plugin_dir_url(__FILE__) . 'css/growtype-form-admin.css', array (), GROWTYPE_FORM_VERSION, 'all');
     }
 
     /**
@@ -198,6 +200,7 @@ class Growtype_Form_Admin
      */
     function growtype_form_settings_tabs($current = self::GROWTYPE_FORM_SETTINGS_DEFAULT_TAB)
     {
+        $tabs['credentials'] = 'Credentials';
         $tabs['login'] = 'Login';
         $tabs['signup'] = 'Signup';
         $tabs['post'] = 'Post';
@@ -242,8 +245,6 @@ class Growtype_Form_Admin
                 }
                 ?>
 
-                <p><b>Json beautifier:</b> <a href="https://jsonbeautify.com/" target="_blank">https://jsonbeautify.com/</a></p>
-
                 <form id="growtype_form_main_settings_form" method="post" action="options.php">
                     <?php
 
@@ -254,6 +255,14 @@ class Growtype_Form_Admin
                     }
 
                     switch ($tab) {
+                        case 'credentials':
+                            settings_fields('growtype_form_settings_credentials');
+
+                            echo '<table class="form-table">';
+                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_credentials');
+                            echo '</table>';
+
+                            break;
                         case 'general':
                             settings_fields('growtype_form_settings_general');
 

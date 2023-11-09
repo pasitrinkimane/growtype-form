@@ -1,5 +1,13 @@
 .growtype-form-wrapper {
   color: black;
+
+  .form-wrapper {
+    border-radius: 10px;
+    position: relative;
+    background: white;
+    overflow: hidden;
+    border: 1px solid #dadce0;
+  }
 }
 
 .growtype-form {

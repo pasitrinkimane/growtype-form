@@ -4,14 +4,6 @@
       max-width: 558px;
     }
 
-    .form-wrapper {
-      border-radius: 10px;
-      position: relative;
-      background: white;
-      overflow: hidden;
-      border: 1px solid #dadce0;
-    }
-
     form {
       padding: 30px;
       @include bp-phone-xl() {

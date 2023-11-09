@@ -85,20 +85,20 @@ class Growtype_Form_General
         /**
          * Main css
          */
-        wp_enqueue_style('growtype-form-render', GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form-render.css', array (), '1.1', 'all');
+        wp_enqueue_style('growtype-form-render', GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form-render.css', array (), GROWTYPE_FORM_VERSION, 'all');
 
         /**
          * Styles
          */
         if (!wp_script_is('image-uploader', 'enqueued')) {
-            wp_enqueue_style('image-uploader', GROWTYPE_FORM_URL_PUBLIC . 'plugins/image-uploader/image-uploader.css', array (), '1.1', 'all');
+            wp_enqueue_style('image-uploader', GROWTYPE_FORM_URL_PUBLIC . 'plugins/image-uploader/image-uploader.css', array (), '1.0', 'all');
         }
 
         /**
          * Jquery UI
          */
         if (!wp_script_is('jquery-ui', 'enqueued')) {
-            wp_enqueue_style('jquery-ui', 'https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css', array (), '1.1', 'all');
+            wp_enqueue_style('jquery-ui', 'https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css', array (), '1.0', 'all');
         }
 
         /**
@@ -112,14 +112,14 @@ class Growtype_Form_General
          * Signup styles
          */
         if (str_contains($form_name, 'signup')) {
-            wp_enqueue_style('growtype-form-signup', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/signup/main.css', array (), '1.1', 'all');
+            wp_enqueue_style('growtype-form-signup', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/signup/main.css', array (), GROWTYPE_FORM_VERSION, 'all');
         }
 
         /**
          * Signup styles
          */
         if (str_contains($form_name, 'login')) {
-            wp_enqueue_style('growtype-form-login', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/login/main.css', array (), '1.1', 'all');
+            wp_enqueue_style('growtype-form-login', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/login/main.css', array (), GROWTYPE_FORM_VERSION, 'all');
         }
 
         do_action('growtype_form_render_styles');

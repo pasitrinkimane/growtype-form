@@ -11,8 +11,8 @@ class Growtype_Form_Google
 
     public function __construct()
     {
-        $this->client_id = '742065155794-qhot1rd7a6o7o84gmstk64ol3d78aro9.apps.googleusercontent.com';
-        $this->client_secret = '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';
+        $this->client_id = get_option('growtype_form_settings_credentials_google_client_id');
+        $this->client_secret = get_option('growtype_form_settings_credentials_google_client_secret');
 
         add_action('init', array ($this, 'validate_response'));
     }
@@ -96,7 +96,7 @@ class Growtype_Form_Google
 
                     $growtype_form_crud = new Growtype_Form_Crud();
 
-                    $growtype_form_crud->update_user_data($user_id, [
+                    $growtype_form_crud->update_user_meta_details($user_id, [
                         'first_name' => $first_name,
                         'last_name' => $last_name,
                         'gender' => $gender,

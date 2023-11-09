@@ -21,7 +21,7 @@ trait AdminAppearanceMenu
     {
         add_meta_box(
             'growtype_form_nav_manu',
-            __('Growtype Form', 'growtype-form'),
+            'Growtype Form',
             array ($this, 'render_nav_menu_meta_box_content'),
             'nav-menus',
             'side',

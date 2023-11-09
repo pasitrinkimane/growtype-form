@@ -61,7 +61,7 @@ class Growtype_Form_Public
      */
     public function enqueue_styles()
     {
-        wp_enqueue_style($this->Growtype_Form, GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form.css', array (), $this->version, 'all');
+        wp_enqueue_style($this->Growtype_Form, GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form.css', array (), GROWTYPE_FORM_VERSION, 'all');
     }
 
     /**
@@ -71,7 +71,7 @@ class Growtype_Form_Public
      */
     public function enqueue_scripts()
     {
-        wp_enqueue_script($this->Growtype_Form, GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form.js', array ('jquery'), $this->version, true);
+        wp_enqueue_script($this->Growtype_Form, GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form.js', array ('jquery'), GROWTYPE_FORM_VERSION, true);
 
         wp_localize_script($this->Growtype_Form, 'growtype_form',
             array (

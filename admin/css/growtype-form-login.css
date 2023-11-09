@@ -1,0 +1,25 @@
+/**
+ * All of the CSS for your admin-specific functionality should be
+ * included in this file.
+ */
+
+.login #nav, #backtoblog, .privacy-policy-page-link {
+    display: none;
+}
+
+.login #login {
+    width: 350px;
+}
+
+.login #login .forgetmenot {
+    margin-bottom: 10px;
+}
+
+.login .button.button-large, .login .button-group.button-large .button {
+    width: 100%;
+    background: black;
+    border-color: black;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 14px;
+}

@@ -1,11 +1,12 @@
 <select name="<?= $field_name ?>"
         data-placeholder="<?php echo isset($placeholder) ? $placeholder : '' ?>"
         id="<?= $field_name ?>"
+        data-params='<?php echo isset($field_params) ? $field_params : '' ?>'
     <?= $field_required ? 'required' : '' ?>
     <?= $field_multiple ? 'multiple' : '' ?>
 >
     <?php if (!$field_multiple && isset($placeholder) && !empty($placeholder)) { ?>
-        <option value="" <?php echo empty($selected_options) ? 'selected' : '' ?> disabled hidden <?= in_array('', $selected_options) ? 'selected' : '' ?>><?= $placeholder ?></option>
+        <option value="" <?php echo empty($selected_options) ? 'selected' : '' ?> disabled hidden <?= in_array('', $selected_options) ? 'selected' : '' ?>></option>
     <?php } ?>
     <?php if (isset($select_type) && $select_type === 'key_value') {
         foreach ($field_options as $key => $field_option) { ?>

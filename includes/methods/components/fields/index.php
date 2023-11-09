@@ -25,6 +25,10 @@ if (str_contains($field_name, 'password')) {
 }
 
 $field_options = isset($field['options']) ? $field['options'] : [];
+
+$field_params = isset($field['params']) ? $field['params'] : [];
+$field_params = json_encode($field_params);
+
 $selected_options = isset($field['selected_options']) ? $field['selected_options'] : [$field_value];
 $select_type = isset($field['select_type']) ? $field['select_type'] : null;
 $field_label = isset($field['label']) ? $field['label'] : null;
