@@ -18,7 +18,9 @@
         <?php } ?>
         <?php if (isset($form_args['footer']['bottom'])) { ?>
             <div class="growtype-form-footer-bottom">
-                <?php echo growtype_form_string_replace_custom_variable($form_args['footer']['bottom']['html']) ?>
+                <?php echo growtype_form_string_replace_custom_variable($form_args['footer']['bottom']['html'], !empty($form_args['redirect_after']) ? [
+                    'redirect_after' => $form_args['redirect_after']
+                ] : []) ?>
             </div>
         <?php } ?>
     </div>

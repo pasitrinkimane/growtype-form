@@ -150,7 +150,7 @@ trait AdminSettingsPost
      */
     function growtype_form_post_default_email_to_subject_callback()
     {
-        $growtype_form_post_default_email_to_subject = !empty(get_option('growtype_form_post_default_email_to_subject')) ? get_option('growtype_form_post_default_email_to_subject') : 'Growtype Form - New post created';
+        $growtype_form_post_default_email_to_subject = !empty(get_option('growtype_form_post_default_email_to_subject')) ? get_option('growtype_form_post_default_email_to_subject') : 'Growtype Form - New submission';
         ?>
         <input type="text" name="growtype_form_post_default_email_to_subject" class="regular-text qtranxs-translatable" value="<?php echo $growtype_form_post_default_email_to_subject ?>"/>
         <?php
@@ -161,7 +161,7 @@ trait AdminSettingsPost
      */
     function growtype_form_post_default_email_to_content_callback()
     {
-        $growtype_form_post_default_email_to_content = !empty(get_option('growtype_form_post_default_email_to_content')) ? get_option('growtype_form_post_default_email_to_content') : '<h2>New post submission,</h2></br> Below are the details of the post submission: </br> $post_content';
+        $growtype_form_post_default_email_to_content = !empty(get_option('growtype_form_post_default_email_to_content')) ? get_option('growtype_form_post_default_email_to_content') : '<h2>New post submission,</h2></br> Below are the details of the form submission: </br> $post_content';
 
         wp_editor($growtype_form_post_default_email_to_content, 'growtype_form_post_default_email_to_content', array (
             'textarea_name' => 'growtype_form_post_default_email_to_content',

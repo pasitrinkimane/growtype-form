@@ -52,6 +52,7 @@ $field_icon = isset($field['icon']) ? $field['icon'] : null;
 $field_price = isset($field['price']) ? $field['price'] : null;
 $field_group = isset($field['group']) ? $field['group'] : null; // inputs can be grouped together
 $field_autocomplete = isset($field['autocomplete']) && $field['autocomplete'] === 'true' ? 'on' : 'off';
+$field_id = isset($field['id']) ? $field['id'] : $field_name;
 $conditions = isset($field['conditions']) && !empty($field['conditions']) ? json_encode($field['conditions']) : '';
 
 if (!in_array($field_type, Growtype_Form_General::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {

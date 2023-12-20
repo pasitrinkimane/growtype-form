@@ -217,14 +217,14 @@ trait Product
          */
         if ($product->get_id() === 0) {
             $response['success'] = false;
-            $response['message'] = __("Something went wrong. Please contact administrator.", "growtype-form");
+            $response['messages'] = __("Something went wrong. Please contact administrator.", "growtype-form");
         } else {
             $response['product_id'] = $product->get_id();
 
             if (!empty($existing_product)) {
-                $response['message'] = __("Product updated.", "growtype-form");
+                $response['messages'] = __("Product updated.", "growtype-form");
             } else {
-                $response['message'] = __("Product created.", "growtype-form");
+                $response['messages'] = __("Product created.", "growtype-form");
             }
 
             $response['success'] = true;

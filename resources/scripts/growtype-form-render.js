@@ -233,6 +233,11 @@ function setupImageUploader() {
                     maxFiles: imageUploaderInitialMaxFiles ? imageUploaderInitialMaxFiles : 1,
                     label: imageUploaderLabel,
                 });
+
+                /**
+                 * Format label
+                 */
+                $('.image-uploader-init .upload-text span:first').html($('.image-uploader-init .upload-text span:first').text())
             });
         }
     } else {

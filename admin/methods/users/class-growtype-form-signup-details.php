@@ -93,8 +93,8 @@ class Growtype_Form_Signup_Details
 
         // Manage signups.
         $hooks['signups'] = $this->signups_page = add_users_page(
-            __('GF Signups', 'growtype-form'),
-            __('GF Signups', 'growtype-form'),
+            __('GF - Signups', 'growtype-form'),
+            __('GF - Signups', 'growtype-form'),
             $this->capability,
             'gf-signups',
             array ($this, 'signups_admin')

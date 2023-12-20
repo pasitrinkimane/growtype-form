@@ -79,6 +79,8 @@ function growtype_form_redirect_url_after_login()
 
     if (isset($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], 'wp/wp-login')) {
         $redirect_url = get_dashboard_url();
+    } elseif (isset($_COOKIE['growtype_form_redirect_after'])) {
+        $redirect_url = $_COOKIE['growtype_form_redirect_after'];
     } elseif ($redirect_page === 'dashboard') {
         $redirect_url = get_dashboard_url();
     } elseif ($redirect_page === 'default-profile') {

@@ -49,6 +49,10 @@
 
     .form-check-input[type=checkbox] {
       margin-right: 7px;
+
+      + .form-label {
+        padding-left: 5px;
+      }
     }
 
     .field-description {
@@ -112,6 +116,15 @@
 }
 
 .login-template-default, .signup-template-default {
+  .container {
+    .growtype-form-wrapper {
+      .growtype-form-container {
+        padding-left: 0;
+        padding-right: 0;
+      }
+    }
+  }
+
   .growtype-form-wrapper {
     .growtype-form-container {
       margin: auto;

@@ -134,7 +134,7 @@ trait AdminSettingsWoocommercePlugin
     {
         $input_val = get_option('growtype_form_redirect_after_product_creation');
         ?>
-        <input id="growtype_form_redirect_after_product_creation" class="input" name="growtype_form_redirect_after_product_creation" style="width: 100%;" value="<?= $input_val ?>">
+        <input type="text" id="growtype_form_redirect_after_product_creation" class="regular-text qtranxs-translatable" name="growtype_form_redirect_after_product_creation" style="width: 100%;" value="<?= $input_val ?>">
         <?php
     }
 

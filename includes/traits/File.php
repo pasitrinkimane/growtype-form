@@ -52,7 +52,7 @@ trait File
 
         if (isset($upload_featured_image['error'])) {
             $response['success'] = false;
-            $response['message'] = $upload_featured_image['error'];
+            $response['messages'] = $upload_featured_image['error'];
 
             return $response;
         }

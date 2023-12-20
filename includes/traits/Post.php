@@ -18,15 +18,30 @@ trait Post
         $submitted_values = apply_filters('growtype_form_post_submitted_values', $submitted_values);
         $submitted_data = $submitted_values['data'];
 
-        $post_type = isset($form_data['post_type']) ? $form_data['post_type'] : null;
+        $post_type = isset($form_data['post_type']) ? $form_data['post_type'] : Growtype_Form_Submissions::POST_TYPE_NAME;
 
         if (empty($post_type)) {
             return null;
         }
 
-        $growtype_form_settings_post_saving_post_title_name = get_option('growtype_form_settings_post_saving_post_title_name', 'title');
+        /**
+         * Set post title
+         */
+        $post_title = date('Y-m-d H:i:s');
 
-        $post_title = isset($submitted_data[$growtype_form_settings_post_saving_post_title_name]) ? $submitted_data[$growtype_form_settings_post_saving_post_title_name] : date('Y-m-d H:i:s');
+        $growtype_form_settings_post_saving_post_title_name = get_option('growtype_form_settings_post_saving_post_title_name');
+
+        if (isset($submitted_data[$growtype_form_settings_post_saving_post_title_name]) && !empty($submitted_data[$growtype_form_settings_post_saving_post_title_name])) {
+            $post_title = $submitted_data[$growtype_form_settings_post_saving_post_title_name];
+        } else {
+            $alternative_titles_keys = ['title', 'name'];
+            foreach ($alternative_titles_keys as $alternative_title_key) {
+                if (isset($submitted_data[$alternative_title_key]) && !empty($submitted_data[$alternative_title_key])) {
+                    $post_title = $submitted_data[$alternative_title_key];
+                    break;
+                }
+            }
+        }
 
         /**
          * Filter post title
@@ -46,11 +61,10 @@ trait Post
             }
         }
 
-        /**
-         * Include IP details
-         */
-        $submitted_data['HTTP_X_FORWARDED_FOR'] = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
-        $submitted_data['REMOTE_ADDR'] = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+        $submission_content_values = $submitted_data;
+
+        unset($submission_content_values['growtype_form_name']);
+        unset($submission_content_values['growtype_form_post_id']);
 
         /**
          * Format post content
@@ -58,8 +72,7 @@ trait Post
         ob_start();
 
         echo growtype_form_include_view('post.content', [
-            'submitted_data' => $submitted_data,
-            'form_data' => $form_data
+            'submitted_data' => $submission_content_values,
         ]);
 
         $formatted_content = ob_get_clean();
@@ -87,9 +100,26 @@ trait Post
 
         if (is_wp_error($post_id)) {
             $response['success'] = false;
-            $response['message'] = __("Something went wrong. Please contact administrator.", "growtype-form");
+            $response['messages'] = __("Something went wrong. Please contact administrator.", "growtype-form");
 
             return $response;
+        }
+
+        /**
+         * Extra meta values for general submission
+         */
+        if ($post_type === Growtype_Form_Submissions::POST_TYPE_NAME) {
+            update_post_meta($post_id, 'form_name', $form_data['form_name']);
+            update_post_meta($post_id, 'submitted_values', json_encode($submitted_values));
+
+            /**
+             * Include IP details
+             */
+            $server_http_x_forwarded_for = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+            $server_remote_addr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+
+            update_post_meta($post_id, 'server_http_x_forwarded_for', $server_http_x_forwarded_for);
+            update_post_meta($post_id, 'server_remote_addr', $server_remote_addr);
         }
 
         /**
@@ -102,7 +132,7 @@ trait Post
         $response['post_id'] = $post_id;
         $response['success'] = true;
         $response['post_content'] = $post_content;
-        $response['message'] = isset($form_data['success_message']) ? $form_data['success_message'] : __("Post has been submitted successfully.", "growtype-form");
+        $response['messages'] = isset($form_data['success_message']) ? $form_data['success_message'] : __("Form has been submitted successfully.", "growtype-form");
 
         return $response;
     }
@@ -130,6 +160,7 @@ trait Post
     {
         if (!empty($post_id) && !empty($files)) {
             $file_urls = [];
+            $uploaded_attachments = [];
             foreach ($files as $file) {
                 $uploaded_files = $this->upload_files_to_media_library($file);
 
@@ -144,6 +175,7 @@ trait Post
                         $file_url = wp_get_attachment_url($uploaded_file['attachment_id']);
 
                         array_push($file_urls, $file_url);
+                        array_push($uploaded_attachments, $uploaded_file);
                     }
                 }
             }
@@ -152,6 +184,8 @@ trait Post
                 $post = get_post($post_id);
                 $post_content = $post->post_content;
                 $post_content .= '<br><br><h3><b>Files:</b></h3><br>' . implode('<br>', $file_urls);
+
+                update_post_meta($post_id, 'uploaded_attachments', json_encode($uploaded_attachments));
 
                 return wp_update_post([
                     'ID' => $post_id,

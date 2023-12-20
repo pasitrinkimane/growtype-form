@@ -6,7 +6,7 @@
  * Custom url
  */
 if (!function_exists('growtype_form_string_replace_custom_variable')) {
-    function growtype_form_string_replace_custom_variable($string)
+    function growtype_form_string_replace_custom_variable($string, $params = [])
     {
         global $wp;
 
@@ -58,6 +58,16 @@ if (!function_exists('growtype_form_string_replace_custom_variable')) {
                     break;
             }
 
+            $counter = 0;
+            foreach ($params as $key => $param) {
+                if ($counter === 0) {
+                    $replace = $replace . '?' . $key . '=' . $param;
+                } else {
+                    $replace = $replace . '&' . $key . '=' . $param;
+                }
+                $counter++;
+            }
+
             if (isset($replace) && !empty($replace)) {
                 $string = str_replace($variable_to_replace, $replace, $string);
             }
@@ -83,6 +93,7 @@ function growtype_form_extract_form_args($form)
     $class = isset($form['class']) && !empty($form['class']) ? $form['class'] : "";
     $submit_row = isset($form['submit_row']) && !empty($form['submit_row']) ? $form['submit_row'] : "";
     $main_fields = isset($form['main_fields']) && !empty($form['main_fields']) ? $form['main_fields'] : "";
+    $redirect_after = isset($form['args']['redirect_after']) && !empty($form['args']['redirect_after']) ? $form['args']['redirect_after'] : "";
 
     $wp_login_form = $form['form'] ?? null;
     $lost_password_btn = $wp_login_form['lost_password_btn'] ?? null;
@@ -112,6 +123,7 @@ function growtype_form_extract_form_args($form)
         'confirmation_fields' => $confirmation_fields,
         'submit_row' => $submit_row,
         'main_fields' => $main_fields,
+        'redirect_after' => $redirect_after,
         'wp_login_form' => [
             'redirect' => $redirect,
             'form_id' => $wp_login_form_id,

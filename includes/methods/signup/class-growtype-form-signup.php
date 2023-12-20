@@ -129,7 +129,7 @@ class Growtype_Form_Signup
         if (!validate_username($username)) {
             return [
                 'success' => false,
-                'message' => __("Not a valid username. </br></br> Please check the following criteria for a valid username: </br>
+                'messages' => __("Not a valid username. </br></br> Please check the following criteria for a valid username: </br>
 - Your username must contain at least 3 characters. </br>
 - It may only consist of letters (a-z, A-Z), numbers (0-9), hyphens (-), and underscores (_). </br>
 - Special characters and spaces are not allowed. </br>
@@ -148,15 +148,28 @@ Please review your username and make the necessary corrections to meet these req
         }
 
         if (is_wp_error($user_id)) {
-            $message = __('Something went wrong, please try again.', 'growtype-form');
+            $messages = __('Something went wrong, please try again.', 'growtype-form');
 
-            if (isset($user_id->errors['existing_user_login'])) {
-                $message = $user_id->errors['existing_user_login'][0];
+            $error_message = $user_id->get_error_messages();
+
+            if (isset($error_message[0])) {
+                $messages = $error_message;
+            }
+
+            if (isset($user_id->errors['registration-error-email-exists'][0])) {
+                $login_page_url = growtype_form_login_page_url();
+
+                if (isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI'])) {
+                    $redirect_after = home_url() . $_SERVER['REQUEST_URI'];
+                    $login_page_url = $login_page_url . '?redirect_after=' . $redirect_after;
+                }
+
+                $messages = str_replace('#', $login_page_url, $user_id->errors['registration-error-email-exists'][0]);
             }
 
             return [
                 'success' => false,
-                'message' => $message,
+                'messages' => $messages,
                 'user_id' => null,
             ];
         }
@@ -187,7 +200,7 @@ Please review your username and make the necessary corrections to meet these req
 
         return [
             'success' => true,
-            'message' => 'success',
+            'messages' => 'Registration is successful.',
             'user_id' => $user_id,
         ];
     }

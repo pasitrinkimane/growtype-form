@@ -1,4 +1,15 @@
 .growtype-form-wrapper {
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield; /* Firefox */
+  }
+
   input:not([type=checkbox]):not([type=radio]):not([type=submit]):not(.qty), textarea {
     min-height: 48px;
     padding-left: 15px;
@@ -84,9 +95,9 @@
     border: 1px solid #aaaaaa;
   }
 
-  label.error-label {
+  label.error-label, label.error {
     margin-top: 5px;
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .chosen-container-single .chosen-single {

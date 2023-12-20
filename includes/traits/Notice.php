@@ -8,12 +8,12 @@ trait Notice
     /**
      * @return void
      */
-    public function growtype_form_set_notice($message, $status, $time = null)
+    public function growtype_form_set_notice($messages, $status, $time = null)
     {
         $time = !empty($time) ? $time : time() + 5;
 
-        if (!empty($message)) {
-            setcookie('growtype_form_notice_message', $message, $time, COOKIEPATH, COOKIE_DOMAIN);
+        if (!empty($messages)) {
+            setcookie('growtype_form_notice_messages', json_encode($messages), $time, COOKIEPATH, COOKIE_DOMAIN);
         }
 
         if (!empty($status)) {
@@ -26,12 +26,16 @@ trait Notice
      */
     public static function growtype_form_get_notice()
     {
-        $message = isset($_COOKIE['growtype_form_notice_message']) ? $_COOKIE['growtype_form_notice_message'] : null;
+        $messages = isset($_COOKIE['growtype_form_notice_messages']) ? json_decode(stripslashes($_COOKIE['growtype_form_notice_messages']), true) : [];
+        $messages = !empty($messages) && !is_array($messages) ? [$messages] : $messages;
+
         $status = isset($_COOKIE['growtype_form_notice_status']) ? $_COOKIE['growtype_form_notice_status'] : null;
 
-        if (!empty($status) && !empty($message)) { ?>
+        if (!empty($status) && !empty($messages)) { ?>
             <div id="growtype-form-alert" class="alert alert-dismissible fade show <?= $status === 'success' ? 'alert-success' : 'alert-danger' ?>" role="alert">
-                <?php echo __($message, "growtype-form") ?>
+                <?php foreach ($messages as $message) {
+                    echo __($message, "growtype-form");
+                } ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             <script>
@@ -51,7 +55,7 @@ trait Notice
             </script>
         <?php }
 
-        unset($_COOKIE['growtype_form_notice_message']);
+        unset($_COOKIE['growtype_form_notice_messages']);
         setcookie('notice_message', '', time(), COOKIEPATH, COOKIE_DOMAIN);
 
         unset($_COOKIE['growtype_form_notice_status']);

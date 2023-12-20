@@ -18,18 +18,23 @@ class Growtype_Form_Crud
         self::GROWTYPE_FORM_NAME_IDENTIFICATOR,
         self::GROWTYPE_FORM_POST_IDENTIFICATOR,
         self::GROWTYPE_FORM_SPAM_IDENTIFICATOR,
+        self::GROWTYPE_FORM_REDIRECT_AFTER,
+        self::GROWTYPE_QUIZ_UNIQUE_HASH,
         'preloaded',
     ];
 
-    const INCLUDED_VALUES_IN_VALIDATION = [
+    const INCLUDED_VALUES_AFTER_VALIDATION = [
         self::GROWTYPE_FORM_SUBMITTER_ID,
         self::GROWTYPE_FORM_NAME_IDENTIFICATOR,
-        self::GROWTYPE_FORM_POST_IDENTIFICATOR
+        self::GROWTYPE_FORM_POST_IDENTIFICATOR,
+        self::GROWTYPE_QUIZ_UNIQUE_HASH
     ];
 
     const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
     const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
     const GROWTYPE_FORM_POST_IDENTIFICATOR = 'growtype_form_post_id';
+    const GROWTYPE_FORM_REDIRECT_AFTER = 'growtype_form_redirect_after';
+    const GROWTYPE_QUIZ_UNIQUE_HASH = 'growtype_quiz_unique_hash';
     const GROWTYPE_FORM_SPAM_IDENTIFICATOR = 'email_spam';
     const GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS = ['submit', 'preview', 'save_as_draft', 'delete', 'update'];
     const GROWTYPE_FORM_SUBMIT_ACTION = 'growtype_form_submit_action';
@@ -37,6 +42,7 @@ class Growtype_Form_Crud
         'password',
         'repeat_password',
         'submit',
+        self::GROWTYPE_FORM_REDIRECT_AFTER,
         self::GROWTYPE_FORM_SUBMIT_ACTION,
         self::GROWTYPE_FORM_SPAM_IDENTIFICATOR,
         self::GROWTYPE_FORM_SUBMITTER_ID
@@ -58,12 +64,12 @@ class Growtype_Form_Crud
         }
 
         /**
-         * Partials
+         * Auth
          */
-        include_once GROWTYPE_FORM_PATH . 'includes/methods/crud/partials/class-growtype-form-facebook.php';
+        include_once GROWTYPE_FORM_PATH . 'includes/methods/crud/auth/class-growtype-form-facebook.php';
         new Growtype_Form_Facebook();
 
-        include_once GROWTYPE_FORM_PATH . 'includes/methods/crud/partials/class-growtype-form-google.php';
+        include_once GROWTYPE_FORM_PATH . 'includes/methods/crud/auth/class-growtype-form-google.php';
         new Growtype_Form_Google();
     }
 
@@ -72,10 +78,6 @@ class Growtype_Form_Crud
      */
     function growtype_form_process_posted_data()
     {
-        if (isset($_GET['redirect_after']) && !empty($_GET['redirect_after'])) {
-            setcookie('growtype_form_redirect_after', $_GET['redirect_after'], time() + 20, COOKIEPATH, COOKIE_DOMAIN);
-        }
-
         /**
          * Process posted values
          */
@@ -138,6 +140,17 @@ class Growtype_Form_Crud
     function process_form_submitted_values($form_name, $submitted_values)
     {
         /**
+         * Set redirect url
+         */
+        if (isset($submitted_values['data']['growtype_form_redirect_after']) && !empty($submitted_values['data']['growtype_form_redirect_after'])) {
+            $redirect_url = $submitted_values['data']['growtype_form_redirect_after'];
+        } elseif (isset($_COOKIE['growtype_form_redirect_after'])) {
+            $redirect_url = $_COOKIE['growtype_form_redirect_after'];
+        } elseif (isset($_GET['redirect_after']) && !empty($_GET['redirect_after'])) {
+            $redirect_url = $_GET['redirect_after'];
+        }
+
+        /**
          * Get form data
          */
         $form_data = self::get_growtype_form_data($form_name);
@@ -150,7 +163,6 @@ class Growtype_Form_Crud
          * Validate if submitted values match available values
          */
         $submitted_values_sanitized = $this->sanitize_form_submitted_values($form_data, $submitted_values);
-
         $submitted_data = $submitted_values_sanitized;
 
         if (!empty($submitted_data)) {
@@ -176,7 +188,7 @@ class Growtype_Form_Crud
                             growtype_form_login_user($user_id);
                         }
 
-                        if (isset($_GET['redirect_after']) && !empty($_GET['redirect_after'])) {
+                        if (!empty($redirect_url)) {
                             $redirect_url = $_GET['redirect_after'];
                         } else {
                             if ($submit_action === 'update') {
@@ -226,7 +238,7 @@ class Growtype_Form_Crud
 
                     $submit_data['product_id'] = $product_id;
                     $submit_data['success'] = true;
-                    $submit_data['message'] = isset($success_message) ? $success_message : __('Product uploaded.', 'growtype-form');
+                    $submit_data['messages'] = isset($success_message) ? $success_message : __('Product uploaded.', 'growtype-form');
 
                     $redirect_url = growtype_form_redirect_url_after_product_creation();
 
@@ -238,7 +250,7 @@ class Growtype_Form_Crud
                         return $redirect_url;
                     }
                 }
-            } elseif (str_contains($form_name, 'post')) {
+            } else {
                 if (isset($form_data['type']) && $form_data['type'] === 'custom') {
                     $submit_data = apply_filters('growtype_form_upload_post_custom', $form_data, $submitted_values);
                 } else {
@@ -269,28 +281,27 @@ class Growtype_Form_Crud
 
                         if (!empty($post)) {
                             $email_content = $post->post_content;
-                            $email_content = $email_content . '<br><br><p><a href="' . get_edit_post_link($post->ID) . '" target="_blank">View post</a></p>';
+                            $email_content = $email_content . '<br><br><p><a href="' . get_edit_post_link($post->ID) . '" target="_blank">' . __('View submission', 'growtype-form') . ' </a></p>';
 
-                            self::send_email_to_admin($email_content);
+                            self::send_email_to_admin($email_content, $form_data);
                         }
                     }
 
+                    do_action('growtype_form_submit_data_success', $submit_data, $form_data, $submitted_data);
+
                     $submit_data['success'] = true;
-                    $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : __('Record created successfully.', 'growtype-form');
+                    $submit_data['messages'] = isset($submit_data['messages']) ? $submit_data['messages'] : __('Record created successfully.', 'growtype-form');
                 } else {
                     $submit_data['success'] = false;
-                    $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : __('Something went wrong. Please contact site admin.', 'growtype-form');
+                    $submit_data['messages'] = isset($submit_data['messages']) ? $submit_data['messages'] : __('Something went wrong. Please contact site admin.', 'growtype-form');
                 }
-            } else {
-                $submit_data['success'] = false;
-                $submit_data['message'] = __('Wrong data submitted. Please contact site admin.', 'growtype-form');
             }
         } else {
 
             error_log(print_r(sprintf("Growtype Form. VALIDATION FAILED. Empty response. Url: %s", isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : ''), true));
 
             $submit_data['success'] = false;
-            $submit_data['message'] = __('Please fill all required fields.', 'growtype-form');
+            $submit_data['messages'] = __('Please fill all required fields.', 'growtype-form');
         }
 
         /**
@@ -312,7 +323,12 @@ class Growtype_Form_Crud
         /**
          * Prepare session redirect details
          */
-        $this->growtype_form_set_notice(isset($submit_data['message']) ? $submit_data['message'] : __("Something went wrong. Please contact administrator.", "growtype-form"), ($submit_data['success'] ? 'success' : 'error'));
+        $this->growtype_form_set_notice(
+            isset($submit_data['messages']) ? $submit_data['messages'] : [
+                __("Something went wrong. Please contact administrator.", "growtype-form")
+            ],
+            ($submit_data['success'] ? 'success' : 'error')
+        );
 
         /**
          * Redirect url
@@ -339,7 +355,7 @@ class Growtype_Form_Crud
         return $redirect_url;
     }
 
-    public static function send_email_to_admin($submitted_content)
+    public static function send_email_to_admin($submitted_content, $form_data)
     {
         $growtype_form_post_default_email_to = get_option('growtype_form_post_default_email_to');
         $growtype_form_post_default_email_to_subject = get_option('growtype_form_post_default_email_to_subject');
@@ -354,9 +370,18 @@ class Growtype_Form_Crud
         $headers = array ('Content-Type: text/html; charset=UTF-8');
         $admin_email = get_option('admin_email');
 
-        $email_body = str_replace('$post_content', $submitted_content, $growtype_form_post_default_email_to_content);
+        $email_body = str_replace('{post_content}', $submitted_content, $growtype_form_post_default_email_to_content);
+
+        if (isset($form_data['form_name'])) {
+            $email_body = str_replace('{form_name}', $form_data['form_name'], $email_body);
+        }
 
         $headers[] = 'From: Admin <' . $admin_email . '>';
+
+        /**
+         * Debug
+         */
+        error_log(sprintf("Growtype Form. Sending email to admin. Details: %s", print_r([$to, $subject, $email_body, $headers], true)));
 
         wp_mail($to, $subject, $email_body, $headers);
     }
@@ -367,7 +392,6 @@ class Growtype_Form_Crud
      */
     public static function get_growtype_form_data($form_name)
     {
-
         if (empty($form_name)) {
             return null;
         }
@@ -377,12 +401,12 @@ class Growtype_Form_Crud
          */
         if (str_contains($form_name, 'wc_product')) {
             $form_json_content = get_option('growtype_form_wc_product_json_content');
-        } elseif (str_contains($form_name, 'post')) {
-            $form_json_content = get_option('growtype_form_post_json_content');
         } elseif (str_contains($form_name, 'signup')) {
             $form_json_content = get_option('growtype_form_signup_json_content');
         } elseif (str_contains($form_name, 'login')) {
             $form_json_content = get_option('growtype_form_login_json_content');
+        } else {
+            $form_json_content = get_option('growtype_form_post_json_content');
         }
 
         if (!isset($form_json_content) || empty($form_json_content)) {
@@ -400,7 +424,16 @@ class Growtype_Form_Crud
             }
         }
 
-        return $available_forms[$form_name] ?? null;
+        $form_data = $available_forms[$form_name] ?? null;
+
+        /**
+         * Include form name
+         */
+        if (!isset($form_data['form_name'])) {
+            $form_data['form_name'] = $form_name;
+        }
+
+        return apply_filters('growtype_form_get_growtype_form_data', $form_data, $form_name);
     }
 
     /**
@@ -422,7 +455,7 @@ class Growtype_Form_Crud
         if ($submit_action === 'submit') {
             if (empty($username) || empty($password) || empty($email)) {
                 $response['success'] = false;
-                $response['message'] = __("Missing values required for login.", "growtype-form");
+                $response['messages'] = __("Missing values required for login.", "growtype-form");
                 return $response;
             }
         }
@@ -430,7 +463,7 @@ class Growtype_Form_Crud
         if (!empty($repeat_password)) {
             if ($password !== $repeat_password) {
                 $response['success'] = false;
-                $response['message'] = __("Passwords do not match", "growtype-form");
+                $response['messages'] = __("Passwords do not match", "growtype-form");
                 return $response;
             }
         }
@@ -440,7 +473,7 @@ class Growtype_Form_Crud
 
             if ($validate_password['success'] === false) {
                 $response['success'] = $validate_password['success'];
-                $response['message'] = $validate_password['message'];
+                $response['messages'] = $validate_password['messages'];
                 return $response;
             }
         }
@@ -462,7 +495,7 @@ class Growtype_Form_Crud
 
             if (empty($user_id)) {
                 $response['success'] = false;
-                $response['message'] = __("Please login to update your information.", "growtype-form");
+                $response['messages'] = __("Please login to update your information.", "growtype-form");
                 return $response;
             }
 
@@ -479,9 +512,9 @@ class Growtype_Form_Crud
                     $response['success'] = false;
 
                     if (isset($update_user->errors['existing_user_email'])) {
-                        $response['message'] = __("Please use another email.", "growtype-form");
+                        $response['messages'] = __("Please use another email.", "growtype-form");
                     } else {
-                        $response['message'] = __("Something went wrong.", "growtype-form");
+                        $response['messages'] = __("Something went wrong.", "growtype-form");
                     }
 
                     return $response;
@@ -503,7 +536,7 @@ class Growtype_Form_Crud
                     $user = get_user_by('login', $username);
                     if ($user->ID !== $user_id) {
                         $response['success'] = false;
-                        $response['message'] = __("Unfortunately, you cannot use this username.", "growtype-form");
+                        $response['messages'] = __("Unfortunately, you cannot use this username.", "growtype-form");
                         return $response;
                     }
                 } else {
@@ -519,9 +552,9 @@ class Growtype_Form_Crud
                         $response['success'] = false;
 
                         if (isset($update_user->errors['existing_user_email'])) {
-                            $response['message'] = __("Please use another email.", "growtype-form");
+                            $response['messages'] = __("Please use another email.", "growtype-form");
                         } else {
-                            $response['message'] = __("Something went wrong.", "growtype-form");
+                            $response['messages'] = __("Something went wrong.", "growtype-form");
                         }
 
                         return $response;
@@ -538,9 +571,9 @@ class Growtype_Form_Crud
         /**
          * Return response
          */
-        if (empty($create_user) || $create_user['success'] === false) {
-            $response['success'] = $create_user['success'];
-            $response['message'] = $create_user['message'];
+        if ($create_user['success'] === false) {
+            $response['success'] = false;
+            $response['messages'] = $create_user['messages'];
         } else {
             $user_id = $create_user['user_id'];
 
@@ -581,16 +614,16 @@ class Growtype_Form_Crud
 
             $response = $this->update_user_meta_details($user_id, $data);
 
-            apply_filters('growtype_form_update_signup_user_data', $user_id, $data, $submit_action);
+            do_action('growtype_form_update_signup_user_data', $user_id, $data, $submit_action);
 
             if ($response['success']) {
-                $response['message'] = __("Sign up successful.", "growtype-form");
+                $response['messages'] = __("Sign up successful.", "growtype-form");
 
                 if ($submit_action === 'update') {
-                    $response['message'] = __("The information was successfully updated.", "growtype-form");
+                    $response['messages'] = __("The information was successfully updated.", "growtype-form");
                 }
             } else {
-                $response['message'] = __("Something went wrong.", "growtype-form");
+                $response['messages'] = __("Something went wrong.", "growtype-form");
             }
         }
 
@@ -656,20 +689,22 @@ class Growtype_Form_Crud
         /**
          * Set confirmation fields values
          */
-        foreach ($form_data['confirmation_fields'] as $field) {
-            if (isset($submitted_values_sanitized[$field['name']])) {
-                if ($field['type'] === 'checkbox') {
-                    $submitted_values_sanitized[$field['name']] = 'true';
-                }
-            } else {
-                if ($field['type'] === 'checkbox') {
-                    $submitted_values_sanitized[$field['name']] = 'false';
+        if (isset($form_data['confirmation_fields']) && !empty($form_data['confirmation_fields'])) {
+            foreach ($form_data['confirmation_fields'] as $field) {
+                if (isset($submitted_values_sanitized[$field['name']])) {
+                    if ($field['type'] === 'checkbox') {
+                        $submitted_values_sanitized[$field['name']] = 'true';
+                    }
+                } else {
+                    if ($field['type'] === 'checkbox') {
+                        $submitted_values_sanitized[$field['name']] = 'false';
+                    }
                 }
             }
         }
 
         /**
-         * Recheck values which did not passed initial validation. Used for repeater fields check.
+         * Recheck values which did not pass initial validation. Used for repeater fields check.
          */
         if (!empty($submitted_values_notsanitized)) {
             $passed_values = [];
@@ -697,13 +732,21 @@ class Growtype_Form_Crud
         /**
          * Extra values included in validation
          */
-        foreach (self::INCLUDED_VALUES_IN_VALIDATION as $value) {
+        foreach (self::get_included_values_after_validation() as $value) {
             if (isset($submitted_values['data'][$value]) && !isset($submitted_values_sanitized[$value])) {
                 $submitted_values_sanitized[$value] = $submitted_values['data'][$value];
             }
         }
 
         return $submitted_values_sanitized;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public static function get_included_values_after_validation()
+    {
+        return apply_filters('growtype_form_included_values_after_validation', self::INCLUDED_VALUES_AFTER_VALIDATION);
     }
 
     /**
@@ -794,20 +837,20 @@ class Growtype_Form_Crud
 
             if (strlen($password) <= '8') {
                 $status['success'] = false;
-                $status['message'] = __("Your Password Must Contain At Least 8 Characters!", "growtype-form");
+                $status['messages'] = __("Your Password Must Contain At Least 8 Characters!", "growtype-form");
             } elseif (!preg_match("#[0-9]+#", $password)) {
                 $status['success'] = false;
-                $status['message'] = __("Your Password Must Contain At Least 1 Number!", "growtype-form");
+                $status['messages'] = __("Your Password Must Contain At Least 1 Number!", "growtype-form");
             } elseif (!preg_match("#[A-Z]+#", $password)) {
                 $status['success'] = false;
-                $status['message'] = __("Your Password Must Contain At Least 1 Capital Letter!", "growtype-form");
+                $status['messages'] = __("Your Password Must Contain At Least 1 Capital Letter!", "growtype-form");
             } elseif (!preg_match("#[a-z]+#", $password)) {
                 $status['success'] = false;
-                $status['message'] = __("Your Password Must Contain At Least 1 Lowercase Letter!", "growtype-form");
+                $status['messages'] = __("Your Password Must Contain At Least 1 Lowercase Letter!", "growtype-form");
             }
         } else {
             $status['success'] = false;
-            $status['message'] = __("Please enter password.", "growtype-form");
+            $status['messages'] = __("Please enter password.", "growtype-form");
         }
 
         return $status;

@@ -231,7 +231,17 @@ class Growtype_Form_General
          * If empty shortcode arguments, return empty
          */
         if (empty($args)) {
-            return null;
+            return '';
+        }
+
+        /**
+         * Set redirect to cookie
+         */
+        $redirect_after = isset($_GET['redirect_after']) && !empty($_GET['redirect_after']) ? $_GET['redirect_after'] : null;
+        $redirect_after = empty($redirect_after) && isset($args['redirect_after']) && !empty($args['redirect_after']) ? $args['redirect_after'] : $redirect_after;
+
+        if (!empty($redirect_after)) {
+            setcookie('growtype_form_redirect_after', $redirect_after, time() + 120, COOKIEPATH, COOKIE_DOMAIN);
         }
 
         /**
@@ -252,7 +262,12 @@ class Growtype_Form_General
         $form_data = Growtype_Form_Crud::get_growtype_form_data($form_name);
 
         /**
-         * Overwrite form data with existing extra arguments
+         * Add args
+         */
+        $form_data['args'] = $args;
+
+        /**
+         * Overwrite form data with existing extra arguments, if they exist
          */
         $extra_args = $args;
 
@@ -425,25 +440,25 @@ class Growtype_Form_General
          */
         $post = self::growtype_form_get_current_post();
 
+        $growtype_form_wrapper_classes = ['growtype-form-wrapper'];
+
+        if (isset($form_data['args']['class'])) {
+            array_push($growtype_form_wrapper_classes, $form_data['args']['class']);
+        }
+
         /**
          * Start form
          */
         ob_start();
         ?>
 
-        <div class="growtype-form-wrapper">
+        <div class="<?php echo implode(' ', $growtype_form_wrapper_classes) ?>">
 
             <?php if (isset($form_args['logo']) && isset($form_args['logo']['url']) && !empty($form_args['logo']['url'])) { ?>
                 <div class="logo-wrapper">
                     <a href="<?php echo isset($form_args['logo']['external_url']) ? growtype_form_string_replace_custom_variable($form_args['logo']['external_url']) : '#' ?>" class="e-logo">
                         <img src="<?php echo growtype_form_string_replace_custom_variable($form_args['logo']['url']) ?>" class="img-fluid" width="<?php echo $form_args['logo']['width'] ?? '' ?>" height="<?php echo $form_args['logo']['height'] ?? '' ?>"/>
                     </a>
-                </div>
-            <?php } ?>
-
-            <?php if (user_can(wp_get_current_user(), 'administrator')) { ?>
-                <div class="container">
-                    <a href="<?php echo admin_url() . 'options-general.php?page=growtype-form-settings&tab=' . $form_name; ?>" style="display: inline-block;margin-left: auto;position: relative;top: -20px;" target="_blank">Edit form (only visible for admin)</a>
                 </div>
             <?php } ?>
 
@@ -456,7 +471,7 @@ class Growtype_Form_General
                     <div class="form-inner-wrapper">
                         <form id="growtype-form-<?php echo $form_name ?>" enctype="multipart/form-data" class="growtype-form form <?php echo $form_args['class'] ?>" action="<?php echo self::growtype_form_get_action_url(); ?>" method="post" data-name="<?php echo $form_name ?>" data-ajax="<?php echo $form_args['ajax'] ?>" data-ajax-action="<?php echo $form_args['ajax_action'] ?>">
                             <?php foreach ($form_data as $key => $form_fields) { ?>
-                                <?php if (str_contains('main_fields', $key)) { ?>
+                                <?php if (isset($form_args['main_fields']) && !empty($form_args['main_fields']) && str_contains('main_fields', $key)) { ?>
                                     <div class="row g-3 main-fields">
                                         <?php foreach ($form_args['main_fields'] as $field) {
                                             self::render_growtype_form_field($field);
@@ -483,6 +498,14 @@ class Growtype_Form_General
                                 <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
                                 <?php if (!empty($post)) { ?>
                                     <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?= $post->ID ?>"/>
+                                <?php } ?>
+
+                                <?php if (isset($form_data['args']['redirect_after'])) { ?>
+                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_REDIRECT_AFTER ?>' value="<?= $form_args['redirect_after'] ?>"/>
+                                <?php } ?>
+
+                                <?php if (class_exists('Growtype_Quiz')) { ?>
+                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_QUIZ_UNIQUE_HASH ?>' value=""/>
                                 <?php } ?>
                             </div>
 
@@ -514,6 +537,12 @@ class Growtype_Form_General
                     <?php echo growtype_form_include_view('components.forms.partials.footer', ['form_args' => $form_args]) ?>
                 </div>
             </div>
+
+            <?php if (user_can(wp_get_current_user(), 'administrator')) { ?>
+                <div style="text-align: right;margin-top: 15px;">
+                    <a href="<?php echo admin_url() . 'options-general.php?page=growtype-form-settings&tab=post'; ?>" style="display: inline-block;margin-left: auto;position: relative;text-decoration: none;" target="_blank">Edit <span style="color: inherit;" class="dashicons dashicons-edit"></span></a>
+                </div>
+            <?php } ?>
         </div>
 
         <?php
@@ -737,6 +766,10 @@ class Growtype_Form_General
                     $(this).closest('.growtype-form').submit();
                 }
             });
+
+            if (localStorage.getItem('growtype_quiz_unique_hash')) {
+                $('input[name="growtype_quiz_unique_hash"]').val(localStorage.getItem('growtype_quiz_unique_hash'));
+            }
         </script>
         <?php
     }

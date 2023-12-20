@@ -273,7 +273,7 @@ msgid "Please use another email."
 msgstr ""
 
 #: ../../../../../../packages/plugins/growtype-form/includes/traits/Post.php:105
-msgid "Post has been submitted successfully."
+msgid "Form has been submitted successfully."
 msgstr ""
 
 #: ../../../../../../packages/plugins/growtype-form/resources/views/modals/privacy.blade.php:5

@@ -121,6 +121,12 @@ class Growtype_Form_Admin
         }
 
         /**
+         * Submission
+         */
+        require_once GROWTYPE_FORM_PATH . 'admin/methods/submissions/class-growtype-form-submissions.php';
+        new Growtype_Form_Submissions();
+
+        /**
          * Login Enqueue styles
          */
         add_action('login_enqueue_scripts', array ($this, 'login_enqueue_scripts_callback'));
@@ -405,11 +411,10 @@ class Growtype_Form_Admin
         new Growtype_Form_User_Accesses();
 
         /**
-         * User details
+         * Signup details
          */
         require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signup-details.php';
         require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signups-list-table.php';
-
         new Growtype_Form_Signup_Details();
     }
 }
