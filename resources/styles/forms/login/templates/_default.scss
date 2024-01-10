@@ -1,16 +1,5 @@
 .login-template-default {
   .growtype-form-wrapper {
-    .growtype-form-container {
-      max-width: 558px;
-    }
-
-    form {
-      padding: 30px;
-      @include bp-phone-xl() {
-        padding: 30px 20px;
-      }
-    }
-
     .btn-recover-password {
       position: absolute;
       right: 30px;

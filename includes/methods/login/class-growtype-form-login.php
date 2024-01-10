@@ -226,7 +226,7 @@ class Growtype_Form_Login
 
         ob_start();
         ?>
-        <div class="growtype-form-wrapper" data-type="login">
+        <div class="growtype-form-wrapper" data-name="login">
             <div class="growtype-form-container">
                 <?php if (isset($form_args['logo']) && isset($form_args['logo']['url']) && !empty($form_args['logo']['url'])) { ?>
                     <div class="logo-wrapper">

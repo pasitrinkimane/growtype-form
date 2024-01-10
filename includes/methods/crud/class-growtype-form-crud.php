@@ -275,7 +275,6 @@ class Growtype_Form_Crud
                  * Success
                  */
                 if (isset($submit_data['success']) && $submit_data['success']) {
-
                     if (isset($submit_data['post_id'])) {
                         $post = get_post($submit_data['post_id']);
 
@@ -287,7 +286,7 @@ class Growtype_Form_Crud
                         }
                     }
 
-                    do_action('growtype_form_submit_data_success', $submit_data, $form_data, $submitted_data);
+                    do_action('growtype_form_submit_data_success', $submit_data, $submitted_data, $form_data);
 
                     $submit_data['success'] = true;
                     $submit_data['messages'] = isset($submit_data['messages']) ? $submit_data['messages'] : __('Record created successfully.', 'growtype-form');
@@ -297,7 +296,6 @@ class Growtype_Form_Crud
                 }
             }
         } else {
-
             error_log(print_r(sprintf("Growtype Form. VALIDATION FAILED. Empty response. Url: %s", isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : ''), true));
 
             $submit_data['success'] = false;
@@ -315,7 +313,7 @@ class Growtype_Form_Crud
                 }
             }
 
-            if (!empty($return_values)) {
+            if (!empty($return_values) && str_contains($form_name, 'signup')) {
                 setcookie('signup_data', json_encode($return_values), time() + 2, COOKIEPATH, COOKIE_DOMAIN);
             }
         }
@@ -352,7 +350,7 @@ class Growtype_Form_Crud
             $redirect_url = Growtype_Wc_Product::edit_permalink($post_id);
         }
 
-        return $redirect_url;
+        return apply_filters('growtype_form_submitted_values_redirect_url', $redirect_url, $form_data);
     }
 
     public static function send_email_to_admin($submitted_content, $form_data)
@@ -425,6 +423,10 @@ class Growtype_Form_Crud
         }
 
         $form_data = $available_forms[$form_name] ?? null;
+
+        if (empty($form_data)) {
+            return null;
+        }
 
         /**
          * Include form name

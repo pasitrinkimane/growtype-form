@@ -85,7 +85,7 @@ trait Post
         /**
          * Create array
          */
-        $post_arr = array (
+        $post_args = array (
             'post_type' => $post_type,
             'post_title' => $post_title,
             'post_content' => $post_content,
@@ -93,46 +93,50 @@ trait Post
             'post_author' => $post_author
         );
 
-        /**
-         * Save post
-         */
-        $post_id = wp_insert_post($post_arr);
+        $post_args = apply_filters('growtype_form_upload_post_args', $post_args, $submitted_data, $form_data);
 
-        if (is_wp_error($post_id)) {
-            $response['success'] = false;
-            $response['messages'] = __("Something went wrong. Please contact administrator.", "growtype-form");
+        if (!empty($post_args)) {
+            /**
+             * Save post
+             */
+            $post_id = wp_insert_post($post_args);
 
-            return $response;
-        }
+            if (is_wp_error($post_id)) {
+                $response['success'] = false;
+                $response['messages'] = __("Something went wrong. Please contact administrator.", "growtype-form");
 
-        /**
-         * Extra meta values for general submission
-         */
-        if ($post_type === Growtype_Form_Submissions::POST_TYPE_NAME) {
-            update_post_meta($post_id, 'form_name', $form_data['form_name']);
-            update_post_meta($post_id, 'submitted_values', json_encode($submitted_values));
+                return $response;
+            }
 
             /**
-             * Include IP details
+             * Extra meta values for general submission
              */
-            $server_http_x_forwarded_for = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
-            $server_remote_addr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+            if ($post_type === Growtype_Form_Submissions::POST_TYPE_NAME) {
+                update_post_meta($post_id, 'form_name', $form_data['form_name']);
+                update_post_meta($post_id, 'submitted_values', json_encode($submitted_values));
 
-            update_post_meta($post_id, 'server_http_x_forwarded_for', $server_http_x_forwarded_for);
-            update_post_meta($post_id, 'server_remote_addr', $server_remote_addr);
+                /**
+                 * Include IP details
+                 */
+                $server_http_x_forwarded_for = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+                $server_remote_addr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+
+                update_post_meta($post_id, 'server_http_x_forwarded_for', $server_http_x_forwarded_for);
+                update_post_meta($post_id, 'server_remote_addr', $server_remote_addr);
+            }
+
+            /**
+             * Add tags
+             */
+            if (!empty($post_tags)) {
+                wp_add_post_tags($post_id, $post_tags);
+            }
         }
 
-        /**
-         * Add tags
-         */
-        if (!empty($post_tags)) {
-            wp_add_post_tags($post_id, $post_tags);
-        }
-
-        $response['post_id'] = $post_id;
-        $response['success'] = true;
+        $response['post_id'] = isset($post_id) ? $post_id : null;
         $response['post_content'] = $post_content;
-        $response['messages'] = isset($form_data['success_message']) ? $form_data['success_message'] : __("Form has been submitted successfully.", "growtype-form");
+        $response['success'] = true;
+        $response['messages'] = apply_filters('growtype_form_upload_post_success_message', (isset($form_data['success_message']) ? $form_data['success_message'] : __("Form has been submitted successfully.", "growtype-form")), $submitted_data, $form_data);
 
         return $response;
     }

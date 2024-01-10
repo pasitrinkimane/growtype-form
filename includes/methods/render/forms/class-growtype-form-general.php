@@ -261,6 +261,10 @@ class Growtype_Form_General
          */
         $form_data = Growtype_Form_Crud::get_growtype_form_data($form_name);
 
+        if (empty($form_data)) {
+            return '<p style="text-align: center;color:red;">' . __('Form is not configured. Please contact site admin.', 'growtype-form') . '</p>';
+        }
+
         /**
          * Add args
          */
@@ -279,10 +283,6 @@ class Growtype_Form_General
                     $form_data[$key] = $extra_args[$key] == 'true' || $extra_args[$key] == 'false' ? filter_var($extra_args[$key], FILTER_VALIDATE_BOOLEAN) : $extra_args[$key];
                 }
             }
-        }
-
-        if (empty($form_data)) {
-            return '<p>' . __('Form is not configured. Please contact site admin.', 'growtype-form') . '</p>';
         }
 
         /**
@@ -364,7 +364,7 @@ class Growtype_Form_General
         ob_start();
         ?>
 
-        <div class="growtype-form-wrapper <?= $form_class ?>">
+        <div class="growtype-form-wrapper <?= $form_class ?>" data-name="<?php echo $form_name ?>">
             <div class="growtype-form-fields">
                 <?php
                 foreach ($form as $key => $form_fields) { ?>
@@ -452,7 +452,7 @@ class Growtype_Form_General
         ob_start();
         ?>
 
-        <div class="<?php echo implode(' ', $growtype_form_wrapper_classes) ?>">
+        <div class="<?php echo implode(' ', $growtype_form_wrapper_classes) ?>" data-name="<?php echo $form_name ?>">
 
             <?php if (isset($form_args['logo']) && isset($form_args['logo']['url']) && !empty($form_args['logo']['url'])) { ?>
                 <div class="logo-wrapper">
