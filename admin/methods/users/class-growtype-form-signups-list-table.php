@@ -80,7 +80,7 @@ class Growtype_Form_Signups_List_Table extends WP_Users_List_Table
 
         $signups = get_users($args);
 
-        if (str_contains($search_value, '=')) {
+        if (strpos($search_value, '=') !== false) {
             $values = explode('=', $search_value);
             $meta_key = $values[0] ?? null;
             $meta_value = $values[1] ?? null;

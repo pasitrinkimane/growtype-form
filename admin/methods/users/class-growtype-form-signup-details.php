@@ -14,11 +14,7 @@ defined('ABSPATH') || exit;
  */
 class Growtype_Form_Signup_Details
 {
-    use User;
-    use AdminSettingsSignup;
-    use UserSignupAdminManage;
-    use UserSignupAdminIndex;
-    use UserSignupAdminExport;
+    use GrowtypeFormUser;
 
     /**
      * URL to the BP Members Admin directory.
@@ -51,7 +47,183 @@ class Growtype_Form_Signup_Details
         $this->setup_globals();
         $this->setup_actions();
 
-        add_action('init', array ($this, 'gf_admin_signup_export_data'));
+        add_action('init', array ($this, 'growtype_form_admin_signup_export_data'));
+    }
+
+    /**
+     * Set admin-related actions and filters.
+     *
+     * @since 2.0.0
+     */
+    function growtype_form_admin_signup_export_data()
+    {
+        $action = $this->gt_admin_list_table_current_bulk_action();
+
+        if ($action === 'export_selected' || $action === 'export_all') {
+
+            $ids = [];
+            if (!empty($_POST['allsignups'])) {
+                $ids = wp_parse_id_list($_POST['allsignups']);
+            } elseif (!empty($_GET['signup_id'])) {
+                $ids = absint($_GET['signup_id']);
+            }
+
+            if (empty($ids) && $action !== 'export_all') {
+                $redirect_to = add_query_arg([
+                    'message' => 'No ids selected',
+                    'page' => 'gf-signups',
+                ], $this->users_url);
+
+                header('Location: ' . $redirect_to);
+                exit();
+            }
+
+            $orderby = 'registered';
+            $order = 'order';
+
+            if (isset($_POST['_wp_http_referer'])) {
+                $url_parameters = parse_url($_POST['_wp_http_referer'])['query'];
+                $url_parameters = explode('&', $url_parameters);
+
+                foreach ($url_parameters as $param) {
+                    if (strpos($param, 'orderby=') !== false) {
+                        $orderby = str_replace('orderby=', '', $param);
+                    } elseif (strpos($param, 'order=') !== false) {
+                        $order = str_replace('order=', '', $param);
+                    }
+                }
+            }
+
+            $user_roles = !empty(get_option('growtype_form_default_user_role')) ? [get_option('growtype_form_default_user_role')] : ['subscriber'];
+
+            $args = array (
+                'orderby' => $orderby,
+                'order' => $order,
+                'include' => $ids,
+                'role__in' => $user_roles,
+            );
+
+            if ($action === 'export_all') {
+                $args['number'] = -1;
+            }
+
+            $export_args = [];
+
+            date_default_timezone_set("Europe/Vilnius");
+            $export_args['file_title'] = 'Registrations-' . date('Y-m-d-H-i');
+            $export_args['file_type'] = 'csv';
+            $export_args['file_content'] = $this->prepare_export_data($args, 'csv');
+
+            return $this->export_users_signups($export_args);
+        }
+    }
+
+    /**
+     * This is the confirmation screen for actions.
+     *
+     * @param string $action Delete, activate, or resend activation link.
+     *
+     * @return null|false
+     * @since 2.0.0
+     *
+     */
+    public function export_users_signups($export_args)
+    {
+        $filename = $export_args['file_title'] . '.' . $export_args['file_type'];
+
+        $fp = fopen($filename, 'w');
+
+        foreach ($export_args['file_content'] as $line) {
+            fputcsv($fp, $line);
+        }
+
+        fclose($fp);
+
+        if ($export_args['file_type'] === 'csv') {
+            header("Pragma: public");
+            header("Expires: 0");
+            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+            header("Cache-Control: private", false);
+            header("Content-Type: application/octet-stream");
+            header("Content-Disposition: attachment; filename=\"" . $filename . "\";");
+            header("Content-Transfer-Encoding: binary");
+            header('Content-type: text/csv');
+        }
+
+        header('Content-disposition:attachment; filename="' . $filename . '"');
+        readfile($filename);
+
+        exit;
+    }
+
+    /**
+     * Converting data to CSV
+     */
+    public function prepare_export_data($args, $type = 'csv')
+    {
+        $users = get_users($args);
+
+        $export_fields = $this->prepare_export_fields($users);
+
+        $export_data = [];
+        $index = 0;
+
+        foreach ($users as $user_key => $signup) {
+            $signup_data = $this->get_user_data($signup->ID);
+
+            $profile_data_clean = [];
+            foreach ($signup_data['signup'] as $field_key => $field_value) {
+                $profile_data_clean[$field_key] = $field_value['value'];
+            }
+
+            $signup_details = array_merge((array)$signup_data['profile'], $profile_data_clean);
+
+            foreach ($export_fields as $export_key => $field) {
+                if ($index === 0) {
+                    $export_data[$index][$export_key] = $field;
+                    $export_data[$index + 1][$export_key] = isset($signup_details[$export_key]) ? $signup_details[$export_key] : '';
+                } else {
+                    $export_data[$index][$export_key] = isset($signup_details[$export_key]) ? $signup_details[$export_key] : '';
+                }
+            }
+
+            if ($index === 0) {
+                $index++;
+                $index++;
+            } else {
+                $index++;
+            }
+        }
+
+        $export_data = apply_filters('growtype_form_alter_export_data', $export_data);
+
+//        echo '<pre>' . var_export($export_data, true) . '</pre>';
+//        die();
+
+        return $export_data;
+    }
+
+    /**
+     * @param $users
+     * @return array
+     */
+    public function prepare_export_fields($users)
+    {
+        $export_fields = [];
+        $export_fields['ID'] = 'ID';
+        $export_fields['display_name'] = 'Username'; //user_nicename
+        $export_fields['user_email'] = 'Email';
+        $export_fields['user_registered'] = 'Registration date';
+
+        foreach ($users as $key => $signup) {
+            $signup_data = Growtype_Form_Signup::get_signup_data($signup->ID);
+
+            foreach ($signup_data as $field_key => $field_value) {
+                $export_fields[$field_key] = isset($field_value['label']) ? $field_value['label'] : $field_key;
+            }
+        }
+
+        return $export_fields;
     }
 
     /**
@@ -268,7 +440,7 @@ class Growtype_Form_Signup_Details
             add_screen_option('per_page', array (
                 'label' => _x('Amount per page', 'Pending Accounts per page (screen options)', 'growtype-form'),
                 'default' => 50,
-                'option'  => 'gf_records_per_page',
+                'option' => 'gf_records_per_page',
             ));
 
             get_current_screen()->add_help_tab(array (
@@ -659,6 +831,354 @@ class Growtype_Form_Signup_Details
                 break;
 
         }
+    }
+
+    /**
+     * This is the list of the Pending accounts (signups).
+     *
+     * @since 2.0.0
+     *
+     * @global $plugin_page
+     * @global $bp_members_signup_list_table
+     */
+    public function signups_admin_index()
+    {
+        global $plugin_page, $bp_members_signup_list_table;
+
+        $search_value = !empty($_REQUEST['s']) ? stripslashes($_REQUEST['s']) : '';
+
+        // Prepare the group items for display.
+        $bp_members_signup_list_table->prepare_items();
+
+        $form_url = growtype_form_admin_url('users.php');
+
+        $form_url = add_query_arg(
+            array (
+                'page' => 'gf-signups',
+            ),
+            $form_url
+        );
+
+        $search_form_url = remove_query_arg(
+            array (
+                'action',
+                'deleted',
+                'notdeleted',
+                'error',
+                'updated',
+                'delete',
+                'activate',
+                'activated',
+                'notactivated',
+                'resend',
+                'resent',
+                'notresent',
+                'do_delete',
+                'do_activate',
+                'do_resend',
+                'action2',
+                '_wpnonce',
+                'signup_ids'
+            ), $_SERVER['REQUEST_URI']
+        );
+
+        ?>
+
+        <div class="wrap">
+            <h1 class="wp-heading-inline"><?php _e('Growtype Form Signups', 'growtype-form'); ?></h1>
+
+            <?php if (current_user_can('create_users')) { ?>
+                <a href="user-new.php" class="page-title-action"><?php echo esc_html_x('Add New', 'user', 'growtype-form'); ?></a>
+            <?php } elseif (is_multisite() && current_user_can('promote_users')) { ?>
+                <a href="user-new.php" class="page-title-action"><?php echo esc_html_x('Add Existing', 'user', 'growtype-form'); ?></a>
+            <?php }
+
+            if ($search_value) {
+                printf('<span class="subtitle">' . __('Search results for &#8220;%s&#8221;', 'growtype-form') . '</span>', esc_html($search_value));
+            }
+            ?>
+
+            <hr class="wp-header-end">
+
+            <?php $bp_members_signup_list_table->views(); ?>
+
+            <form id="gf-signups-search-form" action="<?php echo esc_url($search_form_url); ?>">
+                <input type="hidden" name="page" value="<?php echo esc_attr($plugin_page); ?>"/>
+                <?php $bp_members_signup_list_table->search_box(__('Search Users', 'growtype-form'), 'growtype-form'); ?>
+            </form>
+
+            <form id="gf-signups-form" action="<?php echo esc_url($form_url); ?>" method="post">
+                <?php $bp_members_signup_list_table->display(); ?>
+            </form>
+        </div>
+        <?php
+    }
+
+    /**
+     * This is the confirmation screen for actions.
+     *
+     * @param string $action Delete, activate, or resend activation link.
+     *
+     * @return null|false
+     * @since 2.0.0
+     *
+     */
+    public function signups_admin_manage($action)
+    {
+        if (!current_user_can($this->capability)) {
+            die('-1');
+        }
+
+        // Get the user IDs from the URL.
+        $ids = [];
+        if (!empty($_POST['allsignups'])) {
+            $ids = wp_parse_id_list($_POST['allsignups']);
+        } elseif (!empty($_GET['signup_id'])) {
+            $ids = absint($_GET['signup_id']);
+        }
+
+        $orderby = 'registered';
+        $order = 'order';
+
+        if (isset($_POST['_wp_http_referer'])) {
+            $url_parameters = parse_url($_POST['_wp_http_referer'])['query'];
+            $url_parameters = explode('&', $url_parameters);
+
+            foreach ($url_parameters as $param) {
+                if (strpos($param, 'orderby=') !== false) {
+                    $orderby = str_replace('orderby=', '', $param);
+                } elseif (strpos($param, 'order=') !== false) {
+                    $order = str_replace('order=', '', $param);
+                }
+            }
+        }
+
+        $get_users_args = array (
+            'orderby' => $orderby,
+            'order' => $order,
+            'include' => $ids
+        );
+
+        if (empty($ids)) {
+            $signups_query = [];
+        } else {
+            $signups_query = get_users($get_users_args);
+        }
+
+        $signups = $signups_query;
+        $signup_ids = wp_list_pluck($signups, 'ID');
+
+        $header_text = 'Are you sure?';
+        $helper_text = 'Selected items';
+
+        // Set up strings.
+        switch ($action) {
+            case 'delete' :
+                $header_text = __('Delete Pending Accounts', 'growtype-form');
+                if (1 == count($signup_ids)) {
+                    $helper_text = __('You are about to delete the following account:', 'growtype-form');
+                } else {
+                    $helper_text = __('You are about to delete the following accounts:', 'growtype-form');
+                }
+                break;
+
+            case 'activate' :
+                $header_text = __('Signup details', 'growtype-form');
+                if (1 == count($signup_ids)) {
+                    $helper_text = __('Below are user signup details:', 'growtype-form');
+                } else {
+                    $helper_text = __('Below are multiple users signup details:', 'growtype-form');
+                }
+                break;
+
+            case 'resend' :
+                $header_text = __('Resend Activation Emails', 'growtype-form');
+                if (1 == count($signup_ids)) {
+                    $helper_text = __('You are about to resend an activation email to the following account:', 'growtype-form');
+                } else {
+                    $helper_text = __('You are about to resend an activation email to the following accounts:', 'growtype-form');
+                }
+                break;
+        }
+
+        // These arguments are added to all URLs.
+        $url_args = array ('page' => 'gf-signups');
+
+        // These arguments are only added when performing an action.
+        $action_args = array (
+            'action' => 'do_' . $action,
+            'signup_ids' => implode(',', $signup_ids)
+        );
+
+        $base_url = growtype_form_admin_url('users.php');
+
+        $cancel_url = add_query_arg($url_args, $base_url);
+
+        $action_url = wp_nonce_url(
+            add_query_arg(
+                array_merge($url_args, $action_args),
+                $base_url
+            ),
+            'signups_' . $action
+        );
+
+        ?>
+
+        <div class="wrap">
+            <h1 class="wp-heading-inline"><?php echo esc_html($header_text); ?></h1>
+            <hr class="wp-header-end">
+
+            <p><?php echo esc_html($helper_text); ?></p>
+
+            <?php
+            if (empty($signups)) {
+                echo '<p>No signups found</p>';
+            } else { ?>
+                <ol class="gf-signups-list">
+                    <?php foreach ($signups as $signup) :
+                        $last_notified = mysql2date('Y/m/d g:i:s a', $signup->date_sent);
+
+                        $signup_data = Growtype_Form_Signup::get_signup_data($signup->ID);
+                        ?>
+
+                        <li>
+                            <?php if ('activate' == $action) { ?>
+                                <table class="wp-list-table widefat fixed striped">
+                                    <tbody>
+
+                                    <tr>
+                                        <td class="column-fields"><?php esc_html_e('Display Name', 'growtype-form'); ?></td>
+                                        <td><?php echo esc_html($signup->display_name); ?></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="column-fields"><?php esc_html_e('Email', 'growtype-form'); ?></td>
+                                        <td><?php echo sanitize_email($signup->user_email); ?></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="column-fields"><?php esc_html_e('Registration Date', 'growtype-form'); ?></td>
+                                        <td><?php echo esc_html($signup->user_registered); ?></td>
+                                    </tr>
+
+                                    <?php
+                                    foreach ($signup_data as $key => $data) { ?>
+                                        <tr>
+                                            <td class="column-fields"><?= __($data['label'], 'growtype-form') ?> (key: <?php echo $key ?>)</td>
+                                            <td><?= $data['value'] ?></td>
+                                        </tr>
+                                    <?php } ?>
+                                    <?php
+                                    if (function_exists('get_user_purchased_products_ids')) {
+                                        $user_purchased_products = get_user_purchased_products_ids($signup->ID);
+                                        ?>
+                                        <tr>
+                                            <td class="column-fields"><?= __('User has bought products:') ?></td>
+                                            <td>
+                                                <?php
+                                                if (!empty($user_purchased_products)) {
+                                                    foreach ($user_purchased_products as $product_id) {
+                                                        $product = wc_get_product($product_id);
+                                                        echo $product->get_title();
+                                                    }
+                                                } else {
+                                                    echo '-';
+                                                }
+                                                ?>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+
+                                    <?php
+
+                                    /**
+                                     * Fires inside the table listing the activate action confirmation details.
+                                     *
+                                     * @param object $signup The Sign-up Object.
+                                     * @since 6.0.0
+                                     *
+                                     */
+                                    do_action('bp_activate_signup_confirmation_details', $signup);
+                                    ?>
+
+                                    </tbody>
+                                </table>
+
+                                <div class="actions" style="display: flex;justify-content: flex-end;padding-top: 20px;">
+                                    <a href="<?= get_edit_user_link($signup->ID) ?>" target="_blank" class="button-primary"><?= __('User profile details', 'growtype-form') ?></a>
+                                </div>
+
+                                <?php
+                                /**
+                                 * Fires outside the table listing the activate action confirmation details.
+                                 *
+                                 * @param object $signup The Sign-up Object.
+                                 * @since 6.0.0
+                                 *
+                                 */
+                                do_action('bp_activate_signup_confirmation_after_details', $signup);
+                                ?>
+                            <?php } elseif ('resend' == $action) { ?>
+
+                                <p class="description">
+                                    <?php
+                                    /* translators: %s: notification date */
+                                    printf(esc_html__('Last notified: %s', 'growtype-form'), $last_notified);
+                                    ?>
+
+                                    <?php if (!empty($signup->recently_sent)) : ?>
+
+                                        <span class="attention wp-ui-text-notification"> <?php esc_html_e('(less than 24 hours ago)', 'growtype-form'); ?></span>
+
+                                    <?php endif; ?>
+                                </p>
+
+                            <?php } else { ?>
+
+                                <table class="wp-list-table widefat fixed striped">
+                                    <tbody>
+                                    <tr>
+                                        <td class="column-fields"><?php esc_html_e('Display Name', 'growtype-form'); ?></td>
+                                        <td><?php echo esc_html($signup->display_name); ?></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="column-fields"><?php esc_html_e('Email', 'growtype-form'); ?></td>
+                                        <td><?php echo sanitize_email($signup->user_email); ?></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="column-fields"><?php esc_html_e('Registration Date', 'growtype-form'); ?></td>
+                                        <td><?php echo esc_html($signup->user_registered); ?></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                            <?php } ?>
+
+                        </li>
+
+                    <?php endforeach; ?>
+                </ol>
+            <?php } ?>
+
+            <div class="actions" style="margin-top: 20px;border-top: 1px solid #c8c8c8;padding: 20px;">
+                <?php if ('delete' === $action) : ?>
+
+                    <p><strong><?php esc_html_e('This action cannot be undone.', 'growtype-form') ?></strong></p>
+
+                <?php endif; ?>
+
+                <?php
+                if (get_option('growtype_form_signup_requires_confirmation')) { ?>
+                    <a class="button-primary" href="<?php echo esc_url($action_url); ?>"><?php esc_html_e('Confirm', 'growtype-form'); ?></a>
+                    <a class="button" href="<?php echo esc_url($cancel_url); ?>"><?php esc_html_e('Cancel', 'growtype-form') ?></a>
+                <?php } ?>
+
+            </div>
+        </div>
+
+        <?php
     }
 }
 

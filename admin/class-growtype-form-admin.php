@@ -22,16 +22,18 @@
  */
 class Growtype_Form_Admin
 {
-    const GROWTYPE_FORM_SETTINGS_DEFAULT_TAB = 'login';
+    const SETTINGS_DEFAULT_TAB = 'general';
+
+    const SETTINGS_PAGE_SLUG = 'growtype-form-settings';
 
     /**
      * The ID of this plugin.
      *
      * @since    1.0.0
      * @access   private
-     * @var      string $Growtype_Form The ID of this plugin.
+     * @var      string $growtype_form The ID of this plugin.
      */
-    private $Growtype_Form;
+    private $growtype_form;
 
     /**
      * The version of this plugin.
@@ -43,76 +45,22 @@ class Growtype_Form_Admin
     private $version;
 
     /**
-     * Traits
-     */
-    use AdminSettingCredentials;
-    use AdminSettingGeneral;
-    use AdminSettingsLogin;
-    use AdminSettingsSignup;
-    use AdminSettingsWoocommercePlugin;
-    use AdminSettingsPost;
-    use AdminSettingsExamples;
-    use AdminAppearanceMenu;
-
-    /**
      * Initialize the class and set its properties.
      *
-     * @param string $Growtype_Form The name of this plugin.
+     * @param string $growtype_form The name of this plugin.
      * @param string $version The version of this plugin.
      * @since    1.0.0
      */
-    public function __construct($Growtype_Form, $version)
+    public function __construct($growtype_form, $version)
     {
-        $this->Growtype_Form = $Growtype_Form;
+        $this->growtype_form = $growtype_form;
         $this->version = $version;
 
         if (is_admin()) {
-            add_action('admin_menu', array ($this, 'add_custom_options_page'));
-
             /**
-             * Credentials
+             * Load admin methods
              */
-            add_action('admin_init', array ($this, 'credentials_content'));
-
-            /**
-             * AdminGeneral
-             */
-            add_action('admin_init', array ($this, 'general_content'));
-
-            /**
-             * AdminSignup
-             */
-            add_action('admin_init', array ($this, 'signup_content'));
-
-            /**
-             * AdminLogin
-             */
-            add_action('admin_init', array ($this, 'login_content'));
-
-            /**
-             * AdminPost
-             */
-            add_action('admin_init', array ($this, 'post_content'));
-
-            /**
-             * AdminWoocommercePlugin
-             */
-            add_action('admin_init', array ($this, 'woocommerce_content'));
-
-            /**
-             * AdminExamples
-             */
-            add_action('admin_init', array ($this, 'examples_content'));
-
-            /**
-             * Admin menu in appearance menus
-             */
-            add_action('load-nav-menus.php', array ($this, 'add_nav_menu_meta_box'));
-
-            /**
-             * Load methods
-             */
-            $this->load_methods();
+            $this->load_admin_methods();
         } else {
             /**
              * Growtype form menu links update
@@ -121,15 +69,19 @@ class Growtype_Form_Admin
         }
 
         /**
-         * Submission
+         * Load global methods
          */
-        require_once GROWTYPE_FORM_PATH . 'admin/methods/submissions/class-growtype-form-submissions.php';
-        new Growtype_Form_Submissions();
+        $this->load_methods();
 
         /**
          * Login Enqueue styles
          */
         add_action('login_enqueue_scripts', array ($this, 'login_enqueue_scripts_callback'));
+
+        /**
+         * Show notices
+         */
+        add_action('admin_notices', array ($this, 'show_admin_notice'));
     }
 
     function login_enqueue_scripts_callback()
@@ -158,7 +110,7 @@ class Growtype_Form_Admin
      */
     public function enqueue_styles()
     {
-        wp_enqueue_style($this->Growtype_Form, plugin_dir_url(__FILE__) . 'css/growtype-form-admin.css', array (), GROWTYPE_FORM_VERSION, 'all');
+        wp_enqueue_style($this->growtype_form, plugin_dir_url(__FILE__) . 'css/growtype-form-admin.css', array (), GROWTYPE_FORM_VERSION, 'all');
     }
 
     /**
@@ -181,228 +133,30 @@ class Growtype_Form_Admin
          * class.
          */
 
-        wp_enqueue_script($this->Growtype_Form, plugin_dir_url(__FILE__) . 'js/growtype-form-admin.js', array ('jquery'), $this->version, false);
+        wp_enqueue_script($this->growtype_form, plugin_dir_url(__FILE__) . 'js/growtype-form-admin.js', array ('jquery'), $this->version, false);
 
     }
 
-    /**
-     * Register the options page with the Wordpress menu.
-     */
-    function add_custom_options_page()
+    private function load_methods()
     {
-        add_options_page(
-            'Growtype - Form',
-            'Growtype - Form',
-            'manage_options',
-            'growtype-form-settings',
-            array ($this, 'growtype_form_settings_form'),
-            1
-        );
-    }
-
-    /**
-     * @param $current
-     * @return void
-     */
-    function growtype_form_settings_tabs($current = self::GROWTYPE_FORM_SETTINGS_DEFAULT_TAB)
-    {
-        $tabs['credentials'] = 'Credentials';
-        $tabs['login'] = 'Login';
-        $tabs['signup'] = 'Signup';
-        $tabs['post'] = 'Post';
-
-        if (class_exists('woocommerce')) {
-            $tabs['woocommerce'] = 'Woocommerce';
-        }
-
-        $tabs['examples'] = 'Examples';
-
-        echo '<div id="icon-themes" class="icon32"><br></div>';
-        echo '<h2 class="nav-tab-wrapper">';
-        foreach ($tabs as $tab => $name) {
-            $class = ($tab == $current) ? ' nav-tab-active' : '';
-            echo "<a class='nav-tab$class' href='?page=growtype-form-settings&tab=$tab'>$name</a>";
-
-        }
-        echo '</h2>';
-    }
-
-    /**
-     * @return void
-     */
-    function growtype_form_settings_form()
-    {
-        if (isset($_GET['page']) && $_GET['page'] == 'growtype-form-settings') {
-            ?>
-
-            <div class="wrap">
-
-                <h1>Growtype Form - Settings</h1>
-
-                <?php
-                if (isset($_GET['updated']) && 'true' == esc_attr($_GET['updated'])) {
-                    echo '<div class="updated" ><p>Settings updated.</p></div>';
-                }
-
-                if (isset ($_GET['tab'])) {
-                    $this->growtype_form_settings_tabs($_GET['tab']);
-                } else {
-                    $this->growtype_form_settings_tabs();
-                }
-                ?>
-
-                <form id="growtype_form_main_settings_form" method="post" action="options.php">
-                    <?php
-
-                    if (isset ($_GET['tab'])) {
-                        $tab = $_GET['tab'];
-                    } else {
-                        $tab = self::GROWTYPE_FORM_SETTINGS_DEFAULT_TAB;
-                    }
-
-                    switch ($tab) {
-                        case 'credentials':
-                            settings_fields('growtype_form_settings_credentials');
-
-                            echo '<table class="form-table">';
-                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_credentials');
-                            echo '</table>';
-
-                            break;
-                        case 'general':
-                            settings_fields('growtype_form_settings_general');
-
-                            echo '<table class="form-table">';
-                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_general');
-                            echo '</table>';
-
-                            break;
-                        case 'login':
-                            settings_fields('growtype_form_settings_login');
-
-                            echo '<table class="form-table">';
-                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_login');
-                            echo '</table>';
-
-                            break;
-                        case 'signup':
-                            settings_fields('growtype_form_settings_signup');
-
-                            echo '<table class="form-table">';
-                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_signup');
-                            echo '</table>';
-
-                            break;
-                        case 'woocommerce' :
-                            settings_fields('growtype_form_settings_woocommerce');
-
-                            echo '<table class="form-table">';
-                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_woocommerce');
-                            echo '</table>';
-
-                            break;
-                        case 'post' :
-                            settings_fields('growtype_form_settings_post');
-
-                            echo '<table class="form-table">';
-                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_post');
-                            echo '</table>';
-
-                            echo '<h2 class="title">Saving settings</h2>';
-                            echo '<p>New post saving settings</p>';
-
-                            echo '<table class="form-table">';
-                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_post_saving');
-                            echo '</table>';
-
-                            echo '<h2 class="title">Email settings</h2>';
-                            echo '<p>Email is sent when the new post is submitted</p>';
-
-                            echo '<table class="form-table">';
-                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_post_email');
-                            echo '</table>';
-
-                            break;
-                        case 'examples' :
-                            settings_fields('growtype_form_settings_examples');
-
-                            echo '</br>';
-                            echo '<b>Shortcode:</b> [growtype_form name="signup"] ' . "</br>";
-                            echo '<b>Allowed input types:</b> ' . implode(',', Growtype_Form_General::GROWTYPE_FORM_ALLOWED_FIELD_TYPES);
-
-                            echo '<table class="form-table">';
-                            do_settings_fields('growtype-form-settings', 'growtype_form_settings_examples');
-                            echo '</table>';
-
-                            break;
-                    }
-
-                    if ($tab !== 'examples') {
-                        submit_button();
-                    }
-
-                    ?>
-                </form>
-
-                <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/ace/ace.js"></script>
-                <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/ace/theme-twilight.js"></script>
-                <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/ace/mode-ruby.js"></script>
-                <script src="<?= plugin_dir_url(__FILE__) ?>plugins/jquery-ace/jquery-ace.min.js"></script>
-
-                <script>
-                    $ = jQuery;
-                    let forms = $('#growtype_form_main_settings_form').find('.growtype_form_json_content');
-
-                    forms.map(function (index, value) {
-                        if ($(value).length > 0) {
-                            let editor = $(value).ace({
-                                theme: 'twilight',
-                                lang: 'ruby'
-                            })
-
-                            let growtype_form_json_content = $(value).data('ace');
-                            if (growtype_form_json_content.length > 0) {
-                                growtype_form_json_content.editor.ace.setValue(JSON.stringify(JSON.parse($(value).text()), null, '\t'));
-                            }
-                        }
-                    });
-
-                    if ($('body').hasClass('settings_page_growtype-form-settings')) {
-                        $('#growtype_form_main_settings_form input[type="submit"]').click(function () {
-                            let forms = $(this).closest('form').find('.growtype_form_json_content');
-                            forms.map(function (index, value) {
-                                if ($(value).data('ace').editor.ace.getValue().length > 0) {
-                                    try {
-                                        JSON.parse($(value).data('ace').editor.ace.getValue())
-                                    } catch (e) {
-                                        alert("Caught: " + e.message)
-                                        event.preventDefault();
-                                    }
-                                }
-                            });
-                        });
-                    }
-                </script>
-            </div>
-
-            <?php
-        }
+        /**
+         * Admin pages
+         */
+        require GROWTYPE_FORM_PATH . '/admin/pages/class-growtype-form-admin-page.php';
+        new Growtype_Form_Admin_Page();
     }
 
     /**
      * Load the required methods for this plugin.
      *
      */
-    private function load_methods()
+    private function load_admin_methods()
     {
         /**
-         * Load users
+         * Appearance
          */
-        if (!class_exists('WP_List_Table')) {
-            require(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
-        }
-
-        require_once(ABSPATH . 'wp-admin/includes/class-wp-users-list-table.php');
+        require_once GROWTYPE_FORM_PATH . 'admin/methods/appearance/class-growtype-form-admin-appearance.php';
+        new Growtype_Form_Admin_Appearance();
 
         /**
          * Accesses
@@ -411,10 +165,110 @@ class Growtype_Form_Admin
         new Growtype_Form_User_Accesses();
 
         /**
-         * Signup details
+         * Signup users
          */
-        require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signup-details.php';
-        require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signups-list-table.php';
-        new Growtype_Form_Signup_Details();
+        if (get_option('growtype_form_settings_signups_enabled')) {
+            /**
+             * Load users
+             */
+            if (!class_exists('WP_List_Table')) {
+                require(ABSPATH . 'wp-admin/includes/class-wp-list-table.php');
+            }
+
+            require_once(ABSPATH . 'wp-admin/includes/class-wp-users-list-table.php');
+
+            /**
+             * Signup details
+             */
+            require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signup-details.php';
+            require_once GROWTYPE_FORM_PATH . 'admin/methods/users/class-growtype-form-signups-list-table.php';
+            new Growtype_Form_Signup_Details();
+        }
+    }
+
+    public static function init_json_editor($element = '.growtype_form_json_content', $additional_params = null)
+    {
+        $params = [
+            'theme' => 'twilight',
+            'lang' => 'ruby'
+        ];
+
+        if (isset($additional_params['height'])) {
+            $params['height'] = $additional_params['height'];
+        }
+
+        if (isset($additional_params['width'])) {
+            $params['width'] = $additional_params['width'];
+        }
+
+        ?>
+        <script src="<?= GROWTYPE_FORM_URL ?>admin/plugins/jquery-ace/ace/ace.js"></script>
+        <script src="<?= GROWTYPE_FORM_URL ?>admin/plugins/jquery-ace/ace/theme-twilight.js"></script>
+        <script src="<?= GROWTYPE_FORM_URL ?>admin/plugins/jquery-ace/ace/mode-ruby.js"></script>
+        <script src="<?= GROWTYPE_FORM_URL ?>admin/plugins/jquery-ace/jquery-ace.min.js"></script>
+
+        <script>
+            $ = jQuery;
+            let forms = $('<?php echo $element ?>');
+
+            let aceParams = <?php echo json_encode($params) ?>;
+
+            forms.map(function (index, value) {
+                if ($(value).length > 0) {
+                    let editor = $(value).ace(aceParams)
+
+                    let growtype_form_json_content = $(value).data('ace');
+                    if (growtype_form_json_content.element.length > 0) {
+                        if ($(value).text()) {
+                            growtype_form_json_content.editor.ace.setValue(JSON.stringify(JSON.parse($(value).text()), null, '\t'));
+                        }
+                    }
+                }
+            });
+
+            $('.wp-admin input[type="submit"]').click(function () {
+                let forms = $('.growtype_form_json_content');
+                forms.map(function (index, value) {
+                    if ($(value).data('ace').editor.ace.getValue().length > 0) {
+                        try {
+                            JSON.parse($(value).data('ace').editor.ace.getValue())
+                        } catch (e) {
+                            alert("Caught: " + e.message)
+                            event.preventDefault();
+                        }
+                    }
+                });
+            });
+        </script>
+        <?php
+    }
+
+    public static function set_notices($notices_details)
+    {
+        set_transient('growtype_form_admin_notices', $notices_details, 60);
+    }
+
+    public static function update_notices($notices_details)
+    {
+        $existing_notices_details = get_transient('growtype_form_admin_notices');
+        $notices_details = !empty($notices_details) ? $notices_details : [];
+        $existing_notices_details = !empty($existing_notices_details) ? $existing_notices_details : [];
+        $existing_notices_details = array_merge($existing_notices_details, $notices_details);
+        self::set_notices($existing_notices_details);
+    }
+
+    function show_admin_notice()
+    {
+        $notices_details = get_transient('growtype_form_admin_notices');
+
+        if (!empty($notices_details)) {
+            foreach ($notices_details as $notice_details) {
+                if (isset($notice_details['message']) && !empty($notice_details['message'])) {
+                    echo '<div class="notice ' . ($notice_details['success'] ? 'notice-success' : 'notice-error') . ' is-dismissible"><p>' . esc_html($notice_details['message']) . '</p></div>';
+                }
+            }
+
+            delete_transient('growtype_form_admin_notices');
+        }
     }
 }

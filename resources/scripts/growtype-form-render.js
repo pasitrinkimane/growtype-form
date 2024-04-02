@@ -183,7 +183,28 @@ $('document').ready(function () {
     });
 });
 
+/**
+ * Growtype quiz check if image uploader has files
+ */
+document.addEventListener('growtypeQuizValidateQuestion', function (event) {
+    $(event.detail.currentQuestion).find('.growtype-form-fields .b-wrapper').each(function (index, element) {
+        if ($(element).find('div[data-required]') && $(element).find('div[data-required]').attr('data-required') === 'true') {
+            if (!$(element).find('.image-uploader-inner').hasClass('has-files')) {
+                $(element).addClass('anim-wrong-selection');
 
+                setTimeout(function () {
+                    $(element).removeClass('anim-wrong-selection');
+                }, 500);
+
+                window.growtype_quiz_global.is_valid = false;
+            }
+        }
+    });
+})
+
+/**
+ * Image uploaded setup
+ */
 function setupImageUploader() {
     /**
      * Image uploader setup
@@ -202,18 +223,21 @@ function setupImageUploader() {
         return;
     }
 
-    let imageUploaderInitialName = imageUploaderInitial.attr('data-name');
-    let imageUploaderInitialExtension = imageUploaderInitial.attr('data-extensions') !== undefined ? imageUploaderInitial.attr('data-extensions').split(",") : '';
-    let imageUploaderInitialMaxSize = imageUploaderInitial.attr('data-max-size');
-    let imageUploaderInitialMaxFiles = imageUploaderInitial.attr('data-max-files');
-    let imageUploaderPreload = imageUploaderInitial.attr('data-preload');
-    let imageUploaderLabel = imageUploaderInitial.attr('data-label') !== undefined ? imageUploaderInitial.attr('data-label') : 'Drag & Drop files here or click to browse';
+    imageUploaderInitial.each(function (index, element) {
+        let formInput = $(element);
+        let imageUploaderInitialName = formInput.attr('data-name');
+        let imageUploaderInitialExtension = formInput.attr('data-extensions') !== undefined ? formInput.attr('data-extensions').split(",") : '';
+        let imageUploaderInitialMaxSize = formInput.attr('data-max-size');
+        let imageUploaderInitialMaxFiles = formInput.attr('data-max-files');
+        let imageUploaderPreload = formInput.attr('data-preload');
+        let imageUploaderLabel = formInput.attr('data-label') !== undefined ? formInput.attr('data-label') : 'Drag & Drop files here or click to browse';
+        let imageCapture = formInput.attr('data-capture') !== undefined ? formInput.attr('data-capture') : '';
+        let mimes = formInput.attr('data-mimes') !== undefined ? formInput.attr('data-mimes') : '';
 
-    if (defaultGallerySupported) {
-        if (typeof $.fn.imageUploader !== 'undefined') {
-            imageUploaderInitial.addClass('image-uploader');
+        if (defaultGallerySupported) {
+            if (typeof $.fn.imageUploader !== 'undefined') {
+                formInput.addClass('image-uploader');
 
-            $('.image-uploader').each(function () {
                 let galleryData = typeof (growtype_form_gallery) !== 'undefined' && imageUploaderPreload ? growtype_form_gallery : [];
                 let preloaded = [];
 
@@ -225,28 +249,38 @@ function setupImageUploader() {
                     }
                 }
 
-                $(this).imageUploader({
+                let uploaderSettings = {
                     preloaded: preloaded,
                     imagesInputName: imageUploaderInitialName,
                     extensions: imageUploaderInitialExtension,
                     maxSize: imageUploaderInitialMaxSize,
                     maxFiles: imageUploaderInitialMaxFiles ? imageUploaderInitialMaxFiles : 1,
-                    label: imageUploaderLabel,
-                });
+                    label: imageUploaderLabel
+                };
+
+                if (imageCapture) {
+                    uploaderSettings.capture = imageCapture;
+                }
+
+                if (mimes) {
+                    uploaderSettings.mimes = mimes;
+                }
+
+                formInput.imageUploader(uploaderSettings);
 
                 /**
                  * Format label
                  */
-                $('.image-uploader-init .upload-text span:first').html($('.image-uploader-init .upload-text span:first').text())
+                formInput.find('.upload-text span:first').html(formInput.find('.upload-text span:first').text())
+            }
+        } else {
+            $('<input multiple type="file" class="upload-multifile with-preview" className="multi" name="' + imageUploaderInitialName + '[]"/>').insertAfter(formInput);
+
+            formInput.MultiFile({
+                max: 10,
+                accept: imageUploaderInitialExtension.join(','),
+                max_size: imageUploaderInitialMaxSize,
             });
         }
-    } else {
-        $('<input multiple type="file" class="upload-multifile with-preview" className="multi" name="' + imageUploaderInitialName + '[]"/>').insertAfter('.image-uploader-init');
-
-        $('.upload-multifile').MultiFile({
-            max: 10,
-            accept: imageUploaderInitialExtension.join([separator = ',']),
-            max_size: imageUploaderInitialMaxSize,
-        });
-    }
+    });
 }

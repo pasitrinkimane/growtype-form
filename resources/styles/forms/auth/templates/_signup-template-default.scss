@@ -1,0 +1,82 @@
+.signup-template-default {
+  .growtype-form-wrapper {
+    .alert {
+      max-width: 560px;
+    }
+
+    .btn, label, a {
+      @include bp-phone-xl() {
+        font-size: 14px;
+      }
+    }
+
+    .growtype-form-container {
+      @include bp-phone-xl() {
+        max-width: 100%;
+      }
+    }
+
+    .row-submit {
+      .d-grid {
+        justify-content: center;
+      }
+    }
+
+    .growtype-form-wrapper {
+      form button[type=submit] {
+        min-width: 250px;
+        width: 100%;
+        @include bp-phone-xl() {
+          min-width: initial;
+        }
+      }
+
+      .b-actions {
+        margin: 0;
+        background: #F5F6F7;
+        color: #9A9EA7;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .btn-link {
+          padding-left: 5px;
+        }
+
+        p {
+          margin: 0;
+          font-size: 14px;
+        }
+      }
+    }
+
+    .fields-confirmation {
+      margin-top: 5px;
+      max-width: 320px;
+      display: block;
+      margin-right: auto;
+      position: relative;
+      bottom: -5px;
+      margin-left: 0;
+      margin-bottom: 10px;
+
+      .col-auto {
+        padding-left: 0;
+      }
+
+      .form-label {
+        margin: 0;
+        position: relative;
+      }
+    }
+
+    .growtype-form {
+      .btn-secondary {
+        @include bp-phone-xl() {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

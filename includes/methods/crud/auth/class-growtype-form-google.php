@@ -1,13 +1,11 @@
 <?php
 
-require_once GROWTYPE_FORM_PATH . 'vendor/autoload.php';
-
 /**
  *
  */
 class Growtype_Form_Google
 {
-    use Notice;
+    use GrowtypeFormNotice;
 
     public function __construct()
     {
@@ -30,7 +28,31 @@ class Growtype_Form_Google
         $client->addScope("email");
         $client->addScope("profile");
 
+        /**
+         * Same extra params to state
+         */
+        if (isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI'])) {
+            $form_origin_url = strtok($_SERVER['REQUEST_URI'], '?');
+            $form_origin_url = home_url($form_origin_url);
+
+            $params = $this->base64UrlEncode(json_encode([
+                'form_origin_url' => $form_origin_url,
+            ]));
+
+            $client->setState($params);
+        }
+
         return $client;
+    }
+
+    public function base64UrlEncode($inputStr)
+    {
+        return strtr(base64_encode($inputStr), '+/=', '-_,');
+    }
+
+    public function base64UrlDecode($inputStr)
+    {
+        return base64_decode(strtr($inputStr, '-_,', '+/='));
     }
 
     public function login_url()
@@ -69,6 +91,18 @@ class Growtype_Form_Google
                 $google_id = $google_account_info->id;
                 $link = $google_account_info->link;
 
+                $state = isset($_GET['state']) && !empty($_GET['state']) ? $_GET['state'] : '';
+                $form_origin_url = '';
+
+                if (!empty($state)) {
+                    $state = base64_decode(strtr($state, '-_,', '+/='));
+                    $state = json_decode($state, true);
+
+                    if (isset($state['form_origin_url'])) {
+                        $form_origin_url = $state['form_origin_url'];
+                    }
+                }
+
                 $user_id = email_exists($email);
 
                 /**
@@ -93,6 +127,10 @@ class Growtype_Form_Google
                             $redirect_url = growtype_form_login_page_url();
                         }
 
+                        if (!empty($form_origin_url)) {
+                            $redirect_url = $form_origin_url;
+                        }
+
                         wp_redirect($redirect_url);
                         exit();
                     }
@@ -115,7 +153,13 @@ class Growtype_Form_Google
 
                 growtype_form_login_user($user_id);
 
-                $redirect_url = growtype_form_redirect_url_after_signup();
+                do_action('growtype_form_google_auth', [
+                    'user_id' => $user_id,
+                    'google_account_info' => $google_account_info,
+                    'form_origin_url' => $form_origin_url
+                ]);
+
+                $redirect_url = apply_filters('growtype_form_google_auth_redirect_url', growtype_form_redirect_url_after_signup(), $form_origin_url);
 
                 if (!empty($redirect_url)) {
                     wp_redirect($redirect_url);

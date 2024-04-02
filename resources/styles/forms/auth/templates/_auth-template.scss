@@ -1,0 +1,9 @@
+.growtype-form-auth {
+  .growtype-form-wrapper {
+    display: none;
+
+    &.is-active {
+      display: block;
+    }
+  }
+}

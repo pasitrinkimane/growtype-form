@@ -5,9 +5,10 @@
  */
 class Growtype_Form_General
 {
-    use Notice;
-    use File;
-    use Product;
+    use GrowtypeFormAuth;
+    use GrowtypeFormNotice;
+    use GrowtypeFormFile;
+    use GrowtypeFormProduct;
 
     const GROWTYPE_FORM_SHORTCODE_NAME = 'growtype_form';
 
@@ -18,8 +19,6 @@ class Growtype_Form_General
         if (!is_admin()) {
             add_shortcode(self::GROWTYPE_FORM_SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
         }
-
-        add_action('wp_footer', array ($this, 'growtype_form_show_hide_password_button'));
     }
 
     public static function get_date_time_data()
@@ -109,17 +108,10 @@ class Growtype_Form_General
         }
 
         /**
-         * Signup styles
+         * Auth styles
          */
-        if (str_contains($form_name, 'signup')) {
-            wp_enqueue_style('growtype-form-signup', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/signup/main.css', array (), GROWTYPE_FORM_VERSION, 'all');
-        }
-
-        /**
-         * Signup styles
-         */
-        if (str_contains($form_name, 'login')) {
-            wp_enqueue_style('growtype-form-login', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/login/main.css', array (), GROWTYPE_FORM_VERSION, 'all');
+        if (strpos($form_name, 'signup') !== false || strpos($form_name, 'login') !== false) {
+            wp_enqueue_style('growtype-form-auth', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/auth/index.css', array (), GROWTYPE_FORM_VERSION, 'all');
         }
 
         do_action('growtype_form_render_styles');
@@ -130,7 +122,7 @@ class Growtype_Form_General
      */
     function growtype_form_enqueue_render_scripts()
     {
-        wp_enqueue_script('growtype-form-render', GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form-render.js', array ('jquery'), '1.3', true);
+        wp_enqueue_script('growtype-form-render', GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form-render.js', array ('jquery'), GROWTYPE_FORM_VERSION, true);
 
         /**
          * File styles
@@ -143,7 +135,7 @@ class Growtype_Form_General
          * Image uploader
          */
         if (!wp_script_is('image-uploader', 'enqueued')) {
-            wp_enqueue_script('image-uploader', GROWTYPE_FORM_URL_PUBLIC . 'plugins/image-uploader/image-uploader.js', array ('jquery'), '1.1', true);
+            wp_enqueue_script('image-uploader', GROWTYPE_FORM_URL_PUBLIC . 'plugins/image-uploader/image-uploader.js', array ('jquery'), '1.21', true);
         }
 
         /**
@@ -235,6 +227,33 @@ class Growtype_Form_General
         }
 
         /**
+         * Check if login required
+         */
+        if (isset($args['login_required']) && $args['login_required'] && !is_user_logged_in()) {
+            wp_redirect(
+                add_query_arg([
+                    'redirect_after' => get_permalink(),
+                ], growtype_form_login_page_url())
+            );
+            die();
+        }
+
+        add_action('wp_footer', array ($this, 'growtype_form_show_hide_password_button'), 100);
+
+        ob_start();
+
+        if (!is_admin()) {
+            echo $this->growtype_form_get_notice();
+        }
+
+        echo $this->form_init($args);
+
+        return ob_get_clean();
+    }
+
+    public function form_init($args)
+    {
+        /**
          * Set redirect to cookie
          */
         $redirect_after = isset($_GET['redirect_after']) && !empty($_GET['redirect_after']) ? $_GET['redirect_after'] : null;
@@ -253,6 +272,7 @@ class Growtype_Form_General
          * Form name
          */
         $form_name = $args['name'];
+        $form_name = self::format_form_name($form_name);
         $form_type = isset($args['type']) ? $args['type'] : null;
         $form_action = isset($args['action']) ? $args['action'] : 'submit';
 
@@ -288,16 +308,20 @@ class Growtype_Form_General
         /**
          * Init form body classes
          */
-        if (str_contains($form_name, 'signup')) {
+        if (strpos($form_name, 'signup') !== false) {
             add_filter('body_class', array ($this, 'growtype_form_signup_body_class'));
-        } elseif (str_contains($form_name, 'login')) {
+        } elseif (strpos($form_name, 'login') !== false) {
             add_filter('body_class', array ($this, 'growtype_form_login_body_class'));
         }
 
         /**
-         * Enqueue render scripts
+         * Enqueue render styles
          */
         $this->growtype_form_enqueue_render_styles($form_name);
+
+        /**
+         * Enqueue render scripts
+         */
         $this->growtype_form_enqueue_render_scripts();
 
         /**
@@ -321,7 +345,7 @@ class Growtype_Form_General
          */
         if ($form_type === 'fields') {
             return $this->render_growtype_fields($form_data, $form_name);
-        } elseif (str_contains($form_name, 'login')) {
+        } elseif (strpos($form_name, 'login') !== false) {
             /**
              * Initiate scripts
              */
@@ -341,35 +365,48 @@ class Growtype_Form_General
         }
     }
 
+    public static function format_form_name($form_name)
+    {
+        return preg_replace('/\s+/', '_', strtolower($form_name));
+    }
+
     /**
      * @return void
      */
-    public function render_growtype_fields($form, $form_name)
+    public function render_growtype_fields($form_data, $form_name)
     {
         /**
          * Form main fields
          */
-        $main_fields = isset($form['main_fields']) ? $form['main_fields'] : [];
+        $main_fields = isset($form_data['main_fields']) ? $form_data['main_fields'] : [];
 
         /**
          * Form confirmation fields
          */
-        $confirmation_fields = isset($form['confirmation_fields']) ? $form['confirmation_fields'] : [];
+        $confirmation_fields = isset($form_data['confirmation_fields']) ? $form_data['confirmation_fields'] : [];
+
+        /**
+         * Style
+         */
+        $form_style = $form_data['args']['style'] ?? $form_data['style'] ?? '';
 
         /**
          * Classes
          */
-        $form_class = isset($form['class']) ? $form['class'] : '';
+        $wrapper_classes = self::wrapper_classes($form_data);
 
+        /**
+         * Render
+         */
         ob_start();
         ?>
 
-        <div class="growtype-form-wrapper <?= $form_class ?>" data-name="<?php echo $form_name ?>">
+        <div class="<?php echo implode(' ', $wrapper_classes) ?>" style="<?php echo $form_style ?>" data-name="<?php echo $form_name ?>">
             <div class="growtype-form-fields">
                 <?php
-                foreach ($form as $key => $form_fields) { ?>
+                foreach ($form_data as $key => $form_fields) { ?>
 
-                    <?php if (str_contains('main_fields', $key)) { ?>
+                    <?php if (strpos('main_fields', $key) !== false) { ?>
                         <div class="row g-3 main-fields">
                             <?php
                             foreach ($main_fields as $field) {
@@ -379,7 +416,7 @@ class Growtype_Form_General
                         </div>
                     <?php } ?>
 
-                    <?php if (str_contains('confirmation_fields', $key)) { ?>
+                    <?php if (strpos('confirmation_fields', $key) !== false) { ?>
                         <div class="row fields-confirmation">
                             <?php
                             foreach ($confirmation_fields as $field) {
@@ -402,6 +439,21 @@ class Growtype_Form_General
         return ob_get_clean();
     }
 
+    public static function wrapper_classes($form_data)
+    {
+        $wrapper_classes = ['growtype-form-wrapper'];
+
+        if (isset($form_data['args']['class'])) {
+            array_push($wrapper_classes, $form_data['args']['class']);
+        }
+
+        if (isset($form_data['class'])) {
+            array_push($wrapper_classes, $form_data['class']);
+        }
+
+        return $wrapper_classes;
+    }
+
     /**
      * @param $form
      * @return false|string|null
@@ -415,8 +467,13 @@ class Growtype_Form_General
         $recaptcha_key = $recaptcha['api_key'] ?? null;
 
         if (!empty($recaptcha_key) && !function_exists('recaptcha_setup')) {
-            add_action('wp_footer', array (__CLASS__, 'recaptcha_setup'));
+            add_action('wp_footer', array (__CLASS__, 'recaptcha_setup'), 100);
         }
+
+        /**
+         * Render modals
+         */
+        add_action('wp_footer', array (__CLASS__, 'growtype_form_modals_render'), 100);
 
         /**
          * Form main fields
@@ -440,11 +497,15 @@ class Growtype_Form_General
          */
         $post = self::growtype_form_get_current_post();
 
-        $growtype_form_wrapper_classes = ['growtype-form-wrapper'];
+        /**
+         * Style
+         */
+        $form_style = $form_data['args']['style'] ?? $form_data['style'] ?? '';
 
-        if (isset($form_data['args']['class'])) {
-            array_push($growtype_form_wrapper_classes, $form_data['args']['class']);
-        }
+        /**
+         * Classes
+         */
+        $wrapper_classes = self::wrapper_classes($form_data);
 
         /**
          * Start form
@@ -452,7 +513,7 @@ class Growtype_Form_General
         ob_start();
         ?>
 
-        <div class="<?php echo implode(' ', $growtype_form_wrapper_classes) ?>" data-name="<?php echo $form_name ?>">
+        <div class="<?php echo implode(' ', $wrapper_classes) ?>" style="<?php echo $form_style ?>" data-name="<?php echo $form_name ?>">
 
             <?php if (isset($form_args['logo']) && isset($form_args['logo']['url']) && !empty($form_args['logo']['url'])) { ?>
                 <div class="logo-wrapper">
@@ -462,8 +523,6 @@ class Growtype_Form_General
                 </div>
             <?php } ?>
 
-            <?php echo self::growtype_form_get_notice(); ?>
-
             <div class="growtype-form-container">
                 <div class="form-wrapper">
                     <?php echo growtype_form_include_view('components.forms.partials.header', ['form_args' => $form_args]) ?>
@@ -471,7 +530,7 @@ class Growtype_Form_General
                     <div class="form-inner-wrapper">
                         <form id="growtype-form-<?php echo $form_name ?>" enctype="multipart/form-data" class="growtype-form form <?php echo $form_args['class'] ?>" action="<?php echo self::growtype_form_get_action_url(); ?>" method="post" data-name="<?php echo $form_name ?>" data-ajax="<?php echo $form_args['ajax'] ?>" data-ajax-action="<?php echo $form_args['ajax_action'] ?>">
                             <?php foreach ($form_data as $key => $form_fields) { ?>
-                                <?php if (isset($form_args['main_fields']) && !empty($form_args['main_fields']) && str_contains('main_fields', $key)) { ?>
+                                <?php if (isset($form_args['main_fields']) && !empty($form_args['main_fields']) && strpos('main_fields', $key) !== false) { ?>
                                     <div class="row g-3 main-fields">
                                         <?php foreach ($form_args['main_fields'] as $field) {
                                             self::render_growtype_form_field($field);
@@ -480,7 +539,7 @@ class Growtype_Form_General
                                     </div>
                                 <?php } ?>
 
-                                <?php if (str_contains('confirmation_fields', $key)) { ?>
+                                <?php if (strpos('confirmation_fields', $key) !== false) { ?>
                                     <div class="row fields-confirmation">
                                         <?php foreach ($form_args['confirmation_fields'] as $field) {
                                             self::render_growtype_form_field($field);
@@ -494,24 +553,28 @@ class Growtype_Form_General
                                 <input type="email" name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATOR ?>' value="" style="display: none;"/>
 
                                 <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION ?>' value="<?php echo $form_action ?>"/>
-                                <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?= get_current_user_id() ?? null ?>"/>
-                                <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?= $form_name ?>"/>
+                                <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?php echo get_current_user_id() ?? null ?>"/>
+                                <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?php echo $form_name ?>"/>
                                 <?php if (!empty($post)) { ?>
-                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?= $post->ID ?>"/>
+                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?php echo $post->ID ?>"/>
                                 <?php } ?>
 
                                 <?php if (isset($form_data['args']['redirect_after'])) { ?>
-                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_REDIRECT_AFTER ?>' value="<?= $form_args['redirect_after'] ?>"/>
+                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_REDIRECT_AFTER ?>' value="<?php echo $form_args['redirect_after'] ?>"/>
                                 <?php } ?>
 
                                 <?php if (class_exists('Growtype_Quiz')) { ?>
-                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_QUIZ_UNIQUE_HASH ?>' value=""/>
+                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_QUIZ_UNIQUE_HASH ?>' value="<?php echo growtype_quiz_get_unique_hash() ?>"/>
+                                <?php } ?>
+
+                                <?php if (class_exists('QTX_Translator')) { ?>
+                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_LANGUAGE ?>' value="<?php echo qtranxf_getLanguage() ?>"/>
                                 <?php } ?>
                             </div>
 
                             <?php if (isset($form_args['submit_row']) && !empty($form_args['submit_row'])) { ?>
                                 <div class="row row-submit <?= isset($form_args['submit_row']['class']) ? $form_args['submit_row']['class'] : '' ?>">
-                                    <div class="d-md-grid gap-2 d-md-flex">
+                                    <div class="row-submit-inner d-md-grid gap-2 d-md-flex">
                                         <?php if (!empty($recaptchav3)) { ?>
                                             <div class="g-recaptcha"
                                                  data-sitekey="<?= $recaptchav3 ?>"
@@ -546,9 +609,9 @@ class Growtype_Form_General
         </div>
 
         <?php
-        add_action('wp_footer', array (__CLASS__, 'growtype_form_modals_render'));
+        $form = ob_get_clean();
 
-        return ob_get_clean();
+        return $form;
     }
 
     public static function growtype_form_modals_render()
@@ -570,7 +633,7 @@ class Growtype_Form_General
             }
         }
 
-        return !empty(get_post()) && str_contains($_SERVER['REQUEST_URI'], get_post()->post_name) ? get_post() : null;
+        return !empty(get_post()) && strpos($_SERVER['REQUEST_URI'], get_post()->post_name) !== false ? get_post() : null;
     }
 
     /**
@@ -900,7 +963,7 @@ class Growtype_Form_General
                     }
                 }
             }
-        } elseif (!empty($post) && str_contains($post->post_name, 'account')) {
+        } elseif (!empty($post) && strpos($post->post_name, 'account') !== false) {
             $user_id = get_current_user_id();
             if (!empty($user_id) && isset($form_data['main_fields'])) {
                 foreach ($form_data['main_fields'] as $field) {
@@ -919,42 +982,5 @@ class Growtype_Form_General
             unset($_COOKIE['signup_data']);
             setcookie('signup_data', '', time(), COOKIEPATH, COOKIE_DOMAIN);
         }
-    }
-
-    function growtype_form_show_hide_password_button()
-    {
-        ?>
-        <script type="text/javascript">
-            jQuery(document).ready(function () {
-                var open = 'fa-eye';
-                var close = 'fa-eye-slash';
-                var ele = jQuery('.growtype-form-wrapper input[type="password"]');
-                jQuery('<button class="far fa-eye-slash show-hide-pw" type="button">&nbsp;</button>').insertAfter(ele);
-                jQuery('.growtype-form-wrapper .show-hide-pw').click(function () {
-                    if (jQuery(this).hasClass(close)) {
-                        jQuery(this).parent().find('input[type="password"]').prop('type', 'text');
-                        jQuery(this).removeClass(close);
-                        jQuery(this).addClass(open);
-                    } else {
-                        jQuery(this).parent().find('input[type="text"]').prop('type', 'password');
-                        jQuery(this).removeClass(open);
-                        jQuery(this).addClass(close);
-                    }
-                });
-            });
-        </script>
-        <style>
-            .growtype-form-wrapper .show-hide-pw {
-                background: none;
-                border: none;
-                position: absolute;
-                right: 7px;
-                top: 45px;
-                opacity: 0.8;
-                width: 40px;
-                text-align: center;
-            }
-        </style>
-        <?php
     }
 }

@@ -20,7 +20,7 @@ if (empty($field_value)) {
     $field_value = !empty($request_field_value) && $field_type !== 'file' ? sanitize_text_field($request_field_value) : '';
 }
 
-if (str_contains($field_name, 'password')) {
+if (strpos($field_name, 'password') !== false) {
     $field_value = null;
 }
 
@@ -32,7 +32,7 @@ $field_params = json_encode($field_params);
 $selected_options = isset($field['selected_options']) ? $field['selected_options'] : [$field_value];
 $select_type = isset($field['select_type']) ? $field['select_type'] : null;
 $field_label = isset($field['label']) ? $field['label'] : null;
-$field_label = !empty($field_label) && $field_required && !str_contains($field_label, '*') ? $field_label . '<span class="required">*</span>' : $field_label;
+$field_label = !empty($field_label) && $field_required && strpos($field_label, '*') === false ? $field_label . '<span class="required">*</span>' : $field_label;
 $field_description = isset($field['description']) ? $field['description'] : null;
 $field_explanation = isset($field['explanation']) ? $field['explanation'] : null;
 $placeholder = isset($field['placeholder']) ? $field['placeholder'] : null;

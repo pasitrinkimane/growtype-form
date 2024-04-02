@@ -6,35 +6,18 @@
  */
 class Growtype_Form_Crud
 {
-    use Post;
-    use User;
-    use File;
-    use Product;
-    use Notice;
-
-    const EXCLUDED_VALUES_FROM_VALIDATION = [
-        self::GROWTYPE_FORM_SUBMIT_ACTION,
-        self::GROWTYPE_FORM_SUBMITTER_ID,
-        self::GROWTYPE_FORM_NAME_IDENTIFICATOR,
-        self::GROWTYPE_FORM_POST_IDENTIFICATOR,
-        self::GROWTYPE_FORM_SPAM_IDENTIFICATOR,
-        self::GROWTYPE_FORM_REDIRECT_AFTER,
-        self::GROWTYPE_QUIZ_UNIQUE_HASH,
-        'preloaded',
-    ];
-
-    const INCLUDED_VALUES_AFTER_VALIDATION = [
-        self::GROWTYPE_FORM_SUBMITTER_ID,
-        self::GROWTYPE_FORM_NAME_IDENTIFICATOR,
-        self::GROWTYPE_FORM_POST_IDENTIFICATOR,
-        self::GROWTYPE_QUIZ_UNIQUE_HASH
-    ];
+    use GrowtypeFormPost;
+    use GrowtypeFormUser;
+    use GrowtypeFormFile;
+    use GrowtypeFormProduct;
+    use GrowtypeFormNotice;
 
     const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
     const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
     const GROWTYPE_FORM_POST_IDENTIFICATOR = 'growtype_form_post_id';
     const GROWTYPE_FORM_REDIRECT_AFTER = 'growtype_form_redirect_after';
     const GROWTYPE_QUIZ_UNIQUE_HASH = 'growtype_quiz_unique_hash';
+    const GROWTYPE_FORM_LANGUAGE = 'form_language';
     const GROWTYPE_FORM_SPAM_IDENTIFICATOR = 'email_spam';
     const GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS = ['submit', 'preview', 'save_as_draft', 'delete', 'update'];
     const GROWTYPE_FORM_SUBMIT_ACTION = 'growtype_form_submit_action';
@@ -46,6 +29,25 @@ class Growtype_Form_Crud
         self::GROWTYPE_FORM_SUBMIT_ACTION,
         self::GROWTYPE_FORM_SPAM_IDENTIFICATOR,
         self::GROWTYPE_FORM_SUBMITTER_ID
+    ];
+
+    const EXCLUDED_VALUES_FROM_VALIDATION = [
+        self::GROWTYPE_FORM_SUBMIT_ACTION,
+        self::GROWTYPE_FORM_SUBMITTER_ID,
+        self::GROWTYPE_FORM_NAME_IDENTIFICATOR,
+        self::GROWTYPE_FORM_POST_IDENTIFICATOR,
+        self::GROWTYPE_FORM_SPAM_IDENTIFICATOR,
+        self::GROWTYPE_FORM_REDIRECT_AFTER,
+        self::GROWTYPE_QUIZ_UNIQUE_HASH,
+        self::GROWTYPE_FORM_LANGUAGE,
+        'preloaded',
+    ];
+
+    const INCLUDED_VALUES_AFTER_VALIDATION = [
+        self::GROWTYPE_FORM_SUBMITTER_ID,
+        self::GROWTYPE_FORM_NAME_IDENTIFICATOR,
+        self::GROWTYPE_FORM_POST_IDENTIFICATOR,
+        self::GROWTYPE_QUIZ_UNIQUE_HASH
     ];
 
     const EXCLUDED_VALUES_FROM_RETURN = ['password', 'repeat_password'];
@@ -151,6 +153,15 @@ class Growtype_Form_Crud
         }
 
         /**
+         * Return page path
+         */
+        $return_page_path = home_url();
+
+        if (isset($_SERVER['REQUEST_URI'])) {
+            $return_page_path = growtype_form_get_url_path();
+        }
+
+        /**
          * Get form data
          */
         $form_data = self::get_growtype_form_data($form_name);
@@ -169,7 +180,7 @@ class Growtype_Form_Crud
             $success_message = isset($form_data['success_message']) ? $form_data['success_message'] : '';
             $submit_action = isset($submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION]) ? $submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION] : 'submit';
 
-            if (str_contains($form_name, 'signup')) {
+            if (strpos($form_name, 'signup') !== false) {
                 $child_user = isset($form_data['child_user']) && $form_data['child_user'] ? true : false;
 
                 $signup_params = [
@@ -189,7 +200,7 @@ class Growtype_Form_Crud
                         }
 
                         if (!empty($redirect_url)) {
-                            $redirect_url = $_GET['redirect_after'];
+                            $redirect_url = isset($_GET['redirect_after']) ? $_GET['redirect_after'] : $redirect_url;
                         } else {
                             if ($submit_action === 'update') {
                                 $redirect_url = home_url(growtype_form_get_url_path());
@@ -199,7 +210,7 @@ class Growtype_Form_Crud
                         }
                     }
                 }
-            } elseif (str_contains($form_name, 'wc_product')) {
+            } elseif (class_exists('Growtype_Wc') && strpos($form_name, 'wc_product') !== false) {
                 $product_data = $submitted_values;
 
                 /**
@@ -209,7 +220,7 @@ class Growtype_Form_Crud
 
                     $description_fields = [];
                     foreach ($form_data['main_fields'] as $field) {
-                        if (str_contains($field['name'], 'description')) {
+                        if (strpos($field['name'], 'description') !== false) {
                             $field_key = str_replace('description[', '', $field['name']);
                             $field_key = str_replace(']', '', $field_key);
                             $description_fields[$field_key] = $field;
@@ -233,7 +244,7 @@ class Growtype_Form_Crud
                 /**
                  * Status
                  */
-                if ($submit_data['success']) {
+                if (isset($submit_data['success']) && $submit_data['success']) {
                     $product_id = $submit_data['product_id'];
 
                     $submit_data['product_id'] = $product_id;
@@ -254,7 +265,7 @@ class Growtype_Form_Crud
                 if (isset($form_data['type']) && $form_data['type'] === 'custom') {
                     $submit_data = apply_filters('growtype_form_upload_post_custom', $form_data, $submitted_values);
                 } else {
-                    $submit_data = $this->upload_post($form_data, $submitted_values);
+                    $submit_data = growtype_form_save_submission($form_data, $submitted_values);
 
                     /**
                      * Process files
@@ -306,6 +317,8 @@ class Growtype_Form_Crud
          * Set return values
          */
         if ($submit_data['success'] === false) {
+            $redirect_url = home_url($return_page_path) . '?' . http_build_query($_GET);
+
             $return_values = [];
             foreach ($submitted_data as $key => $value) {
                 if (!in_array($key, self::EXCLUDED_VALUES_FROM_RETURN) && !in_array($key, self::EXCLUDED_VALUES_FROM_VALIDATION)) {
@@ -313,7 +326,7 @@ class Growtype_Form_Crud
                 }
             }
 
-            if (!empty($return_values) && str_contains($form_name, 'signup')) {
+            if (!empty($return_values) && strpos($form_name, 'signup') !== false) {
                 setcookie('signup_data', json_encode($return_values), time() + 2, COOKIEPATH, COOKIE_DOMAIN);
             }
         }
@@ -329,15 +342,6 @@ class Growtype_Form_Crud
         );
 
         /**
-         * Redirect url
-         */
-        $return_page_path = home_url();
-
-        if (isset($_SERVER['REQUEST_URI'])) {
-            $return_page_path = growtype_form_get_url_path();
-        }
-
-        /**
          * Current post id
          */
         $post_id = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
@@ -350,7 +354,7 @@ class Growtype_Form_Crud
             $redirect_url = Growtype_Wc_Product::edit_permalink($post_id);
         }
 
-        return apply_filters('growtype_form_submitted_values_redirect_url', $redirect_url, $form_data);
+        return apply_filters('growtype_form_submitted_values_redirect_url', $redirect_url, $form_data, $submitted_data);
     }
 
     public static function send_email_to_admin($submitted_content, $form_data)
@@ -368,7 +372,7 @@ class Growtype_Form_Crud
         $headers = array ('Content-Type: text/html; charset=UTF-8');
         $admin_email = get_option('admin_email');
 
-        $email_body = str_replace('{post_content}', $submitted_content, $growtype_form_post_default_email_to_content);
+        $email_body = str_replace('{form_submission_details}', $submitted_content, $growtype_form_post_default_email_to_content);
 
         if (isset($form_data['form_name'])) {
             $email_body = str_replace('{form_name}', $form_data['form_name'], $email_body);
@@ -395,26 +399,56 @@ class Growtype_Form_Crud
         }
 
         /**
-         * Form Settings
+         * Check forms
          */
-        if (str_contains($form_name, 'wc_product')) {
-            $form_json_content = get_option('growtype_form_wc_product_json_content');
-        } elseif (str_contains($form_name, 'signup')) {
-            $form_json_content = get_option('growtype_form_signup_json_content');
-        } elseif (str_contains($form_name, 'login')) {
-            $form_json_content = get_option('growtype_form_login_json_content');
-        } else {
-            $form_json_content = get_option('growtype_form_post_json_content');
+        $forms = get_posts(
+            [
+                'posts_per_page' => -1,
+                'post_type' => Growtype_Form_Admin_Form::POST_TYPE_NAME,
+                'post_status' => 'publish'
+            ]
+        );
+
+        if (!empty($forms)) {
+            foreach ($forms as $form) {
+                if (Growtype_Form_General::format_form_name($form->post_title) === $form_name) {
+                    $form_json_content = get_post_meta($form->ID, 'json_content', true);
+                    $form_json_content = self::json_decode($form_json_content);
+                    if (!empty($form_json_content)) {
+                        $form_json_content = [
+                            $form_name => $form_json_content
+                        ];
+
+                        $form_json_content = json_encode($form_json_content);
+
+                        break;
+                    }
+                }
+            }
         }
 
-        if (!isset($form_json_content) || empty($form_json_content)) {
-            return null;
+        if (empty($form_json_content)) {
+            /**
+             * Form Settings
+             */
+            if (strpos($form_name, 'wc_product') !== false) {
+                $form_json_content = get_option('growtype_form_wc_product_json_content');
+            } elseif (strpos($form_name, 'signup') !== false) {
+                $form_json_content = get_option('growtype_form_signup_json_content');
+            } elseif (strpos($form_name, 'login') !== false) {
+                $form_json_content = get_option('growtype_form_login_json_content');
+            } else {
+                $form_json_content = get_option('growtype_form_post_json_content');
+            }
+
+            if (!isset($form_json_content) || empty($form_json_content)) {
+                return null;
+            }
         }
 
-        $available_forms = json_decode($form_json_content, true);
+        $available_forms = self::json_decode($form_json_content);
 
-        if (str_contains($form_name, 'edit') && !isset($available_forms[$form_name]['main_fields'])) {
-
+        if (strpos($form_name, 'edit') !== false && !isset($available_forms[$form_name]['main_fields'])) {
             $form_parent = str_replace('_edit', '', $form_name);
 
             if (isset($available_forms[$form_parent]['main_fields'])) {
@@ -424,18 +458,29 @@ class Growtype_Form_Crud
 
         $form_data = $available_forms[$form_name] ?? null;
 
-        if (empty($form_data)) {
-            return null;
-        }
-
         /**
          * Include form name
          */
-        if (!isset($form_data['form_name'])) {
+        if (!empty($form_data) && !isset($form_data['form_name'])) {
             $form_data['form_name'] = $form_name;
         }
 
         return apply_filters('growtype_form_get_growtype_form_data', $form_data, $form_name);
+    }
+
+    public static function json_decode($form_json_content)
+    {
+        $available_forms = json_decode($form_json_content, true);
+
+        /**
+         * Check if trailing comma exists
+         */
+        if (empty($available_forms)) {
+            $form_json_content = preg_replace('/,\s*([\]}])/m', '$1', $form_json_content);
+            $available_forms = json_decode($form_json_content, true);
+        }
+
+        return $available_forms;
     }
 
     /**
@@ -646,7 +691,7 @@ class Growtype_Form_Crud
          * Collect fields
          */
         foreach ($form_data as $key => $field_group) {
-            if (str_contains('main_fields', $key) || str_contains('confirmation_fields', $key)) {
+            if (strpos('main_fields', $key) !== false || strpos('confirmation_fields', $key) !== false) {
                 array_push($available_fields, array_column($field_group, 'name'));
             }
         }
@@ -712,12 +757,12 @@ class Growtype_Form_Crud
             $passed_values = [];
             foreach ($submitted_values_notsanitized as $index => $value) {
                 $match = array_filter($required_fields_names, function ($key) use ($value) {
-                    return str_contains($key, $value);
+                    return strpos($key, $value) !== false;
                 });
 
                 if (!$match) {
                     $match = array_filter($required_fields_names, function ($key) use ($value) {
-                        return str_contains($value, $key);
+                        return strpos($value, $key) !== false;
                     });
                 }
 

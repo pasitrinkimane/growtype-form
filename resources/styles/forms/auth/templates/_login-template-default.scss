@@ -1,0 +1,51 @@
+.login-template-default {
+  .growtype-form-wrapper {
+    .btn-recover-password {
+      border: none;
+      text-decoration: none;
+      float: right;
+      margin-top: 10px;
+    }
+
+    .btn, label, a {
+      @include bp-phone-xl() {
+        font-size: 14px;
+      }
+    }
+
+    .login-submit {
+      padding-top: 15px;
+    }
+
+    input[type=submit] {
+      max-width: initial !important;
+    }
+
+    label {
+      line-height: 18px;
+
+      &.error {
+        margin-bottom: 0;
+      }
+    }
+
+    .b-actions {
+      margin: 0;
+      background: #F5F6F7;
+      color: #9A9EA7;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .btn-link {
+        padding-left: 5px;
+      }
+
+      p {
+        margin: 0;
+        font-size: 14px;
+      }
+    }
+  }
+}

@@ -15,6 +15,7 @@
             mimes: ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'],
             maxSize: undefined,
             maxFiles: undefined,
+            capture: null
         };
 
         // Get instance
@@ -75,14 +76,20 @@
             // Create the image uploader container
             let $container = $('<div>', {class: 'image-uploader-inner'});
 
-            // Create the input type file and append it to the container
-            $input = $('<input>', {
+            let inputParams = {
                 type: 'file',
                 id: plugin.settings.imagesInputName + '-' + random(),
                 name: plugin.settings.imagesInputName + '[]',
                 accept: plugin.settings.extensions.join(','),
                 multiple: ''
-            }).appendTo($container);
+            };
+
+            if (plugin.settings.capture) {
+                inputParams.capture = plugin.settings.capture;
+            }
+
+            // Create the input type file and append it to the container
+            $input = $('<input>', inputParams).appendTo($container);
 
             // Create the uploaded images container and append it to the container
             let $uploadedContainer = $('<div>', {class: 'uploaded'}).appendTo($container),
@@ -292,6 +299,10 @@
 
         let validateMIME = function (file) {
 
+            if (plugin.settings.extensions.includes('.pdf')) {
+                plugin.settings.mimes.push('application/pdf');
+            }
+
             if (plugin.settings.mimes.indexOf(file.type) < 0) {
                 alert(`The file "${file.name}" does not match with the accepted mime types: "${plugin.settings.mimes.join('", "')}"`);
 
@@ -336,14 +347,22 @@
                 // Get the files input
                 $input = $container.find('input[type="file"]');
 
+            let imgSrc = '';
+
             // Run through the files
             $(files).each(function (i, file) {
 
                 // Add it to data transfer
                 dataTransfer.items.add(file);
 
+                if (file.type === 'application/pdf') {
+                    imgSrc = window.growtype_form.public_url + 'images/pdf.png';
+                } else {
+                    imgSrc = URL.createObjectURL(file);
+                }
+
                 // Set preview
-                $uploadedContainer.append(createImg(URL.createObjectURL(file), dataTransfer.items.length - 1), false);
+                $uploadedContainer.append(createImg(imgSrc, dataTransfer.items.length - 1), false);
 
             });
 

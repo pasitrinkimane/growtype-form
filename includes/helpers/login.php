@@ -17,7 +17,9 @@ if (!function_exists('growtype_form_login_user')) {
         $user = get_user_by('id', $user_id);
 
         wp_set_current_user($user->ID, $user->user_login);
+
         wp_set_auth_cookie($user->ID);
+
         do_action('wp_login', $user->user_login, $user);
 
         error_log('User logged in: ' . $user->user_login);
@@ -39,7 +41,7 @@ function growtype_form_login_page_is_active()
 
     $post = get_post($page_ID);
 
-    return !empty($post) && str_contains($_SERVER['REQUEST_URI'], $post->post_name);
+    return !empty($post) && strpos($_SERVER['REQUEST_URI'], $post->post_name) !== false;
 }
 
 /**
@@ -64,7 +66,7 @@ function growtype_form_login_page_url($query_vars = [])
 /**
  * @return array|WP_Post|null
  */
-function growtype_form_redirect_after_login_page()
+function growtype_form_default_redirect_after_login_page()
 {
     return get_option('growtype_form_redirect_after_login_page');
 }
@@ -75,9 +77,9 @@ function growtype_form_redirect_after_login_page()
  */
 function growtype_form_redirect_url_after_login()
 {
-    $redirect_page = growtype_form_redirect_after_login_page();
+    $redirect_page = growtype_form_default_redirect_after_login_page();
 
-    if (isset($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], 'wp/wp-login')) {
+    if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'wp/wp-login') !== false) {
         $redirect_url = get_dashboard_url();
     } elseif (isset($_COOKIE['growtype_form_redirect_after'])) {
         $redirect_url = $_COOKIE['growtype_form_redirect_after'];
@@ -89,7 +91,7 @@ function growtype_form_redirect_url_after_login()
         $redirect_url = get_permalink($redirect_page);
     }
 
-    return $redirect_url;
+    return apply_filters('growtype_form_redirect_url_after_login', $redirect_url);
 }
 
 if (!function_exists('growtype_form_facebook_login_form')) {
@@ -102,15 +104,15 @@ if (!function_exists('growtype_form_facebook_login_form')) {
     }
 }
 
-if (!function_exists('growtype_form_google_login_btn')) {
-    function growtype_form_google_login_btn()
+if (!function_exists('growtype_form_google_auth_btn')) {
+    function growtype_form_google_auth_btn($type = 'login')
     {
         $methods = new Growtype_Form_Google();
         $login_url = $methods->login_url();
 
-        $btn_text = __('Sign Up with Google', 'growtype-form');
-        if (growtype_form_login_page_is_active()) {
-            $btn_text = __('Sign In with Google', 'growtype-form');
+        $btn_text = __('Sign In with Google', 'growtype-form');
+        if ($type === 'signup') {
+            $btn_text = __('Sign Up with Google', 'growtype-form');
         }
 
         return sprintf('<a href="%s" class="btn btn-google-login"><img src="' . GROWTYPE_FORM_URL_PUBLIC . 'images/auth/google.png' . '" width="15" height="15">%s</a>', $login_url, $btn_text);

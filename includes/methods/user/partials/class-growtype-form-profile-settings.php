@@ -5,7 +5,7 @@
  */
 class Growtype_Form_Profile_Settings
 {
-    use User;
+    use GrowtypeFormUser;
 
     const URL_PATH = 'profile/settings';
 

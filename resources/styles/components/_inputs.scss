@@ -6,14 +6,74 @@
     margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
   }
 
+  .form-check {
+    padding-left: 30px;
+    margin: 0;
+    min-height: 23px;
+  }
+
+  .form-check {
+    .form-check-input {
+      min-height: 19px;
+      position: relative;
+      top: 2px;
+      width: 19px;
+      margin: 0;
+      margin-left: -29px;
+      min-width: 19px;
+      cursor: pointer;
+      height: 19px;
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+      float: left;
+
+      &:focus {
+        outline: none;
+        box-shadow: none;
+      }
+
+      &:before {
+        content: "";
+        background: #f0f0f0;
+        border: 1px solid #e6e6e6;
+        bottom: -1px;
+        color: #fff;
+        font-size: 19px;
+        left: -1px;
+        position: absolute;
+        right: -1px;
+        top: -1px;
+      }
+
+      &:checked:before {
+        bottom: 0;
+        color: black;
+        content: "\f15e";
+        font-family: dashicons;
+        font-size: 19px;
+        left: 0;
+        line-height: 18px;
+        position: absolute;
+        right: 0;
+        text-indent: -1px;
+        top: 0;
+      }
+    }
+  }
+
   input[type=number] {
     -moz-appearance: textfield; /* Firefox */
   }
 
+  input[type=checkbox] {
+    cursor: pointer;
+  }
+
   input:not([type=checkbox]):not([type=radio]):not([type=submit]):not(.qty), textarea {
     min-height: 48px;
-    padding-left: 15px;
-    padding-right: 15px;
+    padding: 10px 15px;
+    width: 100%;
   }
 
   .chosen-container-single .chosen-single abbr {

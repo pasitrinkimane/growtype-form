@@ -23,7 +23,7 @@ function growtype_form_signup_page_is_active()
 
     $post = get_post($page_ID);
 
-    return !empty($post) && str_contains($_SERVER['REQUEST_URI'], $post->post_name);
+    return !empty($post) && strpos($_SERVER['REQUEST_URI'], $post->post_name) !== false;
 }
 
 /**
@@ -66,7 +66,7 @@ function growtype_form_profile_settings_page_url()
 /**
  * @return array|WP_Post|null
  */
-function growtype_form_redirect_after_signup_page()
+function growtype_form_default_redirect_after_signup_page()
 {
     return get_option('growtype_form_redirect_after_signup_page');
 }
@@ -78,9 +78,9 @@ function growtype_form_redirect_after_signup_page()
 if (!function_exists('growtype_form_redirect_url_after_signup')) {
     function growtype_form_redirect_url_after_signup()
     {
-        $redirect_page = growtype_form_redirect_after_signup_page();
+        $redirect_page = growtype_form_default_redirect_after_signup_page();
 
-        if (isset($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], 'wp/wp-login')) {
+        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'wp/wp-login') !== false) {
             $redirect_url = get_dashboard_url();
         } elseif (isset($_COOKIE['growtype_form_redirect_after'])) {
             $redirect_url = $_COOKIE['growtype_form_redirect_after'];
@@ -98,6 +98,6 @@ if (!function_exists('growtype_form_redirect_url_after_signup')) {
             error_log('Redirect url is missing. Growtype-form');
         }
 
-        return $redirect_url;
+        return apply_filters('growtype_form_redirect_url_after_signup', $redirect_url);
     }
 }

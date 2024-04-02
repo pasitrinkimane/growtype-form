@@ -19,6 +19,12 @@ class Growtype_Form_Render
         new Growtype_Form_General();
 
         /**
+         * Authorisation form
+         */
+        include_once GROWTYPE_FORM_PATH . 'includes/methods/render/forms/class-growtype-form-auth.php';
+        new Growtype_Form_Auth();
+
+        /**
          * Newsletter form
          */
         include_once GROWTYPE_FORM_PATH . 'includes/methods/render/forms/class-growtype-form-newsletter.php';

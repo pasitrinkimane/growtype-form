@@ -46,9 +46,9 @@ class Growtype_Form
      *
      * @since    1.0.0
      * @access   protected
-     * @var      string $Growtype_Form The string used to uniquely identify this plugin.
+     * @var      string $growtype_form The string used to uniquely identify this plugin.
      */
-    protected $Growtype_Form;
+    protected $growtype_form;
 
     /**
      * The current version of the plugin.
@@ -81,7 +81,7 @@ class Growtype_Form
             $this->version = '1.0.0';
         }
 
-        $this->Growtype_Form = 'growtype-form';
+        $this->growtype_form = 'growtype-form';
 
         $this->load_frontend_traits();
         $this->load_admin_traits();
@@ -196,7 +196,8 @@ class Growtype_Form
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/url.php';
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/wc.php';
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/profile.php';
-        require_once GROWTYPE_FORM_PATH . 'includes/helpers/render.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/helpers/form.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/helpers/submission.php';
 
         $this->loader = new Growtype_Form_Loader();
 
@@ -285,7 +286,7 @@ class Growtype_Form
      */
     public function get_growtype_form()
     {
-        return $this->Growtype_Form;
+        return $this->growtype_form;
     }
 
     /**

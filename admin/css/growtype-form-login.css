@@ -22,4 +22,12 @@
     padding-top: 5px;
     padding-bottom: 5px;
     font-size: 14px;
+    color: white;
+    margin: 0;
+    border-radius: 0;
+    text-align: center;
+}
+
+.login .button.button-large + .button, .login .button-group.button-large .button + .button {
+    margin-top: 10px;
 }

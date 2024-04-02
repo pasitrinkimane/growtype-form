@@ -25,7 +25,7 @@ function growtype_form_profile_page_is_active()
 
     $post = get_post($page_ID);
 
-    return !empty($post) && str_contains($_SERVER['REQUEST_URI'], $post->post_name);
+    return !empty($post) && strpos($_SERVER['REQUEST_URI'], $post->post_name) !== false;
 }
 
 /**
@@ -53,5 +53,5 @@ function growtype_form_profile_settings_page_is_active()
 
     $post = get_post($page_ID);
 
-    return !empty($post) && str_contains($_SERVER['REQUEST_URI'], $post->post_name);
+    return !empty($post) && strpos($_SERVER['REQUEST_URI'], $post->post_name) !== false;
 }

@@ -1,0 +1,62 @@
+.page-newsletter-unsubscribe {
+  .main {
+    text-align: center;
+  }
+}
+
+/**
+Newsletter
+ */
+.growtype-form-newsletter .form-check {
+  margin-top: 20px;
+  display: flex;
+}
+
+.growtype-form-newsletter button[type="submit"] {
+  margin-top: 20px;
+}
+
+.growtype-form-newsletter {
+  .input-wrapper-inner {
+    button {
+      &[type="submit"] {
+        display: none;
+      }
+    }
+  }
+
+  &.submit-in-input {
+    button {
+      &[type="submit"] {
+        display: none;
+      }
+    }
+
+    .input-wrapper-inner {
+      display: flex;
+      position: relative;
+
+      input[type="email"] {
+        padding-right: 100px;
+      }
+
+      button {
+        &[type="submit"] {
+          min-width: initial;
+          padding: 5px 20px;
+          border: none;
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          height: 90%;
+          margin: auto;
+          right: 2px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          justify-content: center;
+        }
+      }
+    }
+  }
+}

@@ -4,7 +4,6 @@
     "type": "wordpress-plugin",
     "require": {
         "php": "^7.0|^8.0",
-        "google/apiclient": "^2.15",
         "rappasoft/laravel-helpers": "^2.1"
     },
     "config": {

@@ -40,8 +40,7 @@
       "label_log_in": "[:en]Login[:lt]Prisijungti[:]",
       "remember_login": true,
       "username_placeholder": "[:en]Your email[:lt]Jūsų el. paštas[:]",
-      "password_placeholder": "[:en]Your password[:lt]Jūsų slaptažodis[:]",
-      "lost_password_btn": true
+      "password_placeholder": "[:en]Your password[:lt]Jūsų slaptažodis[:]"
     }
   }
 }

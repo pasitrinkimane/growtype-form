@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       Growtype - Form
  * Plugin URI:        http://newcoolstudio.com/
- * Description:       Advanced form functionality for "Growtype" theme.
+ * Description:       Advanced form functionality.
  * Version:           1.3.9.2
  * Author:            Growtype
  * Author URI:        http://newcoolstudio.com/
@@ -35,7 +35,7 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('GROWTYPE_FORM_VERSION', '1.3.9.2');
+define('GROWTYPE_FORM_VERSION', '1.3.9.4');
 
 /**
  * Plugin base name

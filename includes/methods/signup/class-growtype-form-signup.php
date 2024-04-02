@@ -44,7 +44,11 @@ class Growtype_Form_Signup
     {
         if (!empty($_SERVER['REQUEST_URI'])) {
             if (growtype_form_signup_page_is_active() && growtype_form_signup_page_ID() === 'default') {
-                echo growtype_form_include_view('signup.default');
+                if (is_user_logged_in()) {
+                    echo growtype_form_include_view('login.success');
+                } else {
+                    echo growtype_form_include_view('signup.default');
+                }
                 exit;
             }
         }
@@ -83,7 +87,7 @@ class Growtype_Form_Signup
 
             if ($field_type === 'repeater') {
                 foreach ($user_meta as $meta_key => $meta_value) {
-                    if (str_contains($meta_key, $field_name)) {
+                    if (strpos($meta_key, $field_name) !== false) {
                         $json_data = unserialize($meta_value[0]);
                         $json_data_formatted = '';
                         foreach ($json_data as $key => $value) {
@@ -160,8 +164,9 @@ Please review your username and make the necessary corrections to meet these req
                 $login_page_url = growtype_form_login_page_url();
 
                 if (isset($_SERVER['REQUEST_URI']) && !empty($_SERVER['REQUEST_URI'])) {
-                    $redirect_after = home_url() . $_SERVER['REQUEST_URI'];
-                    $login_page_url = $login_page_url . '?redirect_after=' . $redirect_after;
+                    $login_page_url = add_query_arg([
+                        'redirect_after' => home_url() . $_SERVER['REQUEST_URI'],
+                    ], $login_page_url);
                 }
 
                 $messages = str_replace('#', $login_page_url, $user_id->errors['registration-error-email-exists'][0]);
@@ -186,12 +191,21 @@ Please review your username and make the necessary corrections to meet these req
             $display_name = strstr($username, '@', true);
         }
 
-        $userdata = array (
+        $new_userdata = array (
             'ID' => $user_id,
             'display_name' => $display_name,
         );
 
-        wp_update_user($userdata);
+        wp_update_user($new_userdata);
+
+        /**
+         * Insert lead
+         */
+        $userdata = get_userdata($user_id);
+
+        Growtype_Form_Admin_Lead::insert([
+            'title' => $userdata->user_email
+        ]);
 
         /**
          * External modifications

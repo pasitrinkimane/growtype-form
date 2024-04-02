@@ -6,8 +6,8 @@ mix.setResourceRoot('./')
 mix
     .sass('resources/styles/growtype-form.scss', 'styles')
     .sass('resources/styles/growtype-form-render.scss', 'styles')
-    .sass('resources/styles/forms/login/main.scss', 'styles/forms/login')
-    .sass('resources/styles/forms/signup/main.scss', 'styles/forms/signup');
+    .sass('resources/styles/forms/newsletter/index.scss', 'styles/forms/newsletter')
+    .sass('resources/styles/forms/auth/index.scss', 'styles/forms/auth');
 
 mix
     .js('resources/scripts/growtype-form.js', 'scripts')

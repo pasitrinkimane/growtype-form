@@ -28,9 +28,9 @@ class Growtype_Form_Public
      *
      * @since    1.0.0
      * @access   private
-     * @var      string $Growtype_Form The ID of this plugin.
+     * @var      string $growtype_form The ID of this plugin.
      */
-    private $Growtype_Form;
+    private $growtype_form;
 
     /**
      * The version of this plugin.
@@ -44,13 +44,13 @@ class Growtype_Form_Public
     /**
      * Initialize the class and set its properties.
      *
-     * @param string $Growtype_Form The name of the plugin.
+     * @param string $growtype_form The name of the plugin.
      * @param string $version The version of this plugin.
      * @since    1.0.0
      */
-    public function __construct($Growtype_Form, $version)
+    public function __construct($growtype_form, $version)
     {
-        $this->Growtype_Form = $Growtype_Form;
+        $this->growtype_form = $growtype_form;
         $this->version = $version;
     }
 
@@ -61,7 +61,7 @@ class Growtype_Form_Public
      */
     public function enqueue_styles()
     {
-        wp_enqueue_style($this->Growtype_Form, GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form.css', array (), GROWTYPE_FORM_VERSION, 'all');
+        wp_enqueue_style($this->growtype_form, GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form.css', array (), GROWTYPE_FORM_VERSION, 'all');
     }
 
     /**
@@ -71,13 +71,14 @@ class Growtype_Form_Public
      */
     public function enqueue_scripts()
     {
-        wp_enqueue_script($this->Growtype_Form, GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form.js', array ('jquery'), GROWTYPE_FORM_VERSION, true);
+        wp_enqueue_script($this->growtype_form, GROWTYPE_FORM_URL_PUBLIC . 'scripts/growtype-form.js', array ('jquery'), GROWTYPE_FORM_VERSION, true);
 
-        wp_localize_script($this->Growtype_Form, 'growtype_form',
+        wp_localize_script($this->growtype_form, 'growtype_form',
             array (
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'date' => Growtype_Form_General::get_date_time_data(),
-                'currency' => Growtype_Form_General::get_currency_data()
+                'currency' => Growtype_Form_General::get_currency_data(),
+                'public_url' => GROWTYPE_FORM_URL_PUBLIC,
             )
         );
     }

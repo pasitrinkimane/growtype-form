@@ -16,13 +16,15 @@ function formNewsletter() {
 
         submitBtn.attr('disabled', true);
 
+        let messageTimeout = 2500;
+
         $.ajax({
             type: "POST",
             url: formUrl.length > 0 ? formUrl : window.ajax_object.ajaxurl,
             data: formData,
             success: function (data) {
                 form.find('.status-message')
-                    .html(data.message)
+                    .html(data.messages)
                     .addClass('alert-success')
                     .fadeIn();
 
@@ -30,11 +32,11 @@ function formNewsletter() {
 
                 setTimeout(function () {
                     form.find('.status-message').fadeOut();
-                }, 1500)
+                }, messageTimeout)
             },
             error: function (data) {
                 form.find('.status-message')
-                    .html(data.responseJSON.message)
+                    .html(data.responseJSON.messages)
                     .addClass('alert-danger')
                     .fadeIn();
 
@@ -42,7 +44,7 @@ function formNewsletter() {
 
                 setTimeout(function () {
                     form.find('.status-message').fadeOut();
-                }, 1500)
+                }, messageTimeout)
             }
         });
     });
