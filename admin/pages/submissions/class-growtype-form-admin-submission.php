@@ -169,7 +169,7 @@ class Growtype_Form_Admin_Submission
             foreach ($params['args']['fields'] as $field) {
                 $meta_value = get_post_meta($post->ID, $field['key'], true); ?>
                 <div style="display: flex;gap:10px;">
-                    <label style="min-width: 150px;" for="<?php echo $field['key'] ?>"><?php echo $field['title'] ?>:</label>
+                    <label style="min-width: 150px;max-width: 150px;" for="<?php echo $field['key'] ?>"><?php echo $field['title'] ?>:</label>
                     <?php if (isset($field['type']) && $field['type'] === 'textarea') { ?>
                         <textarea style="width: 100%;" id="<?php echo $field['key'] ?>" name="<?php echo $field['key'] ?>" rows="4" cols="50"><?php echo esc_attr($meta_value); ?></textarea>
                     <?php } else { ?>
@@ -234,7 +234,7 @@ class Growtype_Form_Admin_Submission
     public static function get_email($post_id)
     {
         $submitted_data = self::get_submitted_data($post_id);
-
-        return $submitted_data['email'] ?? get_the_title($post_id);
+        $email = $submitted_data['email'] ?? get_the_title($post_id);
+        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;
     }
 }

@@ -1,3 +1,5 @@
+@import "./../../common/mixins";
+
 .page-newsletter-unsubscribe {
   .main {
     text-align: center;
@@ -17,6 +19,18 @@ Newsletter
 }
 
 .growtype-form-newsletter {
+  position: relative;
+
+  .status-message {
+    position: absolute;
+    bottom: -85px;
+    left: 0;
+    right: 0;
+    @include bp-phone-xl() {
+      bottom: -109px;
+    }
+  }
+
   .input-wrapper-inner {
     button {
       &[type="submit"] {

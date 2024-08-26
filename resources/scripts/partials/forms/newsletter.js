@@ -20,7 +20,7 @@ function formNewsletter() {
 
         $.ajax({
             type: "POST",
-            url: formUrl.length > 0 ? formUrl : window.ajax_object.ajaxurl,
+            url: formUrl.length > 0 ? formUrl : window.growtype_form.ajax_url,
             data: formData,
             success: function (data) {
                 form.find('.status-message')
@@ -29,6 +29,8 @@ function formNewsletter() {
                     .fadeIn();
 
                 submitBtn.attr('disabled', false);
+
+                form.find('input').val('');
 
                 setTimeout(function () {
                     form.find('.status-message').fadeOut();

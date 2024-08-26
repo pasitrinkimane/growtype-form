@@ -8,10 +8,35 @@ trait GrowtypeFormPost
     /**
      * Attach featured image
      */
-    public function post_attach_featured_image($post_id, $featured_image)
+    public static function post_attach_featured_image($post_id, $featured_image)
     {
         if (!empty($post_id) && !empty($featured_image)) {
-            $featured_image = self::upload_file_to_media_library($featured_image);
+
+            if (is_array($featured_image['name'])) {
+                $featured_images = [];
+                $fileCount = count($featured_image['name']);
+                for ($i = 0; $i < $fileCount; $i++) {
+                    $name = $featured_image['name'][$i];
+                    $type = $featured_image['type'][$i];
+                    $tmp_name = $featured_image['tmp_name'][$i];
+                    $error = $featured_image['error'][$i];
+                    $size = $featured_image['size'][$i];
+
+                    $featured_images[] = [
+                        'name' => $name,
+                        'type' => $type,
+                        'tmp_name' => $tmp_name,
+                        'error' => $error,
+                        'size' => $size,
+                    ];
+                }
+
+                foreach ($featured_images as $featured_image) {
+                    $featured_image = self::upload_file_to_media_library($featured_image);
+                }
+            } else {
+                $featured_image = self::upload_file_to_media_library($featured_image);
+            }
 
             if (isset($featured_image['attachment_id'])) {
                 return set_post_thumbnail($post_id, $featured_image['attachment_id']);
@@ -24,13 +49,13 @@ trait GrowtypeFormPost
     /**
      * Attach featured image
      */
-    public function post_attach_files($post_id, $files)
+    public static function post_attach_files($post_id, $files)
     {
         if (!empty($post_id) && !empty($files)) {
             $file_urls = [];
             $uploaded_attachments = [];
             foreach ($files as $file) {
-                $uploaded_files = $this->upload_files_to_media_library($file);
+                $uploaded_files = self::upload_files_to_media_library($file);
 
                 if (!empty($uploaded_files)) {
                     foreach ($uploaded_files as $uploaded_file) {

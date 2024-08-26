@@ -203,7 +203,11 @@ class Growtype_Form_Login
          */
         if (!empty($referrer) && !empty(growtype_form_login_page_ID())) {
             $query_string = parse_url($referrer, PHP_URL_QUERY);
-            parse_str($query_string, $query_args);
+
+            $query_args = [];
+            if (!empty($query_string)) {
+                parse_str($query_string, $query_args);
+            }
 
             if (isset($_GET['loggedout']) && !empty($_GET['loggedout'])) {
                 $query_args['action'] = 'loggedout';
@@ -223,7 +227,7 @@ class Growtype_Form_Login
      * @param $form_data
      * @return false|string
      */
-    public static function render_growtype_login_form($form_data)
+    public static function render_login_form($form_data)
     {
         $form_args = growtype_form_extract_form_args($form_data);
         $wp_login_form_args = $form_args['wp_login_form'];

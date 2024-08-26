@@ -10,7 +10,7 @@ trait GrowtypeFormFile
      * @return void
      * Multiple files upload
      */
-    public function upload_files_to_media_library($files)
+    public static function upload_files_to_media_library($files)
     {
         if (count($files) === count($files, COUNT_RECURSIVE)) {
             throw new Exception('Use multidimensional file input name in settings. F.e. files[].');

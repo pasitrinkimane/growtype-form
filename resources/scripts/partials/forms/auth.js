@@ -9,6 +9,10 @@ function formAuth() {
                         $(this).addClass('is-active');
                     });
                 })
+
+                var currentUrl = window.location.href;
+                var newUrl = currentUrl.replace("/signup/", "/login/");
+                history.replaceState(null, null, newUrl);
             }
             if ($(this).attr('data-type') === 'signup') {
                 $(this).closest('.growtype-form-wrapper').fadeOut().promise().done(function () {
@@ -17,6 +21,10 @@ function formAuth() {
                         $(this).addClass('is-active');
                     });
                 })
+
+                var currentUrl = window.location.href;
+                var newUrl = currentUrl.replace("/login/", "/signup/");
+                history.replaceState(null, null, newUrl);
             }
         }
     });

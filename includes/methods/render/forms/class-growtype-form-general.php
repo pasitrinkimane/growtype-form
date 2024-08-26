@@ -12,7 +12,22 @@ class Growtype_Form_General
 
     const GROWTYPE_FORM_SHORTCODE_NAME = 'growtype_form';
 
-    const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = ['text', 'textarea', 'file', 'email', 'select', 'radio', 'checkbox', 'hidden', 'number', 'password', 'custom', 'repeater', 'shortcode'];
+    const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = [
+        'text',
+        'textarea',
+        'file',
+        'email',
+        'select',
+        'radio',
+        'checkbox',
+        'hidden',
+        'number',
+        'password',
+        'custom',
+        'repeater',
+        'shortcode',
+        'tel'
+    ];
 
     public function __construct()
     {
@@ -98,13 +113,13 @@ class Growtype_Form_General
          */
         if (!wp_script_is('jquery-ui', 'enqueued')) {
             wp_enqueue_style('jquery-ui', 'https://code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css', array (), '1.0', 'all');
-        }
 
-        /**
-         * Timepicker
-         */
-        if (!wp_script_is('timepicker-addon', 'enqueued')) {
-            wp_enqueue_style('timepicker-addon', GROWTYPE_FORM_URL_PUBLIC . 'plugins/jquery-ui-timepicker-addon/jquery-ui-timepicker-addon.min.css', array (), '1.1', 'all');
+            /**
+             * Timepicker
+             */
+            if (!wp_script_is('jquery-ui-timepicker-addon.min.css', 'enqueued')) {
+                wp_enqueue_style('jquery-ui-timepicker-addon.min.css', GROWTYPE_FORM_URL_PUBLIC . 'plugins/jquery-ui-timepicker-addon/jquery-ui-timepicker-addon.min.css', array (), '1.1', 'all');
+            }
         }
 
         /**
@@ -150,10 +165,10 @@ class Growtype_Form_General
          */
         if (!wp_script_is('jquery-ui', 'enqueued') && !wp_script_is('jquery-ui-core', 'enqueued')) {
             wp_enqueue_script('jquery-ui', 'https://code.jquery.com/ui/1.13.1/jquery-ui.js', array ('jquery'), '1.1', true);
-        }
 
-        if (!wp_script_is('timepicker-addon', 'enqueued')) {
-            wp_enqueue_script('timepicker-addon', GROWTYPE_FORM_URL_PUBLIC . 'plugins/jquery-ui-timepicker-addon/jquery-ui-timepicker-addon.min.js', array ('jquery'), '1.1', true);
+            if (!wp_script_is('jquery-ui-timepicker-addon.min.js', 'enqueued')) {
+                wp_enqueue_script('jquery-ui-timepicker-addon.min.js', GROWTYPE_FORM_URL_PUBLIC . 'plugins/jquery-ui-timepicker-addon/jquery-ui-timepicker-addon.min.js', array ('jquery'), '1.1', true);
+            }
         }
 
         /**
@@ -226,10 +241,12 @@ class Growtype_Form_General
             return '';
         }
 
+        $args = apply_filters('growtype_form_shortcode_args', $args);
+
         /**
          * Check if login required
          */
-        if (isset($args['login_required']) && $args['login_required'] && !is_user_logged_in()) {
+        if (isset($args['login_required']) && filter_var($args['login_required'], FILTER_VALIDATE_BOOLEAN) && !is_user_logged_in()) {
             wp_redirect(
                 add_query_arg([
                     'redirect_after' => get_permalink(),
@@ -344,14 +361,14 @@ class Growtype_Form_General
          * $form_type Fields - plain fields with no extra features
          */
         if ($form_type === 'fields') {
-            return $this->render_growtype_fields($form_data, $form_name);
+            return $this->render_fields($form_data, $form_name);
         } elseif (strpos($form_name, 'login') !== false) {
             /**
              * Initiate scripts
              */
             add_action('wp_footer', array (__CLASS__, 'growtype_form_login_validation_scripts'), 100);
 
-            return Growtype_Form_Login::render_growtype_login_form($form_data);
+            return Growtype_Form_Login::render_login_form($form_data);
         } else {
             /**
              * Initiate scripts
@@ -361,7 +378,7 @@ class Growtype_Form_General
             /**
              * Render form
              */
-            return $this->render_growtype_general_form($form_name, $form_data, $form_action);
+            return $this->render_form($form_name, $form_data, $form_action);
         }
     }
 
@@ -373,7 +390,7 @@ class Growtype_Form_General
     /**
      * @return void
      */
-    public function render_growtype_fields($form_data, $form_name)
+    public function render_fields($form_data, $form_name)
     {
         /**
          * Form main fields
@@ -458,7 +475,7 @@ class Growtype_Form_General
      * @param $form
      * @return false|string|null
      */
-    function render_growtype_general_form($form_name, $form_data, $form_action = 'submit')
+    function render_form($form_name, $form_data, $form_action = 'submit')
     {
         /**
          * Recaptcha setup
@@ -496,6 +513,9 @@ class Growtype_Form_General
          * Post data
          */
         $post = self::growtype_form_get_current_post();
+
+        $growtype_form_post_identificator = $post->ID ?? null;
+        $growtype_form_post_identificator = apply_filters('growtype_form_post_identificator', $growtype_form_post_identificator);
 
         /**
          * Style
@@ -555,8 +575,9 @@ class Growtype_Form_General
                                 <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION ?>' value="<?php echo $form_action ?>"/>
                                 <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?php echo get_current_user_id() ?? null ?>"/>
                                 <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_NAME_IDENTIFICATOR ?>' value="<?php echo $form_name ?>"/>
-                                <?php if (!empty($post)) { ?>
-                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?php echo $post->ID ?>"/>
+
+                                <?php if (!empty($growtype_form_post_identificator)) { ?>
+                                    <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR ?>' value="<?php echo $growtype_form_post_identificator ?>"/>
                                 <?php } ?>
 
                                 <?php if (isset($form_data['args']['redirect_after'])) { ?>
@@ -625,7 +646,9 @@ class Growtype_Form_General
      */
     public static function growtype_form_get_current_post()
     {
-        if (!empty($_SERVER['REQUEST_URI'])) {
+        $request_uri = $_SERVER['REQUEST_URI'] ?? null;
+
+        if (!empty($request_uri)) {
             $page_slug = str_replace('/', '', $_SERVER['REQUEST_URI']);
 
             if ($page_slug === Growtype_Form_Signup::URL_PATH || $page_slug === Growtype_Form_Login::URL_PATH) {
@@ -633,7 +656,9 @@ class Growtype_Form_General
             }
         }
 
-        return !empty(get_post()) && strpos($_SERVER['REQUEST_URI'], get_post()->post_name) !== false ? get_post() : null;
+        $post = get_post();
+
+        return !empty($post) && !empty($post->post_title) && !empty($request_uri) && strpos($request_uri, $post->post_title) !== false ? $post : null;
     }
 
     /**
@@ -739,14 +764,62 @@ class Growtype_Form_General
      */
     public static function growtype_form_submit_scripts_init()
     {
-        $validation_message = [
-            'at_leas_one' => __('At least one selection is required.', 'growtype-form'),
-            'wrong_date_format' => __('Wrong date format. Please select again.', 'growtype-form'),
-        ];
+        $validation_message = Growtype_Form_Crud::validation_messages();
         ?>
         <script>
             $ = jQuery;
 
+            let allowSimplePassword = "<?php echo Growtype_Form_Crud::simple_password_is_allowed() ?>";
+
+            $.validator.addMethod("containsNumber", function (value, element) {
+                return /[0-9]/.test(value);
+            }, "<?php echo $validation_message['password_contains_number'] ?>");
+
+            $.validator.addMethod("containsUppercase", function (value, element) {
+                return /[A-Z]/.test(value);
+            }, "<?php echo $validation_message['password_contains_uppercase'] ?>");
+
+            $.validator.addMethod("containsLowercase", function (value, element) {
+                return /[a-z]/.test(value);
+            }, "<?php echo $validation_message['password_contains_lowercase'] ?>");
+
+            let validationParams = {
+                rules: {
+                    password: {
+                        required: true,
+                    },
+                    repeat_password: {
+                        required: true,
+                        equalTo: "#password"
+                    }
+                },
+                messages: {
+                    password: {
+                        required: "<?php echo $validation_message['password_required'] ?>",
+                        minlength: "<?php echo $validation_message['password_min_length'] ?>",
+                    },
+                    repeat_password: {
+                        required: "<?php echo $validation_message['repeat_password'] ?>",
+                        equalTo: "<?php echo $validation_message['passwords_not_match'] ?>"
+                    }
+                }
+            };
+
+            if (!allowSimplePassword) {
+                validationParams.rules.password.minlength = "<?php echo Growtype_Form_Crud::password_min_length() ?>";
+                validationParams.rules.password.containsNumber = true;
+                validationParams.rules.password.containsUppercase = true;
+                validationParams.rules.password.containsLowercase = true;
+            }
+
+            /**
+             * Setup validation
+             */
+            $('.growtype-form').validate(validationParams);
+
+            /**
+             * Form submit
+             */
             $('.growtype-form button[type="submit"]').click(function () {
 
                 $(this).attr('disabled', false);
@@ -770,7 +843,7 @@ class Growtype_Form_General
                         $(".form-check-wrapper[aria-required='true']:visible").each(function () {
                             $(this).find('.error').remove();
                             if ($(this).find("input:checked").length === 0) {
-                                $(this).append('<label class="error"><?php echo $validation_message['at_leas_one'] ?></label>');
+                                $(this).append('<label class="error"><?php echo $validation_message['at_leas_one_selection'] ?></label>');
                                 isValid = false;
                             }
                         });
@@ -783,7 +856,7 @@ class Growtype_Form_General
                         if ($(this).closest('.e-wrapper').attr('data-required') === 'true') {
                             $(this).closest('.e-wrapper').find('.error').remove();
                             if (!$(this).find('.image-uploader-inner').hasClass('has-files')) {
-                                $(this).closest('.e-wrapper').append('<label class="error"><?php echo $validation_message['at_leas_one'] ?></label>');
+                                $(this).closest('.e-wrapper').append('<label class="error"><?php echo $validation_message['at_leas_one_selection'] ?></label>');
                                 isValid = false;
                             }
                         }
@@ -888,7 +961,7 @@ class Growtype_Form_General
                 }
             }
 
-        } elseif (!empty($post) && $post->post_type === 'product') {
+        } elseif (!empty($post) && $post->post_type === 'product' && class_exists('woocommerce')) {
             $product = wc_get_product($post_id);
 
             if (empty($product)) {
@@ -931,27 +1004,6 @@ class Growtype_Form_General
                 array_unshift($image_upload_ids, (int)$f_img_id);
             }
 
-            $gallery_images = [];
-            if (!empty($image_upload_ids)) {
-                foreach ($image_upload_ids as $key => $image_id) {
-                    $gallery_images[$key] = [
-                        'id' => $image_id,
-                        'src' => wp_get_attachment_image_url($image_id),
-                    ];
-                }
-            }
-
-            $growtype_form_gallery = [
-                'images' => json_encode($gallery_images)
-            ];
-
-            $_REQUEST['gallery_images'] = $gallery_images;
-
-            /**
-             * Add gallery data to js
-             */
-            wp_localize_script('growtype-form-render', 'growtype_form_gallery', $growtype_form_gallery);
-
             /**
              * Update shipping details
              */
@@ -974,13 +1026,38 @@ class Growtype_Form_General
             }
         }
 
+        $image_upload_ids = apply_filters('growtype_form_render_update_return_data_image_upload_ids', $image_upload_ids ?? [], $post_id, $form_data, $form_name);
+
+        $gallery_images = [];
+        if (!empty($image_upload_ids)) {
+            foreach ($image_upload_ids as $key => $image_id) {
+                $gallery_images[$key] = [
+                    'id' => $image_id,
+                    'src' => wp_get_attachment_image_url($image_id),
+                ];
+            }
+        }
+
+        if (!empty($gallery_images)) {
+            $growtype_form_gallery = [
+                'images' => json_encode($gallery_images)
+            ];
+
+            $_REQUEST['gallery_images'] = $gallery_images;
+
+            /**
+             * Add gallery data to js
+             */
+            wp_localize_script('growtype-form-render', 'growtype_form_gallery', $growtype_form_gallery);
+        }
+
         if ($post_id && apply_filters('growtype_form_render_update_return_data', $post_id, $_REQUEST) !== $post_id) {
             $_REQUEST = apply_filters('growtype_form_render_update_return_data', $post_id, $_REQUEST);
         }
 
-        if (isset($_COOKIE['signup_data'])) {
-            unset($_COOKIE['signup_data']);
-            setcookie('signup_data', '', time(), COOKIEPATH, COOKIE_DOMAIN);
-        }
+//        if (isset($_COOKIE['signup_data'])) {
+//            unset($_COOKIE['signup_data']);
+//            setcookie('signup_data', '', time(), COOKIEPATH, COOKIE_DOMAIN);
+//        }
     }
 }

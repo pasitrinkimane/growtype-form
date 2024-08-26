@@ -2,8 +2,8 @@
 $field = apply_filters('growtype_form_field', $field);
 
 $field_name = $field['name'] ?? false;
-$field_required = isset($field['required']) && $field['required'] === 'true' ? true : false;
-$field_multiple = isset($field['multiple']) && $field['multiple'] === 'true' ? true : false;
+$field_required = isset($field['required']) && filter_var($field['required'], FILTER_VALIDATE_BOOLEAN) ? true : false;
+$field_multiple = isset($field['multiple']) && filter_var($field['multiple'], FILTER_VALIDATE_BOOLEAN) ? true : false;
 $field_type = isset($field['type']) ? $field['type'] : 'text';
 $field_hidden = $field['hidden'] ?? false;
 
@@ -11,7 +11,11 @@ if ($field_type === 'hidden') {
     $field_hidden = true;
 }
 
-$field_value = isset($field['value']) ? sanitize_text_field($field['value']) : '';
+$field_value = isset($field['value']) ? $field['value'] : '';
+
+if ($field_type !== 'textarea') {
+    $field_value = !empty($field_value) ? sanitize_text_field($field_value) : '';
+}
 
 $request_field_value = isset($_REQUEST[$field_name]) ? $_REQUEST[$field_name] : '';
 $request_field_value = $field_name === 'name' && isset($_REQUEST[Growtype_Form_Crud::ALTERNATIVE_SUBMITTED_DATA_KEYS[$field_name]]) ? $_REQUEST[Growtype_Form_Crud::ALTERNATIVE_SUBMITTED_DATA_KEYS[$field_name]] : $request_field_value;

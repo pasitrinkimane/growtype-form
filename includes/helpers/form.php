@@ -158,7 +158,7 @@ function growtype_form_fill_form_args_with_existing_data($form_args)
         }
     }
 
-    if (isset($form_args['confirmation_fields'])) {
+    if (isset($form_args['confirmation_fields']) && !empty($form_args['confirmation_fields'])) {
         foreach ($form_args['confirmation_fields'] as $key => $field) {
             if (isset($form_args['confirmation_fields'][$key]) && isset($user_main_fields[$field['name']])) {
                 $form_args['confirmation_fields'][$key]['selected_options'] = [$user_main_fields[$field['name']]['value']];

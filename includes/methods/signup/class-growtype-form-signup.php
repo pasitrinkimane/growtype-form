@@ -69,7 +69,7 @@ class Growtype_Form_Signup
         $form_name = isset($user_meta['growtype_form_name']) ? $user_meta['growtype_form_name'][0] : null;
         $json_form_encoded = get_option('growtype_form_signup_json_content');
         $json_form = json_decode($json_form_encoded, true);
-        $form_data = isset($json_form[$form_name]) ? $json_form[$form_name] : $json_form['signup'];
+        $form_data = isset($json_form[$form_name]) ? $json_form[$form_name] : $json_form['signup'] ?? [];
         $main_fields = isset($form_data['main_fields']) ? $form_data['main_fields'] : [];
         $confirmation_fields = isset($form_data['confirmation_fields']) ? $form_data['confirmation_fields'] : [];
 

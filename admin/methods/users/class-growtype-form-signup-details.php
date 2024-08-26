@@ -110,7 +110,7 @@ class Growtype_Form_Signup_Details
             $export_args = [];
 
             date_default_timezone_set("Europe/Vilnius");
-            $export_args['file_title'] = 'Registrations-' . date('Y-m-d-H-i');
+            $export_args['file_title'] = 'Registrations-' . wp_date('Y-m-d-H-i');
             $export_args['file_type'] = 'csv';
             $export_args['file_content'] = $this->prepare_export_data($args, 'csv');
 

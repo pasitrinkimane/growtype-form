@@ -69,7 +69,7 @@ class Growtype_Form_Admin_Form
             }
 
             if (isset($_POST['json_content'])) {
-                update_post_meta($post_id, 'json_content', sanitize_text_field($_POST['json_content']));
+                update_post_meta($post_id, 'json_content', $_POST['json_content']);
             }
         }
     }
@@ -118,7 +118,7 @@ class Growtype_Form_Admin_Form
             'public' => false,
             'publicly_queryable' => false,
             'show_ui' => true,
-            'show_in_menu' => true,
+            'show_in_menu' => current_user_can('administrator') ? true : false,
             'query_var' => false,
             'rewrite' => array ('slug' => self::POST_TYPE_NAME),
             'capability_type' => 'post',

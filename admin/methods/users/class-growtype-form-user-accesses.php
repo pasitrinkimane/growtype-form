@@ -30,13 +30,19 @@ class Growtype_Form_User_Accesses
          * Prevent admin access for basic roles
          */
         if (isset($_SERVER['REQUEST_URI']) && (strpos($_SERVER['REQUEST_URI'], '/wp-admin') !== false || strpos($_SERVER['REQUEST_URI'], '/wp-login.php') !== false)) {
+            $roles_prevented_from_admin_access = apply_filters('growtype_form_roles_prevented_from_admin_access', [
+                'subscriber',
+                'lead',
+            ]);
+
+            $role_is_prevented = array_filter($roles_prevented_from_admin_access, function ($role) {
+                return current_user_can($role);
+            });
+
             if (
                 !defined('DOING_AJAX')
                 &&
-                (
-                    current_user_can('lead')
-                    || current_user_can('subscriber')
-                )
+                $role_is_prevented
             ) {
                 if (is_user_logged_in()) {
                     wp_redirect(growtype_form_profile_page_url());

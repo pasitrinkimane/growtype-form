@@ -77,8 +77,6 @@ class Growtype_Form_Admin_Lead
 
     function qtranxf_post_type_optional($post_types)
     {
-//        $post_types[] = self::POST_TYPE_NAME;
-
         return $post_types;
     }
 
@@ -105,7 +103,7 @@ class Growtype_Form_Admin_Lead
             foreach ($params['args']['fields'] as $field) {
                 $meta_value = get_post_meta($post->ID, $field['key'], true); ?>
                 <div style="display: flex;gap:10px;">
-                    <label style="min-width: 150px;" for="<?php echo $field['key'] ?>"><?php echo $field['title'] ?>:</label>
+                    <label style="min-width: 150px;max-width: 150px;" for="<?php echo $field['key'] ?>"><?php echo $field['title'] ?>:</label>
                     <?php if (isset($field['type']) && $field['type'] === 'textarea') { ?>
                         <textarea style="width: 100%;" id="<?php echo $field['key'] ?>" name="<?php echo $field['key'] ?>" rows="10" cols="50"><?php echo esc_attr($meta_value); ?></textarea>
                     <?php } else { ?>
@@ -244,6 +242,11 @@ class Growtype_Form_Admin_Lead
 
     public static function get_by_title($title)
     {
+        if (count(self::get_all_by_title($title)) > 1) {
+            error_log('!!!IMPORTANT!!! Multiple leads found with the same title: ' . $title);
+            return null;
+        }
+
         return self::get_all_by_title($title)[0] ?? null;
     }
 
@@ -312,17 +315,70 @@ class Growtype_Form_Admin_Lead
 
     function admin_footer_extend()
     {
+        global $pagenow;
+
         if (self::is_edit_post_type()) {
             Growtype_Form_Admin::init_json_editor('#events_log', [
                 'height' => '600px'
             ]);
         }
+
+        /**
+         * Filter by day extended
+         */
+        if (isset($_GET['post_type']) && $_GET['post_type'] === self::POST_TYPE_NAME && $pagenow === 'edit.php') {
+            ?>
+            <script>
+                jQuery(document).ready(function ($) {
+                    var currentDate = new Date();
+                    var year = currentDate.getFullYear();
+                    var month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
+                    var day = ('0' + currentDate.getDate()).slice(-2);
+                    var currentDayValue = year + month + day;
+                    var currentDayText = 'Today';
+
+                    var yesterdayDate = new Date(currentDate);
+                    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+                    var yYear = yesterdayDate.getFullYear();
+                    var yMonth = ('0' + (yesterdayDate.getMonth() + 1)).slice(-2);
+                    var yDay = ('0' + yesterdayDate.getDate()).slice(-2);
+                    var yesterdayValue = yYear + yMonth + yDay;
+                    var yesterdayText = 'Yesterday';
+
+                    var filterSelect = $('select[name="m"]');
+                    if (filterSelect.length > 0) {
+                        $('<option value="' + yesterdayValue + '">' + yesterdayText + '</option>').insertAfter(filterSelect.find('option').first());
+                        $('<option value="' + currentDayValue + '">' + currentDayText + '</option>').insertAfter(filterSelect.find('option').first());
+                    }
+
+                    filterSelect.change(function () {
+                        if ($(this).val() === currentDayValue) {
+                            $('input[name="filter_by_day"]').val(currentDayValue);
+                        } else {
+                            $('input[name="filter_by_day"]').val('');
+                        }
+                    });
+
+                    function getUrlParameter(name) {
+                        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+                        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+                        var results = regex.exec(window.location.search);
+                        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+                    }
+
+                    var dayParam = getUrlParameter('m');
+                    if (dayParam) {
+                        filterSelect.val(dayParam).change();
+                    }
+                });
+            </script>
+            <?php
+        }
     }
 
     public static function update_events_log($id, $details)
     {
-        $events_log = get_post_meta($id, 'events_log', true);
-        $events_log = !empty($events_log) ? json_decode($events_log, true) : [];
+        $events_log = self::get_events_log($id);
 
         /**
          * Remove body from log
@@ -331,13 +387,23 @@ class Growtype_Form_Admin_Lead
             $details['data']['body'] = 'Body removed from log for security reasons.';
         }
 
+        $success = $details['success'] ?? '';
+
         $events_log[] = [
-            'date' => date('Y-m-d H:i:s'),
+            'date' => wp_date('Y-m-d H:i:s'),
             'details' => $details['data'] ?? [],
-            'status' => $details['status'] ?? false
+            'success' => $success ? 'true' : 'false'
         ];
 
         update_post_meta($id, 'events_log', json_encode($events_log));
+    }
+
+    public static function get_events_log($id)
+    {
+        $events_log = get_post_meta($id, 'events_log', true);
+        $events_log = !empty($events_log) ? json_decode($events_log, true) : [];
+
+        return $events_log;
     }
 
     public function load_methods()

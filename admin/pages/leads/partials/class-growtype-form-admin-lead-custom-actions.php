@@ -50,7 +50,7 @@ class Growtype_Form_Admin_Lead_Custom_Actions
                 __('Custom actions', 'growtype-form'),
                 function () {
                     ?>
-                    <div style="display: inline-block">
+                    <div style="display: inline-block;width: 100%;margin-top: 10px;">
                         <?php $this->bulk_actions_html() ?>
                     </div>
                     <?php
@@ -82,14 +82,16 @@ class Growtype_Form_Admin_Lead_Custom_Actions
         global $typenow;
 
         if ($typenow === self::POST_TYPE_NAME) { ?>
-            <div class="alignleft actions bulkactions">
+            <div class="alignleft actions bulkactions" style="display: inline-block;width: 100%;">
                 <label for="lead_custom_action_select" class="screen-reader-text">Custom actions</label>
                 <select id="lead_custom_action_select">
                     <option value="">Default</option>
                     <?php do_action('growtype_form_admin_lead_custom_actions_select_options'); ?>
                 </select>
                 <input type="hidden" name="lead_custom_action">
-                <?php echo submit_button(__('Submit'), 'action', '', false, array ('id' => "custom_action_submit")); ?>
+                <div style="margin-top: 10px;">
+                    <?php echo submit_button(__('Submit'), 'action', '', false, array ('id' => "custom_action_submit")); ?>
+                </div>
             </div>
             <?php
         }
@@ -109,18 +111,20 @@ class Growtype_Form_Admin_Lead_Custom_Actions
             }
 
             if (!empty($posts)) {
-                $response = apply_filters('growtype_form_admin_lead_custom_action_submit', [
+                $responses = apply_filters('growtype_form_admin_lead_custom_action_submit', [
                     'action' => $lead_custom_action,
                     'ids' => $posts
                 ]);
             }
 
-            Growtype_Form_Admin::update_notices([
-                [
-                    'message' => $response['message'] ?? '',
-                    'success' => $response['success'] ?? true
-                ]
-            ]);
+            foreach ($responses as $response) {
+                Growtype_Form_Admin::update_notices([
+                    [
+                        'message' => $response['message'] ?? '',
+                        'success' => $response['success'] ?? true
+                    ]
+                ]);
+            }
 
             wp_redirect($url);
 

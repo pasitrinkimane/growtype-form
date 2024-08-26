@@ -23,7 +23,7 @@ function growtype_form_signup_page_is_active()
 
     $post = get_post($page_ID);
 
-    return !empty($post) && strpos($_SERVER['REQUEST_URI'], $post->post_name) !== false;
+    return !empty($post) && !empty($post->post_name) && strpos($_SERVER['REQUEST_URI'], $post->post_name) !== false;
 }
 
 /**

@@ -107,14 +107,18 @@ class Growtype_Form_Crud
                  * Check if main values are not empty
                  */
                 if (empty($form_name)) {
-                    throw new Exception('Empty form name');
+                    error_log(sprintf('Empty form name. Posted data %s', print_r($_POST ?? [], true)));
+                    wp_redirect(growtype_form_login_page_url());
+                    exit();
                 }
 
                 /**
                  * Check if form is spam
                  */
                 if (isset($_POST[Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATOR]) && !empty($_POST[Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATOR])) {
-                    throw new Exception('Spam identification');
+                    error_log(sprintf('Spam identification. Posted data %s', print_r($_POST ?? [], true)));
+                    wp_redirect(growtype_form_login_page_url());
+                    exit();
                 }
 
                 $submitted_values = [
@@ -171,6 +175,11 @@ class Growtype_Form_Crud
         }
 
         /**
+         * Current post id
+         */
+        $post_id = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
+
+        /**
          * Validate if submitted values match available values
          */
         $submitted_values_sanitized = $this->sanitize_form_submitted_values($form_data, $submitted_values);
@@ -181,6 +190,7 @@ class Growtype_Form_Crud
             $submit_action = isset($submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION]) ? $submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION] : 'submit';
 
             if (strpos($form_name, 'signup') !== false) {
+                $redirect_url = growtype_form_signup_page_url() . '?' . http_build_query($_GET);
                 $child_user = isset($form_data['child_user']) && $form_data['child_user'] ? true : false;
 
                 $signup_params = [
@@ -204,8 +214,6 @@ class Growtype_Form_Crud
                         } else {
                             if ($submit_action === 'update') {
                                 $redirect_url = home_url(growtype_form_get_url_path());
-                            } else {
-                                $redirect_url = growtype_form_redirect_url_after_signup();
                             }
                         }
                     }
@@ -275,9 +283,9 @@ class Growtype_Form_Crud
                          * Attach featured image
                          */
                         if (isset($submitted_values['files']['featured_image'])) {
-                            $this->post_attach_featured_image($submit_data['post_id'], $submitted_values['files']['featured_image']);
+                            self::post_attach_featured_image($submit_data['post_id'], $submitted_values['files']['featured_image']);
                         } else {
-                            $this->post_attach_files($submit_data['post_id'], $submitted_values['files']);
+                            self::post_attach_files($submit_data['post_id'], $submitted_values['files']);
                         }
                     }
                 }
@@ -314,10 +322,17 @@ class Growtype_Form_Crud
         }
 
         /**
+         * Set redirect url
+         */
+        if (isset($submit_data['redirect_url']) && !empty($submit_data['redirect_url'])) {
+            $redirect_url = $submit_data['redirect_url'];
+        }
+
+        /**
          * Set return values
          */
         if ($submit_data['success'] === false) {
-            $redirect_url = home_url($return_page_path) . '?' . http_build_query($_GET);
+            $redirect_url = isset($redirect_url) ? $redirect_url : home_url($return_page_path) . '?' . http_build_query($_GET);
 
             $return_values = [];
             foreach ($submitted_data as $key => $value) {
@@ -327,7 +342,7 @@ class Growtype_Form_Crud
             }
 
             if (!empty($return_values) && strpos($form_name, 'signup') !== false) {
-                setcookie('signup_data', json_encode($return_values), time() + 2, COOKIEPATH, COOKIE_DOMAIN);
+                setcookie('signup_data', json_encode($return_values), time() + 3, COOKIEPATH, COOKIE_DOMAIN);
             }
         }
 
@@ -340,11 +355,6 @@ class Growtype_Form_Crud
             ],
             ($submit_data['success'] ? 'success' : 'error')
         );
-
-        /**
-         * Current post id
-         */
-        $post_id = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
 
         if (!isset($redirect_url)) {
             $redirect_url = !empty($post_id) ? get_permalink($post_id) : home_url($return_page_path);
@@ -383,7 +393,7 @@ class Growtype_Form_Crud
         /**
          * Debug
          */
-        error_log(sprintf("Growtype Form. Sending email to admin. Details: %s", print_r([$to, $subject, $email_body, $headers], true)));
+//        error_log(sprintf("Growtype Form. Sending email to admin. Details: %s", print_r([$to, $subject, $email_body, $headers], true)));
 
         wp_mail($to, $subject, $email_body, $headers);
     }
@@ -413,7 +423,7 @@ class Growtype_Form_Crud
             foreach ($forms as $form) {
                 if (Growtype_Form_General::format_form_name($form->post_title) === $form_name) {
                     $form_json_content = get_post_meta($form->ID, 'json_content', true);
-                    $form_json_content = self::json_decode($form_json_content);
+                    $form_json_content = self::json_sanitize($form_json_content);
                     if (!empty($form_json_content)) {
                         $form_json_content = [
                             $form_name => $form_json_content
@@ -446,7 +456,7 @@ class Growtype_Form_Crud
             }
         }
 
-        $available_forms = self::json_decode($form_json_content);
+        $available_forms = self::json_sanitize($form_json_content);
 
         if (strpos($form_name, 'edit') !== false && !isset($available_forms[$form_name]['main_fields'])) {
             $form_parent = str_replace('_edit', '', $form_name);
@@ -468,7 +478,7 @@ class Growtype_Form_Crud
         return apply_filters('growtype_form_get_growtype_form_data', $form_data, $form_name);
     }
 
-    public static function json_decode($form_json_content)
+    public static function json_sanitize($form_json_content)
     {
         $available_forms = json_decode($form_json_content, true);
 
@@ -510,7 +520,7 @@ class Growtype_Form_Crud
         if (!empty($repeat_password)) {
             if ($password !== $repeat_password) {
                 $response['success'] = false;
-                $response['messages'] = __("Passwords do not match", "growtype-form");
+                $response['messages'] = __("Passwords do not match.", "growtype-form") . " ";
                 return $response;
             }
         }
@@ -518,7 +528,7 @@ class Growtype_Form_Crud
         if (!empty($password)) {
             $validate_password = $this->validate_password($password);
 
-            if ($validate_password['success'] === false) {
+            if (filter_var($validate_password['success'], FILTER_VALIDATE_BOOLEAN) === false) {
                 $response['success'] = $validate_password['success'];
                 $response['messages'] = $validate_password['messages'];
                 return $response;
@@ -777,6 +787,15 @@ class Growtype_Form_Crud
         }
 
         /**
+         * Include passed values
+         */
+        if (!empty($passed_values)) {
+            foreach ($passed_values as $key) {
+                $submitted_values_sanitized[$key] = $submitted_data[$key];
+            }
+        }
+
+        /**
          * Extra values included in validation
          */
         foreach (self::get_included_values_after_validation() as $value) {
@@ -866,6 +885,11 @@ class Growtype_Form_Crud
         return $response;
     }
 
+    public static function simple_password_is_allowed()
+    {
+        return get_option('growtype_form_allow_simple_password');
+    }
+
     /**
      * @param $password
      * @return array
@@ -875,31 +899,53 @@ class Growtype_Form_Crud
     {
         $status['success'] = true;
 
-        if (!empty($password)) {
-            $allow_simple_password = get_option('growtype_form_allow_simple_password');
+        $validation_messages = self::validation_messages();
 
-            if ($allow_simple_password) {
+        if (!empty($password)) {
+            if (self::simple_password_is_allowed()) {
                 return $status;
             }
 
-            if (strlen($password) <= '8') {
+            if (strlen($password) < self::password_min_length()) {
                 $status['success'] = false;
-                $status['messages'] = __("Your Password Must Contain At Least 8 Characters!", "growtype-form");
+                $status['messages'] = $validation_messages['password_min_length'];
             } elseif (!preg_match("#[0-9]+#", $password)) {
                 $status['success'] = false;
-                $status['messages'] = __("Your Password Must Contain At Least 1 Number!", "growtype-form");
+                $status['messages'] = $validation_messages['password_contains_number'];
             } elseif (!preg_match("#[A-Z]+#", $password)) {
                 $status['success'] = false;
-                $status['messages'] = __("Your Password Must Contain At Least 1 Capital Letter!", "growtype-form");
+                $status['messages'] = $validation_messages['password_contains_uppercase'];
             } elseif (!preg_match("#[a-z]+#", $password)) {
                 $status['success'] = false;
-                $status['messages'] = __("Your Password Must Contain At Least 1 Lowercase Letter!", "growtype-form");
+                $status['messages'] = $validation_messages['password_contains_lowercase'];
             }
         } else {
             $status['success'] = false;
-            $status['messages'] = __("Please enter password.", "growtype-form");
+            $status['messages'] = $validation_messages['password_required'];
         }
 
         return $status;
+    }
+
+    public static function password_min_length()
+    {
+        return 8;
+    }
+
+    public static function validation_messages()
+    {
+        $validation_messages = [
+            'at_leas_one_selection' => __('At least one selection is required.', 'growtype-form'),
+            'wrong_date_format' => __('Wrong date format. Please select again.', 'growtype-form'),
+            'password_min_length' => sprintf(__("Your password must contain at least %s characters.", "growtype-form"), self::password_min_length()),
+            'password_required' => __("Please enter password.", "growtype-form"),
+            'password_contains_number' => __("Your password must contain at least 1 number.", "growtype-form"),
+            'password_contains_uppercase' => __("Your password must contain at least 1 capital letter.", "growtype-form"),
+            'password_contains_lowercase' => __("Your password must contain at least 1 lowercase letter.", "growtype-form"),
+            'repeat_password' => __("Please repeat your password.", "growtype-form"),
+            'passwords_not_match' => __("Passwords do not match.", "growtype-form"),
+        ];
+
+        return apply_filters('growtype_form_validation_messages', $validation_messages);
     }
 }

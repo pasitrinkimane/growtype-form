@@ -103,7 +103,7 @@ function growtype_form_save_submission($form_data, $submitted_values)
     /**
      * Set post title
      */
-    $post_title = date('Y-m-d H:i:s');
+    $post_title = wp_date('Y-m-d H:i:s');
 
     $growtype_form_settings_post_saving_post_title_name = isset($form_data['post_title_name_key']) ? $form_data['post_title_name_key'] : get_option('growtype_form_settings_post_saving_post_title_name');
 
