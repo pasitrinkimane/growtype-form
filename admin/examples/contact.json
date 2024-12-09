@@ -1,0 +1,51 @@
+{
+  "success_message": "Form submitted successfully",
+  "main_fields": [
+    {
+      "type": "text",
+      "name": "first_name",
+      "label": "First Name",
+      "placeholder": "John",
+      "required": "true"
+    },
+    {
+      "type": "text",
+      "name": "last_name",
+      "label": "Last Name",
+      "placeholder": "Doe",
+      "required": "true"
+    },
+    {
+      "type": "email",
+      "name": "email",
+      "label": "Email",
+      "placeholder": "Enter your email",
+      "required": "true"
+    },
+    {
+      "type": "number",
+      "name": "phone",
+      "label": "Phone",
+      "placeholder": "Enter your phone",
+      "required": "true"
+    },
+    {
+      "type": "textarea",
+      "name": "question",
+      "label": "Please let us know how we can help you *",
+      "placeholder": "Your answer here",
+      "required": "true",
+      "class": ""
+    }
+  ],
+  "submit_row": {
+    "class": "",
+    "cta": [
+      {
+        "type": "submit",
+        "label": "Submit",
+        "class": "btn btn-primary w-100"
+      }
+    ]
+  }
+}

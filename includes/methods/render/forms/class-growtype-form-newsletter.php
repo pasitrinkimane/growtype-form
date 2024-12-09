@@ -50,16 +50,18 @@ class Growtype_Form_Newsletter
 
         $response = apply_filters('growtype_form_newsletter_submission_save_data', $data);
 
+        $error_message = apply_filters('growtype_form_newsletter_submission_save_data_error_message', __('Something went wrong. Please contact us for help.', 'growtype-form'));
+
         if (!empty($response) && !$response || is_wp_error($response) || (isset($response['success']) && !$response['success'])) {
             return wp_send_json(
                 [
-                    'messages' => isset($response['messages']) ? $response['messages'] : __('Something went wrong. Please contact us for help.', 'growtype-form')
+                    'message' => $error_message
                 ], 400);
         }
 
         return wp_send_json(
             [
-                'messages' => __('Your subscription is successful. Thank you.', 'growtype')
+                'message' => $response['message'] ?? $error_message
             ], 200);
     }
 
@@ -83,11 +85,13 @@ class Growtype_Form_Newsletter
             ]
         );
 
-        $submission['messages'] = __('Your subscription is successful. Thank you.', 'growtype-form');
+        $submission['message'] = apply_filters('growtype_form_newsletter_submission_message', __('Your subscription is successful. Thank you.', 'growtype-form'));
 
         if ($submission['success'] === false) {
-            $submission['messages'] = __('You are already subscribed.', 'growtype-form');
+            $submission['message'] = __('You are already subscribed.', 'growtype-form');
         }
+
+        $submission = apply_filters('growtype_form_newsletter_submission_save_data', $submission);
 
         return $submission;
     }

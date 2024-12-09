@@ -6,7 +6,7 @@
                     <a href="<?= isset($form_args['header']['top']['back_btn']['url']) ? growtype_form_string_replace_custom_variable($form_args['header']['top']['back_btn']['url']) : growtype_form_login_page_url() ?>" class="btn-back"></a>
                 <?php } ?>
                 <?php if (isset($form_args['header']['top']['title']) && !empty($form_args['header']['top']['title'])) { ?>
-                    <h2 class="e-title-intro"><?php echo $form_args['header']['top']['title'] ?></h2>
+                    <h2 class="e-title-intro"><?php echo __($form_args['header']['top']['title'], 'growtype-form') ?></h2>
                 <?php } ?>
                 <?php if (isset($form_args['header']['top']['html']) && !empty($form_args['header']['top']['html'])) { ?>
                     <div class="growtype-form-header-html">
@@ -35,7 +35,7 @@
                     <a href="<?= isset($form_args['header']['bottom']['back_btn']['url']) ? growtype_form_string_replace_custom_variable($form_args['header']['bottom']['back_btn']['url']) : growtype_form_login_page_url() ?>" class="btn-back"></a>
                 <?php } ?>
                 <?php if (isset($form_args['header']['bottom']['title']) && !empty($form_args['header']['bottom']['title'])) { ?>
-                    <h2 class="e-title-intro"><?php echo $form_args['header']['bottom']['title'] ?></h2>
+                    <h2 class="e-title-intro"><?php echo __($form_args['header']['bottom']['title'], 'growtype-form') ?></h2>
                 <?php } ?>
                 <?php if (isset($form_args['header']['bottom']['html']) && !empty($form_args['header']['bottom']['html'])) { ?>
                     <div class="growtype-form-header-html">

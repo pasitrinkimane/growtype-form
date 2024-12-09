@@ -235,6 +235,7 @@ class Growtype_Form_Admin_Submission
     {
         $submitted_data = self::get_submitted_data($post_id);
         $email = $submitted_data['email'] ?? get_the_title($post_id);
+
         return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;
     }
 }

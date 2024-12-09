@@ -88,12 +88,18 @@
   .form-wrapper {
     border-radius: 5px;
     position: relative;
-    background: white;
+    //background: white;
     //overflow: hidden;
     padding: 30px;
     @include bp-phone-xl() {
       padding-right: 15px;
       padding-left: 15px;
+    }
+  }
+
+  &[data-name="signup"], &[data-name="login"] {
+    .form-wrapper {
+      background: white;
     }
   }
 }

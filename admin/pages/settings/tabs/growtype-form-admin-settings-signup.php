@@ -194,23 +194,6 @@ class Growtype_Form_Admin_Settings_Signup
         );
 
         /**
-         * Account requires evaluation
-         */
-        register_setting(
-            'growtype_form_settings_signup', // settings group name
-            'growtype_form_signup_requires_confirmation', // option name
-            'sanitize_text_field' // sanitization function
-        );
-
-        add_settings_field(
-            'growtype_form_signup_requires_confirmation',
-            'Signup requires confirmation',
-            array ($this, 'growtype_form_signup_requires_confirmation_callback'),
-            'growtype_form_settings_signup_general_section',
-            'growtype_form_settings_signup_general_section_id'
-        );
-
-        /**
          * Platform page
          */
         register_setting(
@@ -224,6 +207,52 @@ class Growtype_Form_Admin_Settings_Signup
             array ($this, 'growtype_form_account_verification_platform_page_callback'),
             'growtype_form_settings_signup_general_section',
             'growtype_form_settings_signup_general_section_id'
+        );
+
+        /**
+         *
+         */
+        add_settings_section(
+            'growtype_form_settings_signup_email_confirmation_section_id',
+            'Confirmation',
+            function () {
+                echo '<p>Signup confirmation settings</p>';
+            },
+            'growtype_form_settings_signup_email_confirmation_section'
+        );
+
+        /**
+         * Signup requires manual confirmation
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_signup_requires_manual_confirmation', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_signup_requires_manual_confirmation',
+            'Signup requires MANUAL confirmation',
+            array ($this, 'growtype_form_signup_requires_manual_confirmation_callback'),
+            'growtype_form_settings_signup_email_confirmation_section',
+            'growtype_form_settings_signup_email_confirmation_section_id'
+        );
+
+        /**
+         * Signup requires email confirmation
+         */
+        register_setting(
+            'growtype_form_settings_signup',
+            'growtype_form_signup_requires_email_confirmation',
+            'sanitize_text_field'
+        );
+
+        add_settings_field(
+            'growtype_form_signup_requires_email_confirmation',
+            'Signup requires EMAIL confirmation',
+            array ($this, 'growtype_form_signup_requires_email_confirmation_callback'),
+            'growtype_form_settings_signup_email_confirmation_section',
+            'growtype_form_settings_signup_email_confirmation_section_id'
         );
 
         /**
@@ -431,13 +460,24 @@ class Growtype_Form_Admin_Settings_Signup
     }
 
     /**
-     * Allow simple password for signup
+     * Manual confirmation
      */
-    function growtype_form_signup_requires_confirmation_callback()
+    function growtype_form_signup_requires_manual_confirmation_callback()
     {
-        $enabled = get_option('growtype_form_signup_requires_confirmation');
+        $enabled = get_option('growtype_form_signup_requires_manual_confirmation');
         ?>
-        <input type="checkbox" name="growtype_form_signup_requires_confirmation" value="1" <?php echo checked(1, $enabled, false) ?> />
+        <input type="checkbox" name="growtype_form_signup_requires_manual_confirmation" value="1" <?php echo checked(1, $enabled, false) ?> />
+        <?php
+    }
+
+    /**
+     * Email confirmation
+     */
+    function growtype_form_signup_requires_email_confirmation_callback()
+    {
+        $enabled = get_option('growtype_form_signup_requires_email_confirmation');
+        ?>
+        <input type="checkbox" name="growtype_form_signup_requires_email_confirmation" value="1" <?php echo checked(1, $enabled, false) ?> />
         <?php
     }
 

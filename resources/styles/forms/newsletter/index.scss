@@ -21,6 +21,10 @@ Newsletter
 .growtype-form-newsletter {
   position: relative;
 
+  .required {
+    color: var(--theme-color);
+  }
+
   .status-message {
     position: absolute;
     bottom: -85px;

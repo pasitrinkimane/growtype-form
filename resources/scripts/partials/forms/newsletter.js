@@ -1,3 +1,5 @@
+import {newsletterFormSuccessEvent} from "../events/newsletterForm";
+
 function formNewsletter() {
     $('.growtype-form-newsletter').submit(function () {
         event.preventDefault();
@@ -24,7 +26,7 @@ function formNewsletter() {
             data: formData,
             success: function (data) {
                 form.find('.status-message')
-                    .html(data.messages)
+                    .html(data.message)
                     .addClass('alert-success')
                     .fadeIn();
 
@@ -32,13 +34,15 @@ function formNewsletter() {
 
                 form.find('input').val('');
 
+                document.dispatchEvent(newsletterFormSuccessEvent());
+
                 setTimeout(function () {
                     form.find('.status-message').fadeOut();
                 }, messageTimeout)
             },
             error: function (data) {
                 form.find('.status-message')
-                    .html(data.responseJSON.messages)
+                    .html(data.responseJSON.message)
                     .addClass('alert-danger')
                     .fadeIn();
 

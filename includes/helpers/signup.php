@@ -5,7 +5,7 @@
  */
 function growtype_form_signup_page_ID()
 {
-    return get_option('growtype_form_signup_page');
+    return get_option('growtype_form_signup_page', 'default');
 }
 
 /**
@@ -80,7 +80,9 @@ if (!function_exists('growtype_form_redirect_url_after_signup')) {
     {
         $redirect_page = growtype_form_default_redirect_after_signup_page();
 
-        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'wp/wp-login') !== false) {
+        if (isset($_GET['redirect_after']) && !empty($_GET['redirect_after'])) {
+            $redirect_url = $_GET['redirect_after'];
+        } elseif (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'wp/wp-login') !== false) {
             $redirect_url = get_dashboard_url();
         } elseif (isset($_COOKIE['growtype_form_redirect_after'])) {
             $redirect_url = $_COOKIE['growtype_form_redirect_after'];

@@ -39,3 +39,40 @@ function growtype_form_get_url_path()
 
     return $url_path;
 }
+
+function growtype_form_get_current_domain()
+{
+    // Default to HTTP protocol if HTTPS is not set
+    $protocol = 'http';
+
+    // Check if HTTPS is set and not 'off'
+    if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        $protocol = 'https';
+    }
+
+    // Check if HTTP_HOST is set
+    if (isset($_SERVER['HTTP_HOST'])) {
+        $domain = $_SERVER['HTTP_HOST'];
+    } else {
+        // Return null or a default value if HTTP_HOST is not set
+        return null;
+    }
+
+    // Return the full domain with protocol
+    return $protocol . '://' . $domain;
+}
+
+function growtype_form_add_domain_to_url_if_missing($url)
+{
+    $current_domain = growtype_form_get_current_domain();
+
+    if (!$current_domain) {
+        return $url;
+    }
+
+    if (!empty($url) && strpos($url, 'http') !== 0) {
+        return rtrim($current_domain, '/') . '/' . ltrim($url, '/');
+    }
+
+    return $url;
+}

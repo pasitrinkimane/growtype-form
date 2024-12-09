@@ -6,13 +6,12 @@
 class Growtype_Form_General
 {
     use GrowtypeFormAuth;
-    use GrowtypeFormNotice;
     use GrowtypeFormFile;
     use GrowtypeFormProduct;
 
-    const GROWTYPE_FORM_SHORTCODE_NAME = 'growtype_form';
+    const SHORTCODE_NAME = 'growtype_form';
 
-    const GROWTYPE_FORM_ALLOWED_FIELD_TYPES = [
+    const ALLOWED_FIELD_TYPES = [
         'text',
         'textarea',
         'file',
@@ -32,7 +31,7 @@ class Growtype_Form_General
     public function __construct()
     {
         if (!is_admin()) {
-            add_shortcode(self::GROWTYPE_FORM_SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
+            add_shortcode(self::SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
         }
     }
 
@@ -260,7 +259,7 @@ class Growtype_Form_General
         ob_start();
 
         if (!is_admin()) {
-            echo $this->growtype_form_get_notice();
+            echo Growtype_Form_Notice::growtype_form_get_notice();
         }
 
         echo $this->form_init($args);
@@ -521,6 +520,7 @@ class Growtype_Form_General
          * Style
          */
         $form_style = $form_data['args']['style'] ?? $form_data['style'] ?? '';
+        $form_style_html = !empty($form_style) ? 'style="' . $form_style . '"' : '';
 
         /**
          * Classes
@@ -528,12 +528,18 @@ class Growtype_Form_General
         $wrapper_classes = self::wrapper_classes($form_data);
 
         /**
-         * Start form
+         * Background color
+         */
+        $background_color = isset($form_data['args']['background_color']) ? $form_data['args']['background_color'] : 'white';
+        $form_wrapper_html = !empty($background_color) && $background_color !== 'none' ? 'style="background-color: ' . $background_color . ';"' : '';
+
+        /**
+         * Render
          */
         ob_start();
         ?>
 
-        <div class="<?php echo implode(' ', $wrapper_classes) ?>" style="<?php echo $form_style ?>" data-name="<?php echo $form_name ?>">
+        <div class="<?php echo implode(' ', $wrapper_classes) ?>" <?php echo $form_style_html ?> data-name="<?php echo $form_name ?>">
 
             <?php if (isset($form_args['logo']) && isset($form_args['logo']['url']) && !empty($form_args['logo']['url'])) { ?>
                 <div class="logo-wrapper">
@@ -544,7 +550,7 @@ class Growtype_Form_General
             <?php } ?>
 
             <div class="growtype-form-container">
-                <div class="form-wrapper">
+                <div class="form-wrapper" <?php echo $form_wrapper_html ?>>
                     <?php echo growtype_form_include_view('components.forms.partials.header', ['form_args' => $form_args]) ?>
 
                     <div class="form-inner-wrapper">
@@ -570,7 +576,9 @@ class Growtype_Form_General
                             <?php } ?>
 
                             <div>
-                                <input type="email" name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATOR ?>' value="" style="display: none;"/>
+                                <?php foreach (Growtype_Form_Crud::GROWTYPE_FORM_SPAM_IDENTIFICATION_RULES as $rule) { ?>
+                                    <input type="<?php echo $rule['type'] ?>" <?php echo $rule['hidden'] ? 'hidden' : '' ?> name='<?php echo $rule['key'] ?>' value="" style="<?php echo $rule['style'] ?>"/>
+                                <?php } ?>
 
                                 <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMIT_ACTION ?>' value="<?php echo $form_action ?>"/>
                                 <input type="text" hidden name='<?php echo Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID ?>' value="<?php echo get_current_user_id() ?? null ?>"/>
@@ -607,7 +615,7 @@ class Growtype_Form_General
                                         <?php
                                         if (isset($form_args['submit_row']['cta'])) {
                                             foreach ($form_args['submit_row']['cta'] as $cta) { ?>
-                                                <button type="<?php echo $cta['type']; ?>" class="<?php echo isset($cta['class']) ? $cta['class'] : 'btn btn-primary'; ?>" data-action="<?php echo isset($cta['action']) ? $cta['action'] : $form_action; ?>"><?= $cta['label'] ?? __("Save", "growtype-form") ?></button>
+                                                <button type="<?php echo $cta['type']; ?>" class="<?php echo isset($cta['class']) ? $cta['class'] : 'btn btn-primary'; ?>" data-action="<?php echo isset($cta['action']) ? $cta['action'] : $form_action; ?>"><?php echo __($cta['label'], 'growtype-form') ?? __("Save", "growtype-form") ?></button>
                                             <?php } ?>
                                         <?php } else { ?>
                                             <button type="submit" class="btn btn-primary" data-action="submit"><?= $form_data['submit_label'] ?? __("Save", "growtype-form") ?></button>
@@ -683,6 +691,7 @@ class Growtype_Form_General
     public static function growtype_form_get_action_url()
     {
         $current_post_slug = self::growtype_form_get_current_post_slug();
+        $current_post_slug = str_replace('/login/', '/signup/', $current_post_slug);
 
         return home_url($current_post_slug);
     }
@@ -908,6 +917,8 @@ class Growtype_Form_General
             }
         </script>
         <?php
+
+        do_action('growtype_form_submit_scripts_init');
     }
 
     /**

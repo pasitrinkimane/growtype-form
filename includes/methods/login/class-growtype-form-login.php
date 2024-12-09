@@ -5,16 +5,14 @@
  */
 class Growtype_Form_Login
 {
-    use GrowtypeFormNotice;
-
     const URL_PATH = 'login';
 
     public function __construct()
     {
         if (!is_admin()) {
             add_action('wp_login_failed', array ($this, 'custom_login_failed'), 10, 2);
-//            add_filter('authenticate', array ($this, 'custom_authenticate_username_password'), 30, 3);
             add_filter('login_url', array ($this, 'change_default_login_url'), 10, 2);
+            add_action('wp_logout', array ($this, 'custom_logout_redirect'));
         }
 
         add_action('init', array ($this, 'custom_url'), 1);
@@ -38,6 +36,12 @@ class Growtype_Form_Login
          * Login form
          */
         add_filter('login_form_middle', array ($this, 'login_form_middle_custom'), 0, 2);
+    }
+
+    function custom_logout_redirect()
+    {
+        wp_redirect(growtype_form_login_page_url());
+        exit;
     }
 
     function login_form_middle_custom($html, $args)
@@ -169,22 +173,6 @@ class Growtype_Form_Login
     }
 
     /**
-     * Updates authentication to return an error when one field or both are blank
-     */
-    function custom_authenticate_username_password($user, $username, $password)
-    {
-        if (is_a($user, 'WP_User')) {
-            return $user;
-        }
-
-        if (empty($username) || empty($password)) {
-            $error = new WP_Error();
-
-            return $error;
-        }
-    }
-
-    /**
      * Updates login failed to send user back to the custom form with a query var
      */
     function custom_login_failed($username)
@@ -232,16 +220,18 @@ class Growtype_Form_Login
         $form_args = growtype_form_extract_form_args($form_data);
         $wp_login_form_args = $form_args['wp_login_form'];
 
-        $wp_login_form_args['redirect'] = growtype_form_redirect_url_after_login();
+        $redirect_url_after_login = growtype_form_redirect_url_after_login();
 
         /**
          * Check if redirect after parameter exists
          */
         if (isset($_GET['redirect_after']) && !empty($_GET['redirect_after']) && strpos($_GET['redirect_after'], get_bloginfo('url')) > -1) {
-            $wp_login_form_args['redirect'] = $_GET['redirect_after'];
+            $redirect_url_after_login = $_GET['redirect_after'];
         } elseif (isset($form_data['args']['redirect_after']) && !empty($form_data['args']['redirect_after'])) {
-            $wp_login_form_args['redirect'] = $form_data['args']['redirect_after'];
+            $redirect_url_after_login = $form_data['args']['redirect_after'];
         }
+
+        $wp_login_form_args['redirect'] = growtype_form_add_domain_to_url_if_missing($redirect_url_after_login);
 
         /**
          * Classes
@@ -280,7 +270,7 @@ class Growtype_Form_Login
         if (isset($form_args['username_placeholder'])) { ?>
             <script>
                 var userLogin = document.getElementById("user_login");
-                userLogin.setAttribute("placeholder", "<?= $form_args['username_placeholder'] ?>");
+                userLogin.setAttribute("placeholder", "<?= __($form_args['username_placeholder'], 'growtype-form') ?>");
             </script>
         <?php } ?>
 
@@ -288,7 +278,7 @@ class Growtype_Form_Login
         if (isset($form_args['password_placeholder'])) { ?>
             <script>
                 var userPass = document.getElementById("user_pass");
-                userPass.setAttribute("placeholder", "<?= $form_args['password_placeholder'] ?>");
+                userPass.setAttribute("placeholder", "<?= __($form_args['password_placeholder'], 'growtype-form') ?>");
             </script>
         <?php } ?>
 

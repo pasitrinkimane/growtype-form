@@ -2,7 +2,7 @@
     <div class="growtype-form-newsletter-content">
         <div class="input-wrapper">
             <?php if (!isset($email_label) || !empty($email_label)) { ?>
-                <label for="newsletter_email" class="form-label"><?php echo empty($email_label) ? __('Email', 'growtype-form') : $email_label ?></label>
+                <label for="newsletter_email" class="form-label"><?php echo empty($email_label) ? __('Email', 'growtype-form') : $email_label ?><span class="required">*</span></label>
             <?php } ?>
             <div class="input-wrapper-inner">
                 <input id="newsletter_email" name="newsletter_email" type="email" class="form-control" placeholder="<?php echo isset($email_placeholder) ? $email_placeholder : __('Your email', 'growtype') ?>" required>

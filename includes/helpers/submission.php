@@ -93,7 +93,7 @@ function growtype_form_save_submission($form_data, $submitted_values)
         if (!empty($result)) {
             return [
                 'success' => false,
-                'messages' => __("You have already submitted this form.", "growtype-form")
+                'message' => __("You have already submitted this form.", "growtype-form")
             ];
         }
     }
@@ -131,7 +131,7 @@ function growtype_form_save_submission($form_data, $submitted_values)
     /**
      * Unset unnecessary values from submitted data
      */
-    foreach (Growtype_Form_Crud::EXCLUDED_VALUES_FROM_SAVING as $value) {
+    foreach (Growtype_Form_Crud::get_excluded_values_from_saving() as $value) {
         if (isset($submitted_data[$value])) {
             unset($submitted_data[$value]);
         }
@@ -195,7 +195,7 @@ function growtype_form_save_submission($form_data, $submitted_values)
 
         if (is_wp_error($post_id)) {
             $response['success'] = false;
-            $response['messages'] = __("Something went wrong. Please contact administrator.", "growtype-form");
+            $response['message'] = __("Something went wrong. Please contact administrator.", "growtype-form");
 
             return $response;
         }
@@ -239,7 +239,7 @@ function growtype_form_save_submission($form_data, $submitted_values)
     $response['post_id'] = isset($post_id) ? $post_id : null;
     $response['post_content'] = $post_content;
     $response['success'] = true;
-    $response['messages'] = apply_filters('growtype_form_upload_post_success_message', (isset($form_data['success_message']) ? $form_data['success_message'] : __("Form has been submitted successfully.", "growtype-form")), $submitted_data, $form_data);
+    $response['message'] = apply_filters('growtype_form_upload_post_success_message', (isset($form_data['success_message']) ? $form_data['success_message'] : __("Form has been submitted successfully.", "growtype-form")), $submitted_data, $form_data);
 
     return $response;
 }

@@ -168,6 +168,13 @@ class Growtype_Form_Admin_Lead_Custom_Actions
             'type' => 'textarea',
         ];
 
+        if (Growtype_Form_Signup_Verification::email_verification_is_required()) {
+            $meta_boxes[0]['fields'][] = [
+                'title' => 'Is verified',
+                'key' => 'user_is_verified',
+            ];
+        }
+
         return $meta_boxes;
     }
 

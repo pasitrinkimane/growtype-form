@@ -2,6 +2,10 @@ function formAuth() {
     $('.growtype-form-auth .btn-link').click(function (e) {
         if ($(this).attr('data-type') && $(this).attr('data-type').length > 0) {
             event.preventDefault();
+
+            var currentUrl = window.location.href;
+            var newUrl;
+
             if ($(this).attr('data-type') === 'login') {
                 $(this).closest('.growtype-form-wrapper').fadeOut().promise().done(function () {
                     $(this).removeClass('is-active');
@@ -10,10 +14,9 @@ function formAuth() {
                     });
                 })
 
-                var currentUrl = window.location.href;
-                var newUrl = currentUrl.replace("/signup/", "/login/");
-                history.replaceState(null, null, newUrl);
+                newUrl = currentUrl.replace("/signup/", "/login/");
             }
+
             if ($(this).attr('data-type') === 'signup') {
                 $(this).closest('.growtype-form-wrapper').fadeOut().promise().done(function () {
                     $(this).removeClass('is-active');
@@ -22,10 +25,10 @@ function formAuth() {
                     });
                 })
 
-                var currentUrl = window.location.href;
-                var newUrl = currentUrl.replace("/login/", "/signup/");
-                history.replaceState(null, null, newUrl);
+                newUrl = currentUrl.replace("/login/", "/signup/");
             }
+
+            history.replaceState(null, null, newUrl);
         }
     });
 }

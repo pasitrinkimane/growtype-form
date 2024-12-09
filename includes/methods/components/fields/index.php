@@ -35,13 +35,13 @@ $field_params = json_encode($field_params);
 
 $selected_options = isset($field['selected_options']) ? $field['selected_options'] : [$field_value];
 $select_type = isset($field['select_type']) ? $field['select_type'] : null;
-$field_label = isset($field['label']) ? $field['label'] : null;
+$field_label = isset($field['label']) ? __($field['label'], 'growtype-form') : null;
 $field_label = !empty($field_label) && $field_required && strpos($field_label, '*') === false ? $field_label . '<span class="required">*</span>' : $field_label;
 $field_description = isset($field['description']) ? $field['description'] : null;
 $field_explanation = isset($field['explanation']) ? $field['explanation'] : null;
-$placeholder = isset($field['placeholder']) ? $field['placeholder'] : null;
+$placeholder = isset($field['placeholder']) ? __($field['placeholder'], 'growtype-form') : null;
 $field_accept = isset($field['accept']) ? $field['accept'] : null;
-$field_cta_text = isset($field['cta_text']) ? $field['cta_text'] : null;
+$field_cta_text = isset($field['cta_text']) ? __($field['cta_text'], 'growtype-form') : null;
 $field_min_value = isset($field['min']) ? $field['min'] : null;
 $field_min_date_value = isset($field['min_date']) ? $field['min_date'] : null;
 $field_max_value = isset($field['max']) ? $field['max'] : null;
@@ -59,7 +59,7 @@ $field_autocomplete = isset($field['autocomplete']) && $field['autocomplete'] ==
 $field_id = isset($field['id']) ? $field['id'] : $field_name;
 $conditions = isset($field['conditions']) && !empty($field['conditions']) ? json_encode($field['conditions']) : '';
 
-if (!in_array($field_type, Growtype_Form_General::GROWTYPE_FORM_ALLOWED_FIELD_TYPES)) {
+if (!in_array($field_type, Growtype_Form_General::ALLOWED_FIELD_TYPES)) {
     return null;
 }
 

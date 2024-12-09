@@ -205,7 +205,14 @@ class Growtype_Form_Admin_Lead
         foreach (self::get_meta_boxes() as $box) {
             foreach ($box['fields'] as $field) {
                 if ($column === $field['key']) {
-                    echo get_post_meta($post_id, $field['key'], true);
+                    if ($field['key'] === 'user_is_verified') {
+                        $user = get_user_by('email', get_the_title($post_id));
+                        if (!empty($user)) {
+                            echo get_user_meta($user->ID, 'is_verified', true);
+                        }
+                    } else {
+                        echo get_post_meta($post_id, $field['key'], true);
+                    }
                 }
             }
         }
@@ -267,10 +274,12 @@ class Growtype_Form_Admin_Lead
                 foreach ($submissions as $submission) {
                     $email = Growtype_Form_Admin_Submission::get_email($submission->ID);
 
-                    self::insert([
-                        'title' => $email,
-                        'status' => 'publish'
-                    ]);
+                    if (!empty($email)) {
+                        self::insert([
+                            'title' => $email,
+                            'status' => 'publish'
+                        ]);
+                    }
                 }
 
                 $users = get_users();
@@ -330,45 +339,60 @@ class Growtype_Form_Admin_Lead
             ?>
             <script>
                 jQuery(document).ready(function ($) {
-                    var currentDate = new Date();
-                    var year = currentDate.getFullYear();
-                    var month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
-                    var day = ('0' + currentDate.getDate()).slice(-2);
-                    var currentDayValue = year + month + day;
-                    var currentDayText = 'Today';
-
-                    var yesterdayDate = new Date(currentDate);
-                    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-                    var yYear = yesterdayDate.getFullYear();
-                    var yMonth = ('0' + (yesterdayDate.getMonth() + 1)).slice(-2);
-                    var yDay = ('0' + yesterdayDate.getDate()).slice(-2);
-                    var yesterdayValue = yYear + yMonth + yDay;
-                    var yesterdayText = 'Yesterday';
-
                     var filterSelect = $('select[name="m"]');
                     if (filterSelect.length > 0) {
-                        $('<option value="' + yesterdayValue + '">' + yesterdayText + '</option>').insertAfter(filterSelect.find('option').first());
-                        $('<option value="' + currentDayValue + '">' + currentDayText + '</option>').insertAfter(filterSelect.find('option').first());
-                    }
+                        var currentDate = new Date();
+                        var optionsHtml = ''; // Collect options as HTML
 
-                    filterSelect.change(function () {
-                        if ($(this).val() === currentDayValue) {
-                            $('input[name="filter_by_day"]').val(currentDayValue);
-                        } else {
-                            $('input[name="filter_by_day"]').val('');
+                        // Generate options for the last 7 days, starting with today
+                        for (let i = 0; i < 7; i++) {
+                            var tempDate = new Date(currentDate);
+                            tempDate.setDate(currentDate.getDate() - i);
+
+                            // Format date as YYYY-MM-DD
+                            var year = tempDate.getFullYear();
+                            var month = ('0' + (tempDate.getMonth() + 1)).slice(-2);
+                            var day = ('0' + tempDate.getDate()).slice(-2);
+                            var formattedDate = year + '-' + month + '-' + day;
+
+                            // Add labels for Today and Yesterday
+                            var label = '';
+                            if (i === 0) {
+                                label = ' (Today)';
+                            } else if (i === 1) {
+                                label = ' (Yesterday)';
+                            }
+
+                            // Build the option HTML
+                            optionsHtml += '<option value="' + formattedDate + '">' + formattedDate + label + '</option>';
                         }
-                    });
 
-                    function getUrlParameter(name) {
-                        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-                        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-                        var results = regex.exec(window.location.search);
-                        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-                    }
+                        // Prepend the options to the dropdown
+                        filterSelect.prepend(optionsHtml);
 
-                    var dayParam = getUrlParameter('m');
-                    if (dayParam) {
-                        filterSelect.val(dayParam).change();
+                        // Handle select change
+                        filterSelect.change(function () {
+                            var selectedValue = $(this).val();
+                            if (selectedValue) {
+                                $('input[name="filter_by_day"]').val(selectedValue);
+                            } else {
+                                $('input[name="filter_by_day"]').val('');
+                            }
+                        });
+
+                        // Get URL parameter
+                        function getUrlParameter(name) {
+                            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+                            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+                            var results = regex.exec(window.location.search);
+                            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+                        }
+
+                        // Set selected value from URL if present
+                        var dayParam = getUrlParameter('m');
+                        if (dayParam) {
+                            filterSelect.val(dayParam).change();
+                        }
                     }
                 });
             </script>

@@ -10,8 +10,19 @@ class Growtype_Form_Signup
     public function __construct()
     {
         add_action('init', array ($this, 'custom_url'), 1);
+
         add_action('template_redirect', array ($this, 'custom_url_template'));
+
         add_filter('document_title_parts', array ($this, 'custom_document_title_parts'));
+
+        $this->load_partials();
+
+        add_filter('growtype_auth_success_redirect_url', array ($this, 'growtype_auth_success_redirect_url_extend'));
+    }
+
+    function growtype_auth_success_redirect_url_extend($redirect_url)
+    {
+        return growtype_form_redirect_url_after_signup();
     }
 
     /**
@@ -128,12 +139,12 @@ class Growtype_Form_Signup
      * @param $email
      * @return false|int|WP_Error
      */
-    public static function create_user($username, $password, $email)
+    public static function create_user($username, $password, $email = null)
     {
         if (!validate_username($username)) {
             return [
                 'success' => false,
-                'messages' => __("Not a valid username. </br></br> Please check the following criteria for a valid username: </br>
+                'message' => __("Not a valid username. </br></br> Please check the following criteria for a valid username: </br>
 - Your username must contain at least 3 characters. </br>
 - It may only consist of letters (a-z, A-Z), numbers (0-9), hyphens (-), and underscores (_). </br>
 - Special characters and spaces are not allowed. </br>
@@ -145,19 +156,19 @@ Please review your username and make the necessary corrections to meet these req
             ];
         }
 
-        if (class_exists('woocommerce')) {
+        if (class_exists('woocommerce') && !empty($email)) {
             $user_id = wc_create_new_customer(sanitize_email($email), wc_clean($username), $password);
         } else {
             $user_id = wp_create_user($username, $password, sanitize_email($email));
         }
 
         if (is_wp_error($user_id)) {
-            $messages = __('Something went wrong, please try again.', 'growtype-form');
+            $message = __('Something went wrong, please try again.', 'growtype-form');
 
             $error_message = $user_id->get_error_messages();
 
             if (isset($error_message[0])) {
-                $messages = $error_message;
+                $message = $error_message;
             }
 
             if (isset($user_id->errors['registration-error-email-exists'][0])) {
@@ -169,12 +180,12 @@ Please review your username and make the necessary corrections to meet these req
                     ], $login_page_url);
                 }
 
-                $messages = str_replace('#', $login_page_url, $user_id->errors['registration-error-email-exists'][0]);
+                $message = str_replace('#', $login_page_url, $user_id->errors['registration-error-email-exists'][0]);
             }
 
             return [
                 'success' => false,
-                'messages' => $messages,
+                'message' => $message,
                 'user_id' => null,
             ];
         }
@@ -214,8 +225,14 @@ Please review your username and make the necessary corrections to meet these req
 
         return [
             'success' => true,
-            'messages' => 'Registration is successful.',
+            'message' => 'Registration is successful.',
             'user_id' => $user_id,
         ];
+    }
+
+    function load_partials()
+    {
+        include_once __DIR__ . '/partials/class-growtype-form-verification.php';
+        new Growtype_Form_Signup_Verification();
     }
 }

@@ -1170,7 +1170,7 @@ class Growtype_Form_Signup_Details
                 <?php endif; ?>
 
                 <?php
-                if (get_option('growtype_form_signup_requires_confirmation')) { ?>
+                if (get_option('growtype_form_signup_requires_manual_confirmation')) { ?>
                     <a class="button-primary" href="<?php echo esc_url($action_url); ?>"><?php esc_html_e('Confirm', 'growtype-form'); ?></a>
                     <a class="button" href="<?php echo esc_url($cancel_url); ?>"><?php esc_html_e('Cancel', 'growtype-form') ?></a>
                 <?php } ?>

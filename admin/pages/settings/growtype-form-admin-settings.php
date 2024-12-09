@@ -85,6 +85,7 @@ class Growtype_Form_Admin_Settings
 
                             echo '<table class="form-table">';
                             do_settings_sections('growtype_form_settings_signup_general_section');
+                            do_settings_sections('growtype_form_settings_signup_email_confirmation_section');
                             do_settings_sections('growtype_form_settings_signup_users_section');
                             echo '</table>';
 
@@ -132,7 +133,7 @@ class Growtype_Form_Admin_Settings
 
                             echo '</br>';
                             echo '<b>Shortcode:</b> [growtype_form name="signup"] ' . "</br>";
-                            echo '<b>Allowed input types:</b> ' . implode(',', Growtype_Form_General::GROWTYPE_FORM_ALLOWED_FIELD_TYPES);
+                            echo '<b>Allowed input types:</b> ' . implode(',', Growtype_Form_General::ALLOWED_FIELD_TYPES);
 
                             echo '<table class="form-table">';
                             do_settings_fields('growtype-form-settings', 'growtype_form_settings_examples');

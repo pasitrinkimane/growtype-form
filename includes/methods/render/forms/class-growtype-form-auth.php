@@ -6,14 +6,13 @@
 class Growtype_Form_Auth
 {
     use GrowtypeFormAuth;
-    use GrowtypeFormNotice;
 
-    const GROWTYPE_FORM_SHORTCODE_NAME = 'growtype_form_auth';
+    const SHORTCODE_NAME = 'growtype_form_auth';
 
     public function __construct()
     {
         if (!is_admin()) {
-            add_shortcode(self::GROWTYPE_FORM_SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
+            add_shortcode(self::SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
         }
     }
 
@@ -30,15 +29,30 @@ class Growtype_Form_Auth
             return growtype_form_include_view('login.partials.success-content');
         }
 
+        add_filter('body_class', function ($classes) {
+            $classes[] = 'page-gf-auth';
+
+            return $classes;
+        });
+
         add_action('wp_footer', array ($this, 'growtype_form_show_hide_password_button'), 100);
 
         ob_start();
         ?>
+        <style>
+            .growtype-form-auth .growtype-form-wrapper {
+                display: none;
+            }
+
+            .growtype-form-auth .growtype-form-wrapper.is-active {
+                display: block;
+            }
+        </style>
         <div class="growtype-form-auth">
             <?php
             $growtype_form_general = new Growtype_Form_General();
 
-            echo $this->growtype_form_get_notice();
+            echo Growtype_Form_Notice::growtype_form_get_notice();
 
             $args_login = $args;
             $args_login['name'] = 'login';

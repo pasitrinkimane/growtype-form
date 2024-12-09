@@ -89,11 +89,6 @@ class Growtype_Form
         $this->load_dependencies();
         $this->set_locale();
 
-        /**
-         * Session
-         */
-        //        $this->set_session();
-
         $this->define_admin_hooks();
         $this->define_public_hooks();
     }
@@ -217,24 +212,6 @@ class Growtype_Form
         $plugin_i18n = new Growtype_Form_i18n();
 
         $this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
-    }
-
-    /**
-     * Define the locale for this plugin for internationalization.
-     *
-     * Uses the Growtype_Form_i18n class in order to set the domain and to register the hook
-     * with WordPress.
-     *
-     * @since    1.0.0
-     * @access   private
-     */
-    private function set_session()
-    {
-        $plugin_session = new Growtype_Form_Session();
-
-        $this->loader->add_action('init', $plugin_session, 'start_session');
-        $this->loader->add_action('wp_logout', $plugin_session, 'end_session');
-        $this->loader->add_action('wp_login', $plugin_session, 'start_session');
     }
 
     /**

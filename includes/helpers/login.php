@@ -94,34 +94,16 @@ function growtype_form_redirect_url_after_login()
     return apply_filters('growtype_form_redirect_url_after_login', $redirect_url);
 }
 
-if (!function_exists('growtype_form_facebook_login_form')) {
-    function growtype_form_facebook_login_btn()
-    {
-        $fb = new Growtype_Form_Facebook();
-        $login_url = $fb->login_url([]);
-
-        return sprintf('<a href="%s" class="btn btn-facebook-login">%s</a>', $login_url, __('Sign In with Facebook', 'growtype-form'));
-    }
-}
-
-if (!function_exists('growtype_form_google_auth_btn')) {
-    function growtype_form_google_auth_btn($type = 'login')
-    {
-        $methods = new Growtype_Form_Google();
-        $login_url = $methods->login_url();
-
-        $btn_text = __('Sign In with Google', 'growtype-form');
-        if ($type === 'signup') {
-            $btn_text = __('Sign Up with Google', 'growtype-form');
-        }
-
-        return sprintf('<a href="%s" class="btn btn-google-login"><img src="' . GROWTYPE_FORM_URL_PUBLIC . 'images/auth/google.png' . '" width="15" height="15">%s</a>', $login_url, $btn_text);
-    }
-}
-
 if (!function_exists('growtype_form_current_page_is_login_page')) {
     function growtype_form_current_page_is_login_page()
     {
         return strpos($_SERVER['REQUEST_URI'], Growtype_Form_Login::URL_PATH) !== false;
+    }
+}
+
+if (!function_exists('growtype_form_current_page_is_signup_page')) {
+    function growtype_form_current_page_is_signup_page()
+    {
+        return strpos($_SERVER['REQUEST_URI'], Growtype_Form_Signup::URL_PATH) !== false;
     }
 }

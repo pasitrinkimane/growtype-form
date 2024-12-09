@@ -58,7 +58,7 @@ trait GrowtypeFormFile
 
         if (isset($upload_featured_image['error'])) {
             $response['success'] = false;
-            $response['messages'] = $upload_featured_image['error'];
+            $response['message'] = $upload_featured_image['error'];
 
             return $response;
         }

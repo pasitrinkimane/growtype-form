@@ -144,5 +144,6 @@ class Growtype_Form_Loader
     private function load_methods()
     {
         require_once GROWTYPE_FORM_PATH . 'includes/methods/index.php';
+        new Growtype_Form_Methods();
     }
 }

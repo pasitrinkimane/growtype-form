@@ -8,17 +8,17 @@
 if (!function_exists('growtype_form_string_replace_custom_variable')) {
     function growtype_form_string_replace_custom_variable($string, $params = [])
     {
-        global $wp;
-
         $variables = [
             '$login_page_url',
             '$register_page_url',
             '$logo_url',
-            '$btn_facebook_login',
-            '$btn_google_login',
-            '$btn_google_signup',
             '$home_url',
         ];
+
+        if (class_exists('Growtype_Auth')) {
+            $available_btns = Growtype_Auth::get_available_btns();
+            $variables = array_merge($variables, array_keys($available_btns));
+        }
 
         $variable_to_replace = '';
         foreach ($variables as $variable) {
@@ -29,7 +29,6 @@ if (!function_exists('growtype_form_string_replace_custom_variable')) {
         }
 
         if (!empty($variable_to_replace)) {
-
             $query_args = [];
 
             if (isset($_SERVER['HTTPS']) && isset($_SERVER['HTTP_HOST']) && isset($_SERVER['REQUEST_URI'])) {
@@ -50,18 +49,15 @@ if (!function_exists('growtype_form_string_replace_custom_variable')) {
                 case '$logo_url':
                     $replace = isset(growtype_get_login_logo()['url']) ? growtype_get_login_logo()['url'] : '';
                     break;
-                case '$btn_facebook_login':
-                    $replace = growtype_form_facebook_login_btn();
-                    break;
-                case '$btn_google_login':
-                    $replace = growtype_form_google_auth_btn();
-                    break;
-                case '$btn_google_signup':
-                    $replace = growtype_form_google_auth_btn('signup');
-                    break;
                 case '$home_url':
                     $replace = home_url();
                     break;
+            }
+
+            if (class_exists('Growtype_Auth')) {
+                if (isset($available_btns[$variable_to_replace])) {
+                    $replace = $available_btns[$variable_to_replace];
+                }
             }
 
             $counter = 0;
@@ -74,12 +70,12 @@ if (!function_exists('growtype_form_string_replace_custom_variable')) {
                 $counter++;
             }
 
-            if (isset($replace) && !empty($replace)) {
+            if (isset($replace)) {
                 $string = str_replace($variable_to_replace, $replace, $string);
             }
         }
 
-        return $string;
+        return __($string, 'growtype-form');
     }
 }
 
@@ -109,7 +105,7 @@ function growtype_form_extract_form_args($form)
     $label_username = isset($wp_login_form['label_username']) && !empty($wp_login_form['label_username']) ? $wp_login_form['label_username'] : "";
     $label_password = isset($wp_login_form['label_password']) && !empty($wp_login_form['label_password']) ? $wp_login_form['label_password'] : "";
     $label_remember = isset($wp_login_form['label_remember']) && !empty($wp_login_form['label_remember']) ? $wp_login_form['label_remember'] : "";
-    $label_log_in = isset($wp_login_form['label_log_in']) && !empty($wp_login_form['label_log_in']) ? $wp_login_form['label_log_in'] : "";
+    $label_log_in = isset($wp_login_form['label_log_in']) && !empty($wp_login_form['label_log_in']) ? __($wp_login_form['label_log_in'], 'growtype-form') : "";
     $remember = isset($wp_login_form['remember']) && !empty($wp_login_form['remember']) ? $wp_login_form['remember'] : true;
 
     return [
