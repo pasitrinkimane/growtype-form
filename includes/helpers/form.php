@@ -16,8 +16,8 @@ if (!function_exists('growtype_form_string_replace_custom_variable')) {
         ];
 
         if (class_exists('Growtype_Auth')) {
-            $available_btns = Growtype_Auth::get_available_btns();
-            $variables = array_merge($variables, array_keys($available_btns));
+            $available_btns_variables = Growtype_Auth::get_available_btns_variables();
+            $variables = array_merge($variables, $available_btns_variables);
         }
 
         $variable_to_replace = '';
@@ -55,8 +55,17 @@ if (!function_exists('growtype_form_string_replace_custom_variable')) {
             }
 
             if (class_exists('Growtype_Auth')) {
-                if (isset($available_btns[$variable_to_replace])) {
-                    $replace = $available_btns[$variable_to_replace];
+                foreach ($variables as $variable) {
+                    if ($variable === $string) {
+                        if (preg_match('/\$(?:btn_)?(\w+)_/', $string, $matches)) {
+                            $service = $matches[1];
+                            $class_name = 'Growtype_Auth_' . ucfirst($service);
+                            if (class_exists($class_name)) {
+                                $replace = $class_name::render_btn($string);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -108,7 +117,7 @@ function growtype_form_extract_form_args($form)
     $label_log_in = isset($wp_login_form['label_log_in']) && !empty($wp_login_form['label_log_in']) ? __($wp_login_form['label_log_in'], 'growtype-form') : "";
     $remember = isset($wp_login_form['remember']) && !empty($wp_login_form['remember']) ? $wp_login_form['remember'] : true;
 
-    return [
+    $form_args = [
         'type' => $type,
         'class' => $class,
         'ajax' => $ajax,
@@ -132,6 +141,8 @@ function growtype_form_extract_form_args($form)
             'remember' => $remember
         ]
     ];
+
+    return apply_filters('growtype_form_extract_form_args', $form_args, $form);
 }
 
 /**

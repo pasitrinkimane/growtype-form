@@ -54,7 +54,9 @@ $field_maxlength = isset($field['maxlength']) ? $field['maxlength'] : null;
 $field_input_class = isset($field['input_class']) && !empty($field['input_class']) ? explode(' ', $field['input_class']) : [];
 $field_icon = isset($field['icon']) ? $field['icon'] : null;
 $field_price = isset($field['price']) ? $field['price'] : null;
-$field_group = isset($field['group']) ? $field['group'] : null; // inputs can be grouped together
+$field_group = isset($field['group']) ? $field['group'] : null;
+$textarea_cols = isset($field['cols']) ? $field['cols'] : '50';
+$textarea_rows = isset($field['rows']) ? $field['rows'] : '4';
 $field_autocomplete = isset($field['autocomplete']) && $field['autocomplete'] === 'true' ? 'on' : 'off';
 $field_id = isset($field['id']) ? $field['id'] : $field_name;
 $conditions = isset($field['conditions']) && !empty($field['conditions']) ? json_encode($field['conditions']) : '';

@@ -21,7 +21,7 @@ class Growtype_Form_Newsletter
          */
         add_action('wp_ajax_growtype_form_newsletter_submission', array ($this, 'growtype_form_newsletter_submission_callback'));
         add_action('wp_ajax_nopriv_growtype_form_newsletter_submission', array ($this, 'growtype_form_newsletter_submission_callback'));
-        add_action('growtype_form_newsletter_submission_save_data', array ($this, 'growtype_form_newsletter_submission_save_data_callback'));
+        add_filter('growtype_form_newsletter_submission_save_data', array ($this, 'growtype_form_newsletter_submission_save_data_callback'));
         add_action('wp_loaded', array ($this, 'growtype_form_newsletter_unsubscribe'));
     }
 
@@ -50,7 +50,7 @@ class Growtype_Form_Newsletter
 
         $response = apply_filters('growtype_form_newsletter_submission_save_data', $data);
 
-        $error_message = apply_filters('growtype_form_newsletter_submission_save_data_error_message', __('Something went wrong. Please contact us for help.', 'growtype-form'));
+        $error_message = apply_filters('growtype_form_newsletter_submission_save_data_error_message', $response['message'] ?? __('Something went wrong. Please contact us for help.', 'growtype-form'));
 
         if (!empty($response) && !$response || is_wp_error($response) || (isset($response['success']) && !$response['success'])) {
             return wp_send_json(

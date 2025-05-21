@@ -12,7 +12,6 @@ class Growtype_Form_Crud
     use GrowtypeFormProduct;
 
     const URL_PATH = 'auth';
-
     const GROWTYPE_FORM_SUBMITTER_ID = 'form_submitter_id';
     const GROWTYPE_FORM_NAME_IDENTIFICATOR = 'growtype_form_name';
     const GROWTYPE_FORM_POST_IDENTIFICATOR = 'growtype_form_post_id';
@@ -98,21 +97,31 @@ class Growtype_Form_Crud
          */
         if (isset($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]) && in_array(sanitize_text_field($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]), self::GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS)) {
             if ($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION] === 'delete') {
-                $product_id = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
+                $post_id = isset($_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $_POST[self::GROWTYPE_FORM_POST_IDENTIFICATOR] : null;
 
-                if (empty($product_id)) {
-                    exit();
-                }
+                if (empty($post_id)) {
+                    $redirect_url = home_url();
+                } else {
+                    $post_can_be_deleted = apply_filters('growtype_form_post_can_be_deleted', false, $post_id);
 
-                if (class_exists('woocommerce')) {
-                    $product = wc_get_product($product_id);
+                    if ($post_can_be_deleted) {
+                        $post = get_post($post_id);
 
-                    if (!empty($product)) {
-                        $product->delete();
+                        if (!empty($post)) {
+                            if ($post->post_type === 'product' && class_exists('woocommerce')) {
+                                $product = wc_get_product($post_id);
+
+                                if (!empty($product)) {
+                                    $product->delete();
+                                }
+                            } else {
+                                wp_delete_post($post_id);
+                            }
+                        }
                     }
-                }
 
-                $redirect_url = growtype_form_redirect_url_after_product_creation();
+                    $redirect_url = growtype_form_redirect_url_after_product_creation();
+                }
             } else {
                 $form_name = isset($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]) ? sanitize_text_field($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]) : null;
 
@@ -243,7 +252,8 @@ class Growtype_Form_Crud
             $submit_action = isset($submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION]) ? $submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION] : 'submit';
 
             if (strpos($form_name, 'signup') !== false) {
-                $redirect_url = growtype_form_signup_page_url() . '?' . http_build_query($_GET);
+                $redirect_url = growtype_form_redirect_url_after_signup();
+
                 $child_user = isset($form_data['child_user']) && $form_data['child_user'] ? true : false;
 
                 $signup_params = [
@@ -262,12 +272,8 @@ class Growtype_Form_Crud
                             growtype_form_login_user($user_id);
                         }
 
-                        if (!empty($redirect_url)) {
-                            $redirect_url = isset($_GET['redirect_after']) ? $_GET['redirect_after'] : $redirect_url;
-                        } else {
-                            if ($submit_action === 'update') {
-                                $redirect_url = home_url(growtype_form_get_url_path());
-                            }
+                        if (empty($redirect_url) && $submit_action === 'update') {
+                            $redirect_url = home_url(growtype_form_get_url_path());
                         }
                     }
                 }
@@ -411,24 +417,36 @@ class Growtype_Form_Crud
             $redirect_url = apply_filters('growtype_form_submitted_values_redirect_url', $redirect_url, $form_data, $submitted_data);
         }
 
+        $set_notice = $submit_data['set_notice'] ?? true;
+
         /**
          * Prepare session redirect details
          */
-        Growtype_Form_Notice::growtype_form_set_notice(
-            isset($submit_data['message']) ? $submit_data['message'] : [
-                __("Something went wrong. Please contact administrator.", "growtype-form")
-            ],
-            ($submit_data['success'] ? 'success' : 'error')
-        );
+        if ($set_notice) {
+            Growtype_Form_Notice::growtype_form_set_notice(
+                isset($submit_data['message']) ? $submit_data['message'] : [
+                    __("Something went wrong. Please contact administrator.", "growtype-form")
+                ],
+                ($submit_data['success'] ? 'success' : 'error')
+            );
+        }
 
         return $redirect_url;
     }
 
     public static function send_email_to_admin($submitted_content, $form_data)
     {
-        $growtype_form_post_default_email_to = get_option('growtype_form_post_default_email_to');
-        $growtype_form_post_default_email_to_subject = get_option('growtype_form_post_default_email_to_subject');
-        $growtype_form_post_default_email_to_content = get_option('growtype_form_post_default_email_to_content');
+        $send_email_to_admin_details = [
+            'recipient' => get_option('growtype_form_post_default_email_to'),
+            'subject' => get_option('growtype_form_post_default_email_to_subject'),
+            'content' => get_option('growtype_form_post_default_email_to_content'),
+        ];
+
+        $growtype_form_details = apply_filters('growtype_form_send_email_to_admin_details', $send_email_to_admin_details, $submitted_content, $form_data);
+
+        $growtype_form_post_default_email_to = $growtype_form_details['recipient'];
+        $growtype_form_post_default_email_to_subject = $growtype_form_details['subject'];
+        $growtype_form_post_default_email_to_content = $growtype_form_details['content'];
 
         if (empty($growtype_form_post_default_email_to)) {
             return null;
@@ -561,6 +579,10 @@ class Growtype_Form_Crud
         $username = !empty($username) ? $username : $email;
         $password = isset($data['password']) ? sanitize_text_field($_REQUEST['password']) : null;
         $repeat_password = isset($data['repeat_password']) ? sanitize_text_field($_REQUEST['repeat_password']) : null;
+
+        if (!isset($data['auth_method'])) {
+            $data['auth_method'] = 'basic';
+        }
 
         if (!empty($signup_params['username_prefix'])) {
             $username = $signup_params['username_prefix'] . date_timestamp_get(date_create());
@@ -912,7 +934,7 @@ class Growtype_Form_Crud
                 'method' => 'first_level_email_validation'
             ],
             'second_level' => [
-                'active' => apply_filters('growtype_form_second_level_email_validation_active', true),
+                'active' => apply_filters('growtype_form_second_level_email_validation_active', false),
                 'method' => 'second_level_email_validation'
             ]
         ];
@@ -992,6 +1014,8 @@ class Growtype_Form_Crud
         // Check if the email domain has valid MX records using getmxrr
         $mx_records = [];
         if (!getmxrr($domain, $mx_records)) {
+            error_log(sprintf('Email validation failed. Invalid email domain. No MX records found. Details: %s', print_r($email, true)));
+
             return [
                 'failed_validation' => false,
                 'success' => false,
@@ -1001,6 +1025,8 @@ class Growtype_Form_Crud
 
         // Check if the email domain is disposable
         if (in_array($domain, $disposable_domains)) {
+            error_log(sprintf('Email validation failed. Disposable email domain. Details: %s', print_r($email, true)));
+
             return [
                 'failed_validation' => false,
                 'success' => false,

@@ -205,10 +205,14 @@ class Growtype_Form_Admin_Lead
         foreach (self::get_meta_boxes() as $box) {
             foreach ($box['fields'] as $field) {
                 if ($column === $field['key']) {
-                    if ($field['key'] === 'user_is_verified') {
+                    if (in_array($field['key'], ['user_is_verified', 'auth_method'])) {
                         $user = get_user_by('email', get_the_title($post_id));
                         if (!empty($user)) {
-                            echo get_user_meta($user->ID, 'is_verified', true);
+                            if ($field['key'] === 'user_is_verified') {
+                                echo get_user_meta($user->ID, 'is_verified', true);
+                            } elseif ($field['key'] === 'auth_method') {
+                                echo get_user_meta($user->ID, 'auth_method', true);
+                            }
                         }
                     } else {
                         echo get_post_meta($post_id, $field['key'], true);

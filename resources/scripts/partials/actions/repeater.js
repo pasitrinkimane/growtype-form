@@ -143,10 +143,8 @@ function repeater() {
         });
     }
 
-    $('document').ready(function () {
-        cloneReapeaterForm($('.repeater-fields a.btn-add'));
-        removeRepeaterForm($('.btn-remove'));
-    });
+    cloneReapeaterForm($('.repeater-fields a.btn-add'));
+    removeRepeaterForm($('.btn-remove'));
 }
 
 export {repeater};

@@ -311,7 +311,7 @@ class Growtype_Form_Admin_Settings_Signup
      */
     function growtype_form_signup_page_callback()
     {
-        $selected = growtype_form_signup_page_ID();
+        $selected = growtype_form_signup_page_id();
         $pages = get_pages();
         ?>
         <select name='growtype_form_signup_page'>
@@ -388,7 +388,7 @@ class Growtype_Form_Admin_Settings_Signup
         ?>
         <select name='growtype_form_redirect_after_signup_page'>
             <option value='none' <?php selected($selected, 'none'); ?>>None</option>
-            <option value='default-profile' <?php selected($selected, 'default-profile'); ?>>Default profile page - Growtype Form</option>
+            <option value='default' <?php selected($selected, 'default'); ?>>Default profile page - Growtype Form</option>
             <?php
             foreach ($pages as $page) { ?>
                 <option value='<?= $page->ID ?>' <?php selected($selected, $page->ID); ?>><?= __($page->post_title, "growtype-form") ?></option>

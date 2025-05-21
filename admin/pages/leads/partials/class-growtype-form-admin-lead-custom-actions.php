@@ -11,7 +11,7 @@ class Growtype_Form_Admin_Lead_Custom_Actions
     {
         add_action('manage_posts_extra_tablenav', array ($this, 'bulk_actions_html'));
 
-        add_action('init', array ($this, 'process_bulk_actions'));
+        add_action('init', array ($this, 'process_bulk_actions'), 20);
 
         /**
          * Bulk actions scripts
@@ -158,8 +158,13 @@ class Growtype_Form_Admin_Lead_Custom_Actions
     public static function get_meta_boxes($meta_boxes)
     {
         $meta_boxes[0]['fields'][] = [
-            'title' => 'Newsletter unsubscribed',
+            'title' => 'Unsubscribed',
             'key' => 'newsletter_unsubscribed'
+        ];
+
+        $meta_boxes[0]['fields'][] = [
+            'title' => 'Auth Method',
+            'key' => 'auth_method'
         ];
 
         $meta_boxes[0]['fields'][] = [

@@ -24,45 +24,43 @@ function conditions() {
         }
     });
 
-    $(document).ready(function () {
-        if (typeof window.growtype_form.conditions === 'object') {
-            /**
-             * on form load
-             */
-            $('.form-wrapper').each(function (index, element) {
-                updateConditionalValues($(element))
-            })
+    if (typeof window.growtype_form.conditions === 'object') {
+        /**
+         * on form load
+         */
+        $('.form-wrapper').each(function (index, element) {
+            updateConditionalValues($(element))
+        })
+
+        /**
+         * On select
+         */
+        $('.growtype-form select').change(function () {
+            let form = $(this).closest('.form-wrapper');
+
+            updateConditionalValues(form)
 
             /**
-             * On select
+             * Reset conditional checkboxes
              */
-            $('.growtype-form select').change(function () {
-                let form = $(this).closest('.form-wrapper');
+            if (form.find('input[type="checkbox"]:checked:hidden').length > 0) {
+                form.find('input[type="checkbox"]:checked:hidden').each(function (index, element) {
+                    $(element).prop('checked', false);
+                });
 
                 updateConditionalValues(form)
+            }
+        });
 
-                /**
-                 * Reset conditional checkboxes
-                 */
-                if (form.find('input[type="checkbox"]:checked:hidden').length > 0) {
-                    form.find('input[type="checkbox"]:checked:hidden').each(function (index, element) {
-                        $(element).prop('checked', false);
-                    });
+        /**
+         * On check
+         */
+        $('.growtype-form input[type="checkbox"]').change(function () {
+            let form = $(this).closest('.form-wrapper');
 
-                    updateConditionalValues(form)
-                }
-            });
-
-            /**
-             * On check
-             */
-            $('.growtype-form input[type="checkbox"]').change(function () {
-                let form = $(this).closest('.form-wrapper');
-
-                updateConditionalValues(form)
-            });
-        }
-    });
+            updateConditionalValues(form)
+        });
+    }
 
     function updateConditionalValues(form) {
         if (window.growtype_form.conditions.length > 0) {

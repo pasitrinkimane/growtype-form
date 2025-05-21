@@ -5,7 +5,7 @@
  */
 function growtype_form_login_page_ID()
 {
-    return get_option('growtype_form_login_page');
+    return get_option('growtype_form_login_page', 'default');
 }
 
 /**

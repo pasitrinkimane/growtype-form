@@ -1,36 +1,50 @@
-function formAuth() {
+export function formAuth() {
     $('.growtype-form-auth .btn-link').click(function (e) {
-        if ($(this).attr('data-type') && $(this).attr('data-type').length > 0) {
-            event.preventDefault();
+        e.preventDefault();
 
-            var currentUrl = window.location.href;
-            var newUrl;
+        const type = $(this).attr('data-type');
+        if (!type) return;
 
-            if ($(this).attr('data-type') === 'login') {
-                $(this).closest('.growtype-form-wrapper').fadeOut().promise().done(function () {
-                    $(this).removeClass('is-active');
-                    $('.growtype-form-wrapper[data-name="login"]').fadeIn().promise().done(function () {
-                        $(this).addClass('is-active');
-                    });
-                })
+        const wrapper = $(this).closest('.growtype-form-wrapper');
 
-                newUrl = currentUrl.replace("/signup/", "/login/");
+        // Get normalized path without trailing slash
+        let path = window.location.pathname.replace(/\/$/, '');
+        const search = window.location.search;
+
+        let newPath;
+
+        if (type === 'login') {
+            wrapper.fadeOut().promise().done(function () {
+                $(this).removeClass('is-active');
+                $('.growtype-form-wrapper[data-name="login"]').fadeIn().promise().done(function () {
+                    $(this).addClass('is-active');
+                });
+            });
+
+            newPath = path.replace(/\/signup$/, '/login');
+            // If not already /signup, force it to /login
+            if (path !== '/signup' && path !== '/signup') {
+                newPath = '/login';
             }
-
-            if ($(this).attr('data-type') === 'signup') {
-                $(this).closest('.growtype-form-wrapper').fadeOut().promise().done(function () {
-                    $(this).removeClass('is-active');
-                    $('.growtype-form-wrapper[data-name="signup"]').fadeIn().promise().done(function () {
-                        $(this).addClass('is-active');
-                    });
-                })
-
-                newUrl = currentUrl.replace("/login/", "/signup/");
-            }
-
-            history.replaceState(null, null, newUrl);
         }
+
+        if (type === 'signup') {
+            wrapper.fadeOut().promise().done(function () {
+                $(this).removeClass('is-active');
+                $('.growtype-form-wrapper[data-name="signup"]').fadeIn().promise().done(function () {
+                    $(this).addClass('is-active');
+                });
+            });
+
+            newPath = path.replace(/\/login$/, '/signup');
+            // If not already /login, force it to /signup
+            if (path !== '/login' && path !== '/login') {
+                newPath = '/signup';
+            }
+        }
+
+        // Re-append search/query params if they exist
+        const newUrl = newPath + search;
+        history.replaceState(null, '', newUrl);
     });
 }
-
-export {formAuth};

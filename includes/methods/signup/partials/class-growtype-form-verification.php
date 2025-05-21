@@ -284,11 +284,11 @@ class Growtype_Form_Signup_Verification
         $message = sprintf(
             __(
                 'Dear User,<br><br>
-            Thank you for registering with Talkiemate. To complete your registration and verify your account, please click the button below:<br><br>
+            Thank you for registering with ChatAiGirl. To complete your registration and verify your account, please click the button below:<br><br>
             <a href="%s" style="display: inline-block; padding: 5px 20px; color: #fff; background-color: %s; text-decoration: none; border-radius: 5px;">Verify my account</a><br><br>
             If you did not register for an account, please disregard this email.<br><br>
             Best regards,<br>
-            The Talkiemate Team',
+            The ChatAiGirl Team',
                 'growtype-form'
             ),
             esc_url($verification_link),

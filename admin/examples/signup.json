@@ -2,14 +2,20 @@
   "signup": {
     "header": {
       "top": {
-        "title": "[:en]Sign up[:lt]Registracija[:]",
-        "back_btn": {
-          "url": "$login_page_url"
-        }
+        "title": "[:en]Sign up[:lt]Registracija[:]"
       },
       "nav": [
         {
-          "html": "$btn_google_login"
+          "html": "$btn_google_signup"
+        },
+        {
+          "html": "$btn_facebook_signup"
+        },
+        {
+          "html": "$btn_twitter_signup"
+        },
+        {
+          "html": "$btn_discord_signup"
         }
       ],
       "bottom": {
@@ -18,13 +24,13 @@
     },
     "footer": {
       "top": {
-        "title": "[:en]Signup[:lt]Registracija[:]",
+        "title": "[:en]Sign Up[:lt]Registracija[:]",
         "back_btn": {
           "url": "$login_page_url"
         }
       },
       "bottom": {
-        "title": "[:en]Signup[:lt]Registracija[:]",
+        "title": "[:en]Sign Up[:lt]Registracija[:]",
         "back_btn": {
           "url": "$login_page_url"
         },
@@ -33,11 +39,11 @@
     },
     "recaptcha": [],
     "submit_row": {
-      "class": "pt-2",
+      "class": "",
       "cta": [
         {
           "type": "submit",
-          "label": "[:en]Continue[:lt]Registruotis[:]"
+          "label": "[:en]Sign Up[:lt]Registruotis[:]"
         }
       ]
     },

@@ -12,7 +12,7 @@ class Growtype_Form_Login
         if (!is_admin()) {
             add_action('wp_login_failed', array ($this, 'custom_login_failed'), 10, 2);
             add_filter('login_url', array ($this, 'change_default_login_url'), 10, 2);
-            add_action('wp_logout', array ($this, 'custom_logout_redirect'));
+            add_filter('logout_redirect', array ($this, 'custom_logout_redirect'), 10, 3);
         }
 
         add_action('init', array ($this, 'custom_url'), 1);
@@ -36,12 +36,25 @@ class Growtype_Form_Login
          * Login form
          */
         add_filter('login_form_middle', array ($this, 'login_form_middle_custom'), 0, 2);
+
+        /**
+         * Disable headers
+         */
+        add_action('send_headers', array ($this, 'disable_page_cache'));
     }
 
-    function custom_logout_redirect()
+    function custom_logout_redirect($redirect_to, $requested_redirect_to, $user)
     {
-        wp_redirect(growtype_form_login_page_url());
-        exit;
+        return growtype_form_login_page_url();
+    }
+
+    function disable_page_cache()
+    {
+        if (growtype_form_current_page_is_login_page() || growtype_form_current_page_is_signup_page()) {
+            header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+            header('Cache-Control: post-check=0, pre-check=0', false);
+            header('Pragma: no-cache');
+        }
     }
 
     function login_form_middle_custom($html, $args)
@@ -104,6 +117,12 @@ class Growtype_Form_Login
                     array_push($query_args, ['redirect_after' => $permalink]);
 
                     $menu_item->url = $menu_item->url . '?' . build_query($query_args);
+
+                    if (strpos($menu_item->url, 'login') !== false) {
+                        $menu_item->url = apply_filters('growtype_form_nav_menu_item_login', $menu_item->url);
+                    } elseif (strpos($menu_item->url, 'signup') !== false) {
+                        $menu_item->url = apply_filters('growtype_form_nav_menu_item_signup', $menu_item->url);
+                    }
                 }
             }
         }

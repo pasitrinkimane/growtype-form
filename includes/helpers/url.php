@@ -15,7 +15,7 @@ function growtype_form_lost_password_page_url()
  */
 function growtype_form_redirect_url_after_product_creation()
 {
-    return get_option('growtype_form_redirect_after_product_creation');
+    return apply_filters('growtype_form_redirect_url_after_product_creation', get_option('growtype_form_redirect_after_product_creation'));
 }
 
 /**

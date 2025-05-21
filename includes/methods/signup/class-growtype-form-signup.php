@@ -31,7 +31,7 @@ class Growtype_Form_Signup
      */
     function custom_document_title_parts($title_parts)
     {
-        if (growtype_form_signup_page_is_active() && growtype_form_signup_page_ID() === 'default') {
+        if (growtype_form_signup_page_is_active() && growtype_form_signup_page_id() === 'default') {
             $title_parts['title'] = __('Sign up', 'growtype-form');
         }
 
@@ -43,7 +43,7 @@ class Growtype_Form_Signup
      */
     function custom_url()
     {
-        if (growtype_form_signup_page_ID() === 'default') {
+        if (growtype_form_signup_page_id() === 'default') {
             add_rewrite_endpoint(self::URL_PATH, EP_ROOT);
         }
     }
@@ -54,7 +54,7 @@ class Growtype_Form_Signup
     function custom_url_template()
     {
         if (!empty($_SERVER['REQUEST_URI'])) {
-            if (growtype_form_signup_page_is_active() && growtype_form_signup_page_ID() === 'default') {
+            if (growtype_form_signup_page_is_active() && growtype_form_signup_page_id() === 'default') {
                 if (is_user_logged_in()) {
                     echo growtype_form_include_view('login.success');
                 } else {

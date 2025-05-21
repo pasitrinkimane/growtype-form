@@ -2,14 +2,20 @@
   "login": {
     "header": {
       "top": {
-        "title": "[:en]Sign in[:lt]Prisijungti[:]",
-        "back_btn": {
-          "url": "$home_url"
-        }
+        "title": "[:en]Sign in[:lt]Prisijungti[:]"
       },
       "nav": [
         {
           "html": "$btn_google_login"
+        },
+        {
+          "html": "$btn_facebook_login"
+        },
+        {
+          "html": "$btn_twitter_login"
+        },
+        {
+          "html": "$btn_discord_login"
         }
       ],
       "bottom": {
@@ -37,10 +43,11 @@
       "label_username": "[:en]Username[:lt]Vartotojo vardas[:]",
       "label_remember": "[:en]Remember Me[:lt]Prisiminti[:]",
       "label_password": "[:en]Password[:lt]Slaptažodis[:]",
-      "label_log_in": "[:en]Login[:lt]Prisijungti[:]",
+      "label_log_in": "[:en]Sign in[:lt]Tęsti[:]",
       "remember_login": true,
       "username_placeholder": "[:en]Your email[:lt]Jūsų el. paštas[:]",
-      "password_placeholder": "[:en]Your password[:lt]Jūsų slaptažodis[:]"
+      "password_placeholder": "[:en]Your password[:lt]Jūsų slaptažodis[:]",
+      "lost_password_btn": true
     }
   }
 }

@@ -10,6 +10,7 @@ class Growtype_Form_General
     use GrowtypeFormProduct;
 
     const SHORTCODE_NAME = 'growtype_form';
+    const IMAGE_UPLOADER_OLD_IMAGES_PREFIX = 'image_uploader_old';
 
     const ALLOWED_FIELD_TYPES = [
         'text',
@@ -231,7 +232,7 @@ class Growtype_Form_General
      * Upload form shortcode
      * [growtype_form name="{form_name}"]
      */
-    function growtype_form_shortcode_function($args)
+    public function growtype_form_shortcode_function($args)
     {
         /**
          * If empty shortcode arguments, return empty
@@ -298,7 +299,7 @@ class Growtype_Form_General
         $form_data = Growtype_Form_Crud::get_growtype_form_data($form_name);
 
         if (empty($form_data)) {
-            return '<p style="text-align: center;color:red;">' . __('Form is not configured. Please contact site admin.', 'growtype-form') . '</p>';
+            return '<p style="text-align: center;color:red;">' . __('Form is not configured. Please contact site admin. (Sometimes need to save form in settings)', 'growtype-form') . '</p>';
         }
 
         /**
@@ -511,9 +512,14 @@ class Growtype_Form_General
         /**
          * Post data
          */
-        $post = self::growtype_form_get_current_post();
 
-        $growtype_form_post_identificator = $post->ID ?? null;
+        $growtype_form_post_identificator = $form_data['args']['post_id'] ?? '';
+
+        if (empty($growtype_form_post_identificator)) {
+            $post = self::growtype_form_get_current_post();
+            $growtype_form_post_identificator = $post->ID ?? null;
+        }
+
         $growtype_form_post_identificator = apply_filters('growtype_form_post_identificator', $growtype_form_post_identificator);
 
         /**
@@ -530,7 +536,7 @@ class Growtype_Form_General
         /**
          * Background color
          */
-        $background_color = isset($form_data['args']['background_color']) ? $form_data['args']['background_color'] : 'white';
+        $background_color = isset($form_data['args']['background_color']) ? $form_data['args']['background_color'] : '';
         $form_wrapper_html = !empty($background_color) && $background_color !== 'none' ? 'style="background-color: ' . $background_color . ';"' : '';
 
         /**
@@ -612,8 +618,7 @@ class Growtype_Form_General
                                             </div>
                                         <?php } ?>
 
-                                        <?php
-                                        if (isset($form_args['submit_row']['cta'])) {
+                                        <?php if (isset($form_args['submit_row']['cta'])) {
                                             foreach ($form_args['submit_row']['cta'] as $cta) { ?>
                                                 <button type="<?php echo $cta['type']; ?>" class="<?php echo isset($cta['class']) ? $cta['class'] : 'btn btn-primary'; ?>" data-action="<?php echo isset($cta['action']) ? $cta['action'] : $form_action; ?>"><?php echo __($cta['label'], 'growtype-form') ?? __("Save", "growtype-form") ?></button>
                                             <?php } ?>
@@ -638,9 +643,9 @@ class Growtype_Form_General
         </div>
 
         <?php
-        $form = ob_get_clean();
+        $form_html = ob_get_clean();
 
-        return $form;
+        return apply_filters('growtype_form_render_form', $form_html, $form_name, $form_data, $form_action);
     }
 
     public static function growtype_form_modals_render()
@@ -1009,11 +1014,15 @@ class Growtype_Form_General
              * Set gallery images
              */
             $f_img_id = $product->get_image_id();
-            $image_upload_ids = $product->get_gallery_image_ids();
+            $wc_gallery_ids = $product->get_gallery_image_ids();
 
-            if (!in_array((int)$f_img_id, $image_upload_ids)) {
-                array_unshift($image_upload_ids, (int)$f_img_id);
+            if (!in_array((int)$f_img_id, $wc_gallery_ids)) {
+                array_unshift($wc_gallery_ids, (int)$f_img_id);
             }
+
+            $image_uploader_ids = [
+                'wc_gallery' => $wc_gallery_ids
+            ];
 
             /**
              * Update shipping details
@@ -1037,29 +1046,36 @@ class Growtype_Form_General
             }
         }
 
-        $image_upload_ids = apply_filters('growtype_form_render_update_return_data_image_upload_ids', $image_upload_ids ?? [], $post_id, $form_data, $form_name);
+        $image_uploader_ids = $image_uploader_ids ?? $form_data['args']['image_uploader_ids'] ?? [];
 
-        $gallery_images = [];
-        if (!empty($image_upload_ids)) {
-            foreach ($image_upload_ids as $key => $image_id) {
-                $gallery_images[$key] = [
-                    'id' => $image_id,
-                    'src' => wp_get_attachment_image_url($image_id),
-                ];
+        $image_uploader_ids = apply_filters('growtype_form_render_update_return_data_image_uploader_ids', $image_uploader_ids, $post_id, $form_data, $form_name);
+
+        $image_uploaders_images = [];
+        if (!empty($image_uploader_ids)) {
+            foreach ($image_uploader_ids as $key => $ids) {
+                if (!empty($ids)) {
+                    foreach ($ids as $image_id) {
+                        $image_uploaders_images[$key][] = [
+                            'id' => $image_id,
+                            'src' => wp_get_attachment_image_url($image_id),
+                        ];
+                    }
+                }
             }
         }
 
-        if (!empty($gallery_images)) {
-            $growtype_form_gallery = [
-                'images' => json_encode($gallery_images)
+        if (!empty($image_uploaders_images)) {
+            $growtype_form_image_uploaders = [
+                'content' => json_encode($image_uploaders_images),
+                'old_images_prefix' => self::IMAGE_UPLOADER_OLD_IMAGES_PREFIX,
             ];
 
-            $_REQUEST['gallery_images'] = $gallery_images;
+            $_REQUEST['growtype_form_image_uploaders'] = $growtype_form_image_uploaders;
 
             /**
              * Add gallery data to js
              */
-            wp_localize_script('growtype-form-render', 'growtype_form_gallery', $growtype_form_gallery);
+            wp_localize_script('growtype-form-render', 'growtype_form_image_uploaders', $growtype_form_image_uploaders);
         }
 
         if ($post_id && apply_filters('growtype_form_render_update_return_data', $post_id, $_REQUEST) !== $post_id) {
@@ -1070,5 +1086,10 @@ class Growtype_Form_General
 //            unset($_COOKIE['signup_data']);
 //            setcookie('signup_data', '', time(), COOKIEPATH, COOKIE_DOMAIN);
 //        }
+    }
+
+    public static function image_uploader_get_old_images_key($group_key)
+    {
+        return Growtype_Form_General::IMAGE_UPLOADER_OLD_IMAGES_PREFIX . '_' . $group_key;
     }
 }

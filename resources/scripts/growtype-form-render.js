@@ -5,19 +5,25 @@ $ = jQuery;
  */
 import {repeater} from "./partials/actions/repeater";
 
-repeater();
-
 /**
  * Conditions
  */
 import {conditions} from "./partials/actions/conditions";
 
-conditions();
-
 /**
  * General
  */
 $('document').ready(function () {
+
+    /**
+     * Set repeater
+     */
+    repeater();
+
+    /**
+     * Set conditions
+     */
+    conditions();
 
     /**
      * Image uploader
@@ -226,6 +232,8 @@ function setupImageUploader() {
     imageUploaderInitial.each(function (index, element) {
         let formInput = $(element);
         let imageUploaderInitialName = formInput.attr('data-name');
+        imageUploaderInitialName = imageUploaderInitialName ? imageUploaderInitialName : formInput.closest('.b-wrapper').attr('data-name');
+        imageUploaderInitialName = imageUploaderInitialName.replace('[]', '');
         let imageUploaderInitialExtension = formInput.attr('data-extensions') !== undefined ? formInput.attr('data-extensions').split(",") : '';
         let imageUploaderInitialMaxSize = formInput.attr('data-max-size');
         let imageUploaderInitialMaxFiles = formInput.attr('data-max-files');
@@ -238,25 +246,27 @@ function setupImageUploader() {
             if (typeof $.fn.imageUploader !== 'undefined') {
                 formInput.addClass('image-uploader');
 
-                let galleryData = typeof (growtype_form_gallery) !== 'undefined' && imageUploaderPreload ? growtype_form_gallery : [];
+                let imageUploaders = typeof (window.growtype_form_image_uploaders) !== 'undefined' && imageUploaderPreload ? window.growtype_form_image_uploaders : [];
                 let preloaded = [];
 
-                if (Object.entries(galleryData).length > 0) {
-                    let imageUploader = JSON.parse(galleryData['images']);
-
-                    if (Object.entries(imageUploader).length > 0) {
-                        preloaded = imageUploader;
-                    }
-                }
-
                 let uploaderSettings = {
-                    preloaded: preloaded,
                     imagesInputName: imageUploaderInitialName,
                     extensions: imageUploaderInitialExtension,
                     maxSize: imageUploaderInitialMaxSize,
                     maxFiles: imageUploaderInitialMaxFiles ? imageUploaderInitialMaxFiles : 1,
                     label: imageUploaderLabel
                 };
+
+                if (Object.entries(imageUploaders).length > 0) {
+                    let imageUploaderContent = JSON.parse(imageUploaders['content']);
+
+                    if (imageUploaderContent[imageUploaderInitialName] && Object.entries(imageUploaderContent[imageUploaderInitialName]).length > 0) {
+                        preloaded = imageUploaderContent[imageUploaderInitialName];
+                    }
+
+                    uploaderSettings['preloaded'] = preloaded;
+                    uploaderSettings['preloadedInputName'] = imageUploaders['old_images_prefix'] + '_' + imageUploaderInitialName;
+                }
 
                 if (imageCapture) {
                     uploaderSettings.capture = imageCapture;

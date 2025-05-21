@@ -165,6 +165,8 @@ class Growtype_Form_Admin_Settings_Post
     {
         $growtype_form_post_default_email_to_content = !empty(get_option('growtype_form_post_default_email_to_content')) ? get_option('growtype_form_post_default_email_to_content') : '<h2>New form submission,</h2></br> Below are the details of the form submission: </br> {form_submission_details}';
 
+        echo 'Available variables: {form_submission_details}, {form_name}';
+
         wp_editor($growtype_form_post_default_email_to_content, 'growtype_form_post_default_email_to_content', array (
             'textarea_name' => 'growtype_form_post_default_email_to_content',
             'media_buttons' => false,

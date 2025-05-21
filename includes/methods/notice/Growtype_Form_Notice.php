@@ -113,6 +113,6 @@ class Growtype_Form_Notice
             setcookie('notice_status', '', time(), COOKIEPATH, COOKIE_DOMAIN);
         }
 
-        return $notices;
+        return apply_filters('growtype_form_notice_content', $notices);
     }
 }
