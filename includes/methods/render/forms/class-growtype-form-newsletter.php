@@ -50,7 +50,7 @@ class Growtype_Form_Newsletter
 
         $response = apply_filters('growtype_form_newsletter_submission_save_data', $data);
 
-        $error_message = apply_filters('growtype_form_newsletter_submission_save_data_error_message', $response['message'] ?? __('Something went wrong. Please contact us for help.', 'growtype-form'));
+        $error_message = apply_filters('growtype_form_newsletter_submission_save_data_error_message', $response['message'] ?? growtype_form_message());
 
         if (!empty($response) && !$response || is_wp_error($response) || (isset($response['success']) && !$response['success'])) {
             return wp_send_json(
@@ -116,10 +116,7 @@ class Growtype_Form_Newsletter
                 return;
             }
 
-            $leads = get_posts([
-                'title' => $email,
-                'post_type' => Growtype_Form_Admin_Lead::POST_TYPE_NAME,
-            ]);
+            $leads = growtype_form_get_lead_by_email($email, false);
 
             foreach ($leads as $lead) {
                 if ($lead->post_title === $email) {

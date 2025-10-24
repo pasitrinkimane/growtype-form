@@ -76,3 +76,30 @@ function growtype_form_add_domain_to_url_if_missing($url)
 
     return $url;
 }
+
+function growtype_form_get_user_ip_address()
+{
+    $ip_address = null;
+
+    // 1. Check Cloudflare header first (most reliable for Cloudflare setups)
+    if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+        $ip_address = $_SERVER['HTTP_CF_CONNECTING_IP'];
+    } // 2. Check standard proxy headers
+    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $forwarded_ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        // take the first non-empty, trimmed IP
+        $ip_address = trim(reset($forwarded_ips));
+    } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip_address = $_SERVER['HTTP_CLIENT_IP'];
+    } // 3. Fallback to remote address
+    elseif (!empty($_SERVER['REMOTE_ADDR'])) {
+        $ip_address = $_SERVER['REMOTE_ADDR'];
+    }
+
+    // Validate format (avoid header injection)
+    if (filter_var($ip_address, FILTER_VALIDATE_IP)) {
+        return $ip_address;
+    }
+
+    return $ip_address;
+}

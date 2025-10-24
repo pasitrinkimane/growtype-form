@@ -97,7 +97,7 @@ if (!function_exists('growtype_form_redirect_url_after_signup')) {
         }
 
         if (empty($redirect_url) || !$redirect_url) {
-            error_log('Redirect url is missing. growtype-form');
+            error_log('Growtype Form - Redirect url is missing. growtype-form');
         }
 
         return apply_filters('growtype_form_redirect_url_after_signup', $redirect_url);

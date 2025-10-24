@@ -48,7 +48,7 @@ class Growtype_Form_Methods
          * Render
          */
         require_once GROWTYPE_FORM_PATH . 'includes/methods/render/class-growtype-form-render.php';
-        $this->loader = new Growtype_Form_Render();
+        new Growtype_Form_Render();
 
         /**
          * Plugins

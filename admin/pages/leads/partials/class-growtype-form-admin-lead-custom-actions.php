@@ -37,10 +37,10 @@ class Growtype_Form_Admin_Lead_Custom_Actions
         /**
          *
          */
-        add_action('add_meta_boxes', array ($this, 'custom_actions_meta_box'));
+        add_action('add_meta_boxes', array ($this, 'custom_actions_meta_box'), 0, 2);
     }
 
-    function custom_actions_meta_box()
+    function custom_actions_meta_box($post_type, $post)
     {
         $screens = array (self::POST_TYPE_NAME);
 
@@ -157,27 +157,30 @@ class Growtype_Form_Admin_Lead_Custom_Actions
 
     public static function get_meta_boxes($meta_boxes)
     {
-        $meta_boxes[0]['fields'][] = [
-            'title' => 'Unsubscribed',
-            'key' => 'newsletter_unsubscribed'
-        ];
-
-        $meta_boxes[0]['fields'][] = [
-            'title' => 'Auth Method',
-            'key' => 'auth_method'
-        ];
-
-        $meta_boxes[0]['fields'][] = [
-            'title' => 'Events log',
-            'key' => 'events_log',
-            'type' => 'textarea',
-        ];
-
-        if (Growtype_Form_Signup_Verification::email_verification_is_required()) {
+        if (get_post_type() === 'gf_lead') {
             $meta_boxes[0]['fields'][] = [
-                'title' => 'Is verified',
-                'key' => 'user_is_verified',
+                'title' => 'Unsubscribed',
+                'key' => 'newsletter_unsubscribed',
+                'type' => 'checkbox',
             ];
+
+            $meta_boxes[0]['fields'][] = [
+                'title' => 'Auth Method',
+                'key' => 'auth_method'
+            ];
+
+            $meta_boxes[0]['fields'][] = [
+                'title' => 'Events log',
+                'key' => 'events_log',
+                'type' => 'textarea',
+            ];
+
+            if (Growtype_Form_Signup_Verification::email_verification_is_required()) {
+                $meta_boxes[0]['fields'][] = [
+                    'title' => 'Is verified',
+                    'key' => 'user_is_verified',
+                ];
+            }
         }
 
         return $meta_boxes;

@@ -98,21 +98,45 @@ class Growtype_Form_Admin_Lead
     function render_custom_meta_box($post, $params)
     {
         ?>
-        <div style="display:flex;gap: 10px; flex-direction: column;">
+        <div style="display: flex; gap: 10px; flex-direction: column;">
             <?php
             foreach ($params['args']['fields'] as $field) {
-                $meta_value = get_post_meta($post->ID, $field['key'], true); ?>
-                <div style="display: flex;gap:10px;">
-                    <label style="min-width: 150px;max-width: 150px;" for="<?php echo $field['key'] ?>"><?php echo $field['title'] ?>:</label>
-                    <?php if (isset($field['type']) && $field['type'] === 'textarea') { ?>
-                        <textarea style="width: 100%;" id="<?php echo $field['key'] ?>" name="<?php echo $field['key'] ?>" rows="10" cols="50"><?php echo esc_attr($meta_value); ?></textarea>
+                $meta_value = get_post_meta($post->ID, $field['key'], true);
+                $type = $field['type'] ?? 'text';
+                ?>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="min-width: 150px; max-width: 150px;" for="<?php echo esc_attr($field['key']); ?>">
+                        <?php echo esc_html($field['title']); ?>:
+                    </label>
+
+                    <?php if ($type === 'textarea') { ?>
+                        <textarea
+                            style="width: 100%;"
+                            id="<?php echo esc_attr($field['key']); ?>"
+                            name="<?php echo esc_attr($field['key']); ?>"
+                            rows="5"
+                        ><?php echo esc_textarea($meta_value); ?></textarea>
+
+                    <?php } elseif ($type === 'checkbox') { ?>
+                        <input
+                            type="checkbox"
+                            id="<?php echo esc_attr($field['key']); ?>"
+                            name="<?php echo esc_attr($field['key']); ?>"
+                            value="1"
+                            <?php checked($meta_value, '1'); ?>
+                        />
+
                     <?php } else { ?>
-                        <input style="width: 100%;" type="text" id="<?php echo $field['key'] ?>" name="<?php echo $field['key'] ?>" value="<?php echo esc_attr($meta_value); ?>">
+                        <input
+                            style="width: 100%;"
+                            type="text"
+                            id="<?php echo esc_attr($field['key']); ?>"
+                            name="<?php echo esc_attr($field['key']); ?>"
+                            value="<?php echo esc_attr($meta_value); ?>"
+                        />
                     <?php } ?>
                 </div>
-                <?php
-            }
-            ?>
+            <?php } ?>
         </div>
         <?php
     }
@@ -125,8 +149,17 @@ class Growtype_Form_Admin_Lead
 
         foreach (self::get_meta_boxes() as $box) {
             foreach ($box['fields'] as $field) {
-                if (isset($_POST[$field['key']])) {
-                    update_post_meta($post_id, $field['key'], sanitize_text_field($_POST[$field['key']]));
+                $key = $field['key'];
+                $type = $field['type'] ?? 'text';
+
+                if ($type === 'checkbox') {
+                    // Save 1 if checked, 0 if not set
+                    $value = isset($_POST[$key]) ? '1' : '0';
+                    update_post_meta($post_id, $key, $value);
+                } else {
+                    if (isset($_POST[$key])) {
+                        update_post_meta($post_id, $key, sanitize_text_field($_POST[$key]));
+                    }
                 }
             }
         }
@@ -254,7 +287,7 @@ class Growtype_Form_Admin_Lead
     public static function get_by_title($title)
     {
         if (count(self::get_all_by_title($title)) > 1) {
-            error_log('!!!IMPORTANT!!! Multiple leads found with the same title: ' . $title);
+            error_log('Growtype Form - !!!IMPORTANT!!! Multiple leads found with the same title: ' . $title);
             return null;
         }
 
@@ -314,6 +347,7 @@ class Growtype_Form_Admin_Lead
                 jQuery(document).ready(function ($) {
                     $('<a href="<?php echo $fetch_emails_url ?>" class="button button-primary" style="top: 9px;position: relative;">Fetch emails</a>').insertBefore($('.wp-header-end'));
                 });
+
             </script>
             <?php
         }
@@ -399,6 +433,7 @@ class Growtype_Form_Admin_Lead
                         }
                     }
                 });
+
             </script>
             <?php
         }

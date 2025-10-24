@@ -223,7 +223,7 @@ trait GrowtypeFormProduct
          */
         if ($product->get_id() === 0) {
             $response['success'] = false;
-            $response['message'] = __("Something went wrong. Please contact administrator.", "growtype-form");
+            $response['message'] = growtype_form_message();
         } else {
             $response['product_id'] = $product->get_id();
 

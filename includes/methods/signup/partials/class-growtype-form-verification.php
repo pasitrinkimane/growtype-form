@@ -226,6 +226,7 @@ class Growtype_Form_Signup_Verification
                 'action' => home_url(self::verification_page_slug()),
                 'current_user_email' => self::get_current_user_email(),
                 'send_verification_code_key' => self::SEND_VERIFICATION_CODE_KEY,
+                'admin_email' => env('ADMIN_EMAIL'),
             ]);
 
             exit();
@@ -267,7 +268,7 @@ class Growtype_Form_Signup_Verification
 
             self::send_verification_email($user->user_email, $activation_key);
 
-            error_log(sprintf('Initial verification email was sent to: %s', $user->user_email));
+            error_log(sprintf('Growtype Form - Initial verification email was sent to: %s', $user->user_email));
         }
     }
 
@@ -284,11 +285,11 @@ class Growtype_Form_Signup_Verification
         $message = sprintf(
             __(
                 'Dear User,<br><br>
-            Thank you for registering with ChatAiGirl. To complete your registration and verify your account, please click the button below:<br><br>
+            Thank you for registering with our service. To complete your registration and verify your account, please click the button below:<br><br>
             <a href="%s" style="display: inline-block; padding: 5px 20px; color: #fff; background-color: %s; text-decoration: none; border-radius: 5px;">Verify my account</a><br><br>
             If you did not register for an account, please disregard this email.<br><br>
             Best regards,<br>
-            The ChatAiGirl Team',
+            Support Team',
                 'growtype-form'
             ),
             esc_url($verification_link),
@@ -308,7 +309,7 @@ class Growtype_Form_Signup_Verification
             return 'text/html';
         });
 
-        error_log(sprintf('Verification link %s was sent to %s.', $verification_link, $email));
+        error_log(sprintf('Growtype Form - Verification link %s was sent to %s.', $verification_link, $email));
     }
 
     function handle_email_verification()
@@ -327,7 +328,7 @@ class Growtype_Form_Signup_Verification
                 $user_info = get_userdata($user_id);
 
                 if (empty($user_info)) {
-                    error_log(sprintf('User not found for activation key %s.', $activation_key));
+                    error_log(sprintf('Growtype Form - User not found for activation key %s.', $activation_key));
                     wp_die(__('User not found for activation key.', 'growtype-form'));
                 }
 
@@ -341,7 +342,7 @@ class Growtype_Form_Signup_Verification
 
                 do_action('growtype_form_successful_user_verification', $user_id);
 
-                error_log(sprintf('User Email %s verification is successful!', $user_email));
+                error_log(sprintf('Growtype Form - User Email %s verification is successful!', $user_email));
 
                 $redirect_url = apply_filters('growtype_form_successful_user_verification_redirect_url', home_url());
 
@@ -377,7 +378,7 @@ class Growtype_Form_Signup_Verification
 
             update_user_meta($user_id, 'last_verification_resent_time', $current_time);
 
-            error_log(sprintf('Verification email was resent to: %s', $user->user_email));
+            error_log(sprintf('Growtype Form - Verification email was resent to: %s', $user->user_email));
 
             $redirect_url = add_query_arg(['resend' => 'true'], home_url(self::verification_page_slug()));
             wp_redirect($redirect_url);

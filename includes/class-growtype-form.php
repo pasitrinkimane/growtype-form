@@ -106,14 +106,22 @@ class Growtype_Form
      */
     private function load_frontend_traits()
     {
-        /**
-         * Frontend traits
-         */
-        spl_autoload_register(function ($traitName) {
-            $fileName = GROWTYPE_FORM_PATH . 'includes/traits/' . $traitName . '.php';
+        static $registered = false;
+        if ($registered) {
+            return;
+        }
+        $registered = true;
 
-            if (file_exists($fileName)) {
-                include $fileName;
+        spl_autoload_register(function ($traitName) {
+            $paths = [
+                GROWTYPE_FORM_PATH . 'includes/traits/' . $traitName . '.php',
+                GROWTYPE_FORM_PATH . 'admin/traits/' . $traitName . '.php',
+            ];
+            foreach ($paths as $path) {
+                if (file_exists($path)) {
+                    include_once $path;
+                    return;
+                }
             }
         });
     }
@@ -185,6 +193,7 @@ class Growtype_Form
         /**
          * Helper functions
          */
+        require_once GROWTYPE_FORM_PATH . 'includes/helpers/general.php';
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/login.php';
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/signup.php';
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/template.php';
@@ -193,6 +202,7 @@ class Growtype_Form
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/profile.php';
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/form.php';
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/submission.php';
+        require_once GROWTYPE_FORM_PATH . 'includes/helpers/lead.php';
 
         $this->loader = new Growtype_Form_Loader();
 

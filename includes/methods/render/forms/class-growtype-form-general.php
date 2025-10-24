@@ -525,8 +525,18 @@ class Growtype_Form_General
         /**
          * Style
          */
-        $form_style = $form_data['args']['style'] ?? $form_data['style'] ?? '';
-        $form_style_html = !empty($form_style) ? 'style="' . $form_style . '"' : '';
+        $form_wrapper_styles = $form_data['args']['style'] ?? $form_data['style'] ?? '';
+
+        $background = isset($form_data['args']['background']) ? $form_data['args']['background'] : null;
+        $padding = isset($form_data['args']['padding']) ? $form_data['args']['padding'] : null;
+
+        if (!empty($background) && $background !== 'none') {
+            $form_wrapper_styles .= 'background: ' . $background . ';';
+        }
+
+        if ($padding !== null) {
+            $form_wrapper_styles .= 'padding: ' . $padding . ';';
+        }
 
         /**
          * Classes
@@ -534,18 +544,12 @@ class Growtype_Form_General
         $wrapper_classes = self::wrapper_classes($form_data);
 
         /**
-         * Background color
-         */
-        $background_color = isset($form_data['args']['background_color']) ? $form_data['args']['background_color'] : '';
-        $form_wrapper_html = !empty($background_color) && $background_color !== 'none' ? 'style="background-color: ' . $background_color . ';"' : '';
-
-        /**
          * Render
          */
         ob_start();
         ?>
 
-        <div class="<?php echo implode(' ', $wrapper_classes) ?>" <?php echo $form_style_html ?> data-name="<?php echo $form_name ?>">
+        <div class="<?php echo implode(' ', $wrapper_classes) ?>" data-name="<?php echo $form_name ?>">
 
             <?php if (isset($form_args['logo']) && isset($form_args['logo']['url']) && !empty($form_args['logo']['url'])) { ?>
                 <div class="logo-wrapper">
@@ -556,7 +560,7 @@ class Growtype_Form_General
             <?php } ?>
 
             <div class="growtype-form-container">
-                <div class="form-wrapper" <?php echo $form_wrapper_html ?>>
+                <div class="form-wrapper" style="<?php echo $form_wrapper_styles ?>">
                     <?php echo growtype_form_include_view('components.forms.partials.header', ['form_args' => $form_args]) ?>
 
                     <div class="form-inner-wrapper">

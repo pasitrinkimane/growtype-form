@@ -41,6 +41,13 @@ class Growtype_Form_Login
          * Disable headers
          */
         add_action('send_headers', array ($this, 'disable_page_cache'));
+
+        /**
+         * Lost password
+         */
+        add_filter('login_message', array ($this, 'custom_lost_password_prompt'));
+
+        add_action('login_enqueue_scripts', array ($this, 'custom_lostpassword_label_script'));
     }
 
     function custom_logout_redirect($redirect_to, $requested_redirect_to, $user)
@@ -309,5 +316,29 @@ class Growtype_Form_Login
         <?php
 
         return ob_get_clean();
+    }
+
+    function custom_lost_password_prompt($message)
+    {
+        if (isset($_GET['action']) && $_GET['action'] === 'lostpassword') {
+            return '<p class="message">' . __('Please enter your email address. You will receive an email message with instructions on how to reset your password.') . '</p>';
+        }
+        return $message;
+    }
+
+    function custom_lostpassword_label_script()
+    {
+        if (isset($_GET['action']) && $_GET['action'] === 'lostpassword') {
+            ?>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const label = document.querySelector('label[for="user_login"]');
+                    if (label) {
+                        label.textContent = 'Email Address';
+                    }
+                });
+            </script>
+            <?php
+        }
     }
 }

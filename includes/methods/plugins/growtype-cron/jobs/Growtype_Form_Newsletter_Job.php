@@ -35,7 +35,7 @@ class Growtype_Form_Newsletter_Job
                 }
             }
         } else {
-            error_log('Growtype_Form_Newsletter_Job. No filter found.');
+            error_log('Growtype Form - Growtype_Form_Newsletter_Job. No filter found.');
         }
     }
 }

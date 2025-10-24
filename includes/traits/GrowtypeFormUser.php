@@ -24,8 +24,8 @@ trait GrowtypeFormUser
         $user_data['signup'] = Growtype_Form_Signup::get_signup_data($user_id);
         $user_data['child_users'] = $this->get_user_child_users($user->ID);
 
-        if (class_exists('Growtype_Quiz') && function_exists('growtype_quiz_get_user_results_by_id')) {
-            $user_data['quiz'] = growtype_quiz_get_user_results_by_id($user->ID);
+        if (class_exists('Growtype_Quiz') && function_exists('growtype_quiz_get_user_results')) {
+            $user_data['quiz'] = growtype_quiz_get_user_results($user->ID);
         }
 
         $user_data = apply_filters('growtype_form_user_data', $user_data, $user_id);

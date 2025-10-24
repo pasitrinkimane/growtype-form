@@ -163,7 +163,7 @@ Please review your username and make the necessary corrections to meet these req
         }
 
         if (is_wp_error($user_id)) {
-            $message = __('Something went wrong, please try again.', 'growtype-form');
+            $message = growtype_form_message();
 
             $error_message = $user_id->get_error_messages();
 

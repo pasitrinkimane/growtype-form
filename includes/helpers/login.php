@@ -22,7 +22,7 @@ if (!function_exists('growtype_form_login_user')) {
 
         do_action('wp_login', $user->user_login, $user);
 
-        error_log('User logged in: ' . $user->user_login);
+        error_log('Growtype Form - User logged in: ' . $user->user_login);
     }
 }
 

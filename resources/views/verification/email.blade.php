@@ -16,7 +16,7 @@
                 <p>{{ __('Check your spam folder or click below to resend it.', 'growtype-form') }}</p>
                 <button type="submit" class="btn btn-primary">{{ __('Resend verification email', 'growtype-form') }}</button>
                 <hr/>
-                <p style="max-width: 320px;margin: auto;">{!! sprintf(__("If you still can't connect, please contact our support at %s.", 'growtype-form'), '<a href="mailto:info@chataigirl.com">info@chataigirl.com</a>') !!}</p>
+                <p style="max-width: 320px;margin: auto;">{!! sprintf(__("If you still can't connect, please contact our support at %s.", 'growtype-form'), '<a href="mailto:'. $admin_email .'">'.$admin_email.'</a>') !!}</p>
             </div>
 
             <input type="hidden" name="{!! $send_verification_code_key !!}" value="1">

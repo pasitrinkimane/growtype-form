@@ -129,18 +129,35 @@ class Growtype_Form_Crud
                  * Check if main values are not empty
                  */
                 if (empty($form_name)) {
-                    error_log(sprintf('Empty form name. Posted data %s', print_r($_POST ?? [], true)));
-                    wp_redirect(growtype_form_login_page_url());
+                    error_log(sprintf('Growtype Form - Empty form name. Posted data %s', print_r($_POST ?? [], true)));
+                    wp_redirect(home_url());
                     exit();
                 }
 
                 /**
-                 * Check if form is spam
+                 * Check if submit is spam
                  */
-                $data_is_free_from_spam = $this->data_is_free_from_spam($_POST);
+                $submitted_data_is_free_from_spam = $this->submitted_data_is_free_from_spam($_POST);
 
-                if ($data_is_free_from_spam['success'] === false) {
-                    wp_redirect(growtype_form_login_page_url());
+                if (!$submitted_data_is_free_from_spam) {
+                    wp_redirect(home_url());
+                    exit();
+                }
+
+                /**
+                 * Check throttle
+                 */
+                $throttle_passed = $this->check_submit_throttle($form_name);
+
+                if ($throttle_passed === false) {
+                    Growtype_Form_Notice::growtype_form_set_notice(
+                        [
+                            growtype_form_message('submission_throttled')
+                        ],
+                        'error'
+                    );
+
+                    wp_redirect(growtype_form_get_url_path());
                     exit();
                 }
 
@@ -152,7 +169,15 @@ class Growtype_Form_Crud
                 $redirect_url = $this->process_form_submitted_values($form_name, $submitted_values);
 
                 if (empty($redirect_url)) {
-                    return __("Something went wrong. Please contact administrator.", "growtype-form");
+                    Growtype_Form_Notice::growtype_form_set_notice(
+                        [
+                            growtype_form_message()
+                        ],
+                        'error'
+                    );
+
+                    wp_redirect(growtype_form_get_url_path());
+                    exit();
                 }
             }
 
@@ -161,34 +186,50 @@ class Growtype_Form_Crud
         }
     }
 
-    public function data_is_free_from_spam($data)
+    public function submitted_data_is_free_from_spam($data)
     {
         foreach (self::GROWTYPE_FORM_SPAM_IDENTIFICATION_RULES as $rule) {
             $value = $data[$rule['key']] ?? '';
 
             if (!empty($value)) {
-                if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-                    $ip_address = $_SERVER['HTTP_CLIENT_IP'];
-                } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-                    $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
-                } else {
-                    $ip_address = $_SERVER['REMOTE_ADDR'];
-                }
+                $ip_address = growtype_form_get_user_ip_address();
 
-                error_log(sprintf('SPAM submission. Data %s', json_encode([
+                error_log(sprintf('Growtype Form - SPAM submission. Data %s', json_encode([
                     $ip_address,
                     $data
                 ])));
 
-                return [
-                    'success' => false
-                ];
+                return false;
             }
         }
 
-        return [
-            'success' => true
-        ];
+        return true;
+    }
+
+    public function check_submit_throttle($form_name, $time = 30)
+    {
+        $form_name = sanitize_key($form_name);
+        $user_ip = sanitize_text_field(growtype_form_get_user_ip_address());
+        $user_id = get_current_user_id();
+
+        // Generate a unique cache key
+        $cache_key = 'gt_form_last_submit_' . md5($form_name . '_' . ($user_id ?: $user_ip));
+
+        // Check if user submitted recently
+        if (get_transient($cache_key)) {
+            error_log(sprintf(
+                'Growtype Form - WP throttle applied for form "%s". Time limit: %s seconds. User: %s',
+                $form_name,
+                $time,
+                $user_id ?: $user_ip
+            ));
+            return false;
+        }
+
+        // Set cooldown period
+        set_transient($cache_key, time(), $time);
+
+        return true;
     }
 
     /**
@@ -370,11 +411,11 @@ class Growtype_Form_Crud
                     $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : __('Record created successfully.', 'growtype-form');
                 } else {
                     $submit_data['success'] = false;
-                    $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : __('Something went wrong. Please contact site admin.', 'growtype-form');
+                    $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : growtype_form_message();
                 }
             }
         } else {
-            error_log(sprintf("Growtype Form. VALIDATION FAILED. Data: %s", print_r($validated_form_submitted_values, true)));
+            error_log(sprintf("Growtype Form - VALIDATION FAILED. Data: %s", print_r($validated_form_submitted_values, true)));
 
             $submit_data['success'] = false;
             $submit_data['message'] = $submitted_data_message;
@@ -413,8 +454,6 @@ class Growtype_Form_Crud
             if (!isset($redirect_url)) {
                 $redirect_url = !empty($post_id) ? get_permalink($post_id) : home_url($return_page_path);
             }
-
-            $redirect_url = apply_filters('growtype_form_submitted_values_redirect_url', $redirect_url, $form_data, $submitted_data);
         }
 
         $set_notice = $submit_data['set_notice'] ?? true;
@@ -425,13 +464,13 @@ class Growtype_Form_Crud
         if ($set_notice) {
             Growtype_Form_Notice::growtype_form_set_notice(
                 isset($submit_data['message']) ? $submit_data['message'] : [
-                    __("Something went wrong. Please contact administrator.", "growtype-form")
+                    growtype_form_message()
                 ],
                 ($submit_data['success'] ? 'success' : 'error')
             );
         }
 
-        return $redirect_url;
+        return apply_filters('growtype_form_submitted_values_redirect_url', $redirect_url, $form_data, $submitted_data, $submit_data);
     }
 
     public static function send_email_to_admin($submitted_content, $form_data)
@@ -463,12 +502,14 @@ class Growtype_Form_Crud
             $email_body = str_replace('{form_name}', $form_data['form_name'], $email_body);
         }
 
+        $email_body .= '<br><strong>Submitter IP:</strong> ' . ($_SERVER['REMOTE_ADDR'] ?? 'Unknown');
+
         $headers[] = 'From: Admin <' . $admin_email . '>';
 
         /**
          * Debug
          */
-//        error_log(sprintf("Growtype Form. Sending email to admin. Details: %s", print_r([$to, $subject, $email_body, $headers], true)));
+        error_log(sprintf("Growtype Form - Sending email to admin. Details: %s", print_r([$to, $subject, $email_body, $headers], true)));
 
         wp_mail($to, $subject, $email_body, $headers);
     }
@@ -650,7 +691,7 @@ class Growtype_Form_Crud
                     if (isset($update_user->errors['existing_user_email'])) {
                         $response['message'] = __("Please use another email.", "growtype-form");
                     } else {
-                        $response['message'] = __("Something went wrong.", "growtype-form");
+                        $response['message'] = growtype_form_message();
                     }
 
                     return $response;
@@ -690,7 +731,7 @@ class Growtype_Form_Crud
                         if (isset($update_user->errors['existing_user_email'])) {
                             $response['message'] = __("Please use another email.", "growtype-form");
                         } else {
-                            $response['message'] = __("Something went wrong.", "growtype-form");
+                            $response['message'] = growtype_form_message();
                         }
 
                         return $response;
@@ -709,7 +750,7 @@ class Growtype_Form_Crud
          */
         if (empty($create_user) || $create_user['success'] === false) {
             $response['success'] = false;
-            $response['message'] = $create_user['message'] ?? __("Something went wrong.", "growtype-form");
+            $response['message'] = $create_user['message'] ?? growtype_form_message();
         } else {
             $user_id = $create_user['user_id'];
 
@@ -759,7 +800,7 @@ class Growtype_Form_Crud
                     $response['messages'] = __("The information was successfully updated.", "growtype-form");
                 }
             } else {
-                $response['messages'] = __("Something went wrong.", "growtype-form");
+                $response['messages'] = growtype_form_message();
             }
         }
 
@@ -914,7 +955,7 @@ class Growtype_Form_Crud
             $quiz_result = Growtype_Quiz_Result_Crud::get_quiz_single_result_data_by_unique_hash($submitted_values_sanitized[Growtype_Form_Crud::GROWTYPE_QUIZ_UNIQUE_HASH]);
 
             if (empty($quiz_result)) {
-                error_log(sprintf('Wrong growtype quiz unique hash. Clear hash. Details: %s', print_r($submitted_values_sanitized, true)));
+                error_log(sprintf('Growtype Form - Wrong growtype quiz unique hash. Clear hash. Details: %s', print_r($submitted_values_sanitized, true)));
 
                 $submitted_values_sanitized[Growtype_Form_Crud::GROWTYPE_QUIZ_UNIQUE_HASH] = '';
             }
@@ -996,7 +1037,9 @@ class Growtype_Form_Crud
             'luxusmail.org',
             'spam4.me',
             'mytemp.email',
-            'frankfort.k12.in.us'
+            'frankfort.k12.in.us',
+            'testing.com',
+            'test.com',
         ];
 
         // Validate email format using filter_var
@@ -1014,7 +1057,7 @@ class Growtype_Form_Crud
         // Check if the email domain has valid MX records using getmxrr
         $mx_records = [];
         if (!getmxrr($domain, $mx_records)) {
-            error_log(sprintf('Email validation failed. Invalid email domain. No MX records found. Details: %s', print_r($email, true)));
+            error_log(sprintf('Growtype Form - Email validation failed. Invalid email domain. No MX records found. Details: %s', print_r($email, true)));
 
             return [
                 'failed_validation' => false,
@@ -1025,7 +1068,7 @@ class Growtype_Form_Crud
 
         // Check if the email domain is disposable
         if (in_array($domain, $disposable_domains)) {
-            error_log(sprintf('Email validation failed. Disposable email domain. Details: %s', print_r($email, true)));
+            error_log(sprintf('Growtype Form - Email validation failed. Disposable email domain. Details: %s', print_r($email, true)));
 
             return [
                 'failed_validation' => false,

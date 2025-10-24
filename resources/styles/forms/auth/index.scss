@@ -6,3 +6,9 @@
 @import "templates/signup-template-wide";
 @import "templates/login-template-default";
 @import "templates/auth-template";
+
+#growtype-form-signup {
+  .main-fields:has(> *:nth-child(2)):not(:has(> *:nth-child(3))) > *:nth-child(2) {
+    flex: 100%;
+  }
+}

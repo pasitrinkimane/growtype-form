@@ -195,7 +195,7 @@ function growtype_form_save_submission($form_data, $submitted_values)
 
         if (is_wp_error($post_id)) {
             $response['success'] = false;
-            $response['message'] = __("Something went wrong. Please contact administrator.", "growtype-form");
+            $response['message'] = growtype_form_message();
 
             return $response;
         }
