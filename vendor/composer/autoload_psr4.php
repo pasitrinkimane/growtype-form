@@ -6,4 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'EmailValidator\\' => array($vendorDir . '/stymiee/email-validator/src/EmailValidator'),
 );

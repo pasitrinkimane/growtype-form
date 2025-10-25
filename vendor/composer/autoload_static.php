@@ -13,6 +13,20 @@ class ComposerStaticInit9550f38646793db9bcd15b144ea678ce
         'daf45b1134c9868f305965e4c0e0f06c' => __DIR__ . '/..' . '/rappasoft/laravel-helpers/src/strings.php',
     );
 
+    public static $prefixLengthsPsr4 = array (
+        'E' => 
+        array (
+            'EmailValidator\\' => 15,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'EmailValidator\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/stymiee/email-validator/src/EmailValidator',
+        ),
+    );
+
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
@@ -20,6 +34,8 @@ class ComposerStaticInit9550f38646793db9bcd15b144ea678ce
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInit9550f38646793db9bcd15b144ea678ce::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit9550f38646793db9bcd15b144ea678ce::$prefixDirsPsr4;
             $loader->classMap = ComposerStaticInit9550f38646793db9bcd15b144ea678ce::$classMap;
 
         }, null, ClassLoader::class);

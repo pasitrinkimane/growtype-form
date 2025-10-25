@@ -1,5 +1,7 @@
 <?php
 
+use EmailValidator\EmailValidator;
+
 /**
  * Class Growtype_Form_Wc_Crud
  * Woocommerce crud
@@ -65,6 +67,48 @@ class Growtype_Form_Crud
 
     const ALTERNATIVE_SUBMITTED_DATA_KEYS = [
         'name' => 'name_s'
+    ];
+
+    const DISPOSABLE_DOMAINS = [
+        'mailinator.com',
+        'tempmail.com',
+        '10minutemail.com',
+        'yopmail.com',
+        'guerrillamail.com',
+        'student.pcps.us',
+        'maildrop.cc',
+        'discard.email',
+        'fakeinbox.com',
+        'trashmail.com',
+        'throwawaymail.com',
+        'dispostable.com',
+        'getnada.com',
+        'mohmal.com',
+        'emailondeck.com',
+        'mailnesia.com',
+        'anonymmail.de',
+        'airmailbox.website',
+        'emailtemporario.com.br',
+        'mailcatch.com',
+        'inboxbear.com',
+        'spambox.us',
+        'sharklasers.com',
+        'spambog.com',
+        'temp-mail.org',
+        'dropmail.me',
+        'mail7.io',
+        'burnermail.io',
+        'jetable.org',
+        'trash-mail.com',
+        'mailfence.com',
+        'protonmail.com', // sometimes used for temporary purposes
+        'tutanota.com', // sometimes used for temporary purposes
+        'luxusmail.org',
+        'spam4.me',
+        'mytemp.email',
+        'frankfort.k12.in.us',
+        'testing.com',
+        'test.com',
     ];
 
     /**
@@ -206,7 +250,7 @@ class Growtype_Form_Crud
         return true;
     }
 
-    public function check_submit_throttle($form_name, $time = 30)
+    public function check_submit_throttle($form_name, $time = 10)
     {
         $form_name = sanitize_key($form_name);
         $user_ip = sanitize_text_field(growtype_form_get_user_ip_address());
@@ -463,9 +507,7 @@ class Growtype_Form_Crud
          */
         if ($set_notice) {
             Growtype_Form_Notice::growtype_form_set_notice(
-                isset($submit_data['message']) ? $submit_data['message'] : [
-                    growtype_form_message()
-                ],
+                isset($submit_data['message']) ? $submit_data['message'] : growtype_form_message(),
                 ($submit_data['success'] ? 'success' : 'error')
             );
         }
@@ -794,13 +836,13 @@ class Growtype_Form_Crud
             do_action('growtype_form_update_signup_user_data', $user_id, $data, $submit_action);
 
             if ($response['success']) {
-                $response['messages'] = __("Sign up successful.", "growtype-form");
+                $response['message'] = __("Sign up successful.", "growtype-form");
 
                 if ($submit_action === 'update') {
-                    $response['messages'] = __("The information was successfully updated.", "growtype-form");
+                    $response['message'] = __("The information was successfully updated.", "growtype-form");
                 }
             } else {
-                $response['messages'] = growtype_form_message();
+                $response['message'] = growtype_form_message();
             }
         }
 
@@ -997,51 +1039,8 @@ class Growtype_Form_Crud
         return $last_validation_result;
     }
 
-    public static function first_level_email_validation($email)
+    public static function first_level_email_validation($email, $config = [])
     {
-        // List of known disposable email domains (can be moved to a config file for scalability)
-        $disposable_domains = [
-            'mailinator.com',
-            'tempmail.com',
-            '10minutemail.com',
-            'yopmail.com',
-            'guerrillamail.com',
-            'student.pcps.us',
-            'maildrop.cc',
-            'discard.email',
-            'fakeinbox.com',
-            'trashmail.com',
-            'throwawaymail.com',
-            'dispostable.com',
-            'getnada.com',
-            'mohmal.com',
-            'emailondeck.com',
-            'mailnesia.com',
-            'anonymmail.de',
-            'airmailbox.website',
-            'emailtemporario.com.br',
-            'mailcatch.com',
-            'inboxbear.com',
-            'spambox.us',
-            'sharklasers.com',
-            'spambog.com',
-            'temp-mail.org',
-            'dropmail.me',
-            'mail7.io',
-            'burnermail.io',
-            'jetable.org',
-            'trash-mail.com',
-            'mailfence.com',
-            'protonmail.com', // sometimes used for temporary purposes
-            'tutanota.com', // sometimes used for temporary purposes
-            'luxusmail.org',
-            'spam4.me',
-            'mytemp.email',
-            'frankfort.k12.in.us',
-            'testing.com',
-            'test.com',
-        ];
-
         // Validate email format using filter_var
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return [
@@ -1051,33 +1050,34 @@ class Growtype_Form_Crud
             ];
         }
 
-        // Extract the domain from the email
-        $domain = substr(strrchr($email, "@"), 1);
+        $default_config = [
+            'checkMxRecords' => true,
+            'checkBannedListedEmail' => true,
+            'checkDisposableEmail' => true,
+            'checkFreeEmail' => false,
+            'bannedList' => [],
+            'disposableList' => Growtype_Form_Crud::DISPOSABLE_DOMAINS,
+            'freeList' => [],
+        ];
 
-        // Check if the email domain has valid MX records using getmxrr
-        $mx_records = [];
-        if (!getmxrr($domain, $mx_records)) {
-            error_log(sprintf('Growtype Form - Email validation failed. Invalid email domain. No MX records found. Details: %s', print_r($email, true)));
+        $config = array_merge($default_config, $config);
+
+        $emailValidator = new EmailValidator($config);
+
+        $isValid = $emailValidator->validate($email);
+
+        if (!$isValid) {
+            $message = $emailValidator->getErrorReason();
+
+            error_log(sprintf('Growtype Form - Email validation failed. Email: %s. Reason: %s', $email, $message));
 
             return [
                 'failed_validation' => false,
                 'success' => false,
-                'message' => __("The email address you entered is not valid. Please check and try again.", "growtype-form"),
+                'message' => __("Please use a valid email address.", "growtype-form"),
             ];
         }
 
-        // Check if the email domain is disposable
-        if (in_array($domain, $disposable_domains)) {
-            error_log(sprintf('Growtype Form - Email validation failed. Disposable email domain. Details: %s', print_r($email, true)));
-
-            return [
-                'failed_validation' => false,
-                'success' => false,
-                'message' => __("Email address is from a disposable provider. Please use a valid email address.", "growtype-form"),
-            ];
-        }
-
-        // If all checks pass, return success
         return [
             'failed_validation' => false,
             'success' => true,

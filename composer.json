@@ -4,7 +4,8 @@
     "type": "wordpress-plugin",
     "require": {
         "php": "^7.0|^8.0",
-        "rappasoft/laravel-helpers": "^2.1"
+        "rappasoft/laravel-helpers": "^2.1",
+        "stymiee/email-validator": "^2.1"
     },
     "config": {
         "allow-plugins": {

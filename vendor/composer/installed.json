@@ -51,6 +51,76 @@
                 "source": "https://github.com/rappasoft/laravel-helpers/tree/v2.1.0"
             },
             "install-path": "../rappasoft/laravel-helpers"
+        },
+        {
+            "name": "stymiee/email-validator",
+            "version": "2.1.0",
+            "version_normalized": "2.1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stymiee/email-validator.git",
+                "reference": "8ee3be76b3d01081d3a91259c118e5dc2b4fb424"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stymiee/email-validator/zipball/8ee3be76b3d01081d3a91259c118e5dc2b4fb424",
+                "reference": "8ee3be76b3d01081d3a91259c118e5dc2b4fb424",
+                "shasum": ""
+            },
+            "require": {
+                "ext-intl": "*",
+                "ext-json": "*",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "nunomaduro/phpinsights": "^2.8",
+                "phpmd/phpmd": "^2.15",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^9.6",
+                "squizlabs/php_codesniffer": "^3.7",
+                "vimeo/psalm": "^5.15"
+            },
+            "time": "2025-06-11T00:31:58+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "EmailValidator\\": "src/EmailValidator/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "John Conde",
+                    "email": "stymiee@gmail.com",
+                    "homepage": "https://stymiee.dev",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A robust PHP 7.4+ email validation library that extends beyond basic validation with MX record checks, disposable email detection, and free email provider validation. Features include strict typing, custom validator support, internationalization (i18n), and an extensible architecture. Perfect for applications requiring thorough email verification with customizable validation rules.",
+            "homepage": "https://github.com/stymiee/email-validator",
+            "keywords": [
+                "MX",
+                "custom-validators",
+                "disposable",
+                "email",
+                "email-verification",
+                "free-email",
+                "i18n",
+                "internationalization",
+                "php",
+                "strict-typing",
+                "type-safe",
+                "validation"
+            ],
+            "support": {
+                "issues": "https://github.com/stymiee/email-validator/issues",
+                "source": "https://github.com/stymiee/email-validator/tree/2.1.0"
+            },
+            "install-path": "../stymiee/email-validator"
         }
     ],
     "dev": true,

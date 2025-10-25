@@ -5,7 +5,7 @@ if (!function_exists('growtype_form_message')) {
     {
         $messages = [
             'general_error' => __("Something went wrong. Please contact the website administrator.", "growtype-form"),
-            'submission_throttled' => __("You're submitting too fast. Please wait a few seconds.", "growtype-form"),
+            'submission_throttled' => __("You're submitting too fast. Please wait 10 seconds.", "growtype-form"),
         ];
         return $messages[$key] ?? $messages['general_error'];
     }

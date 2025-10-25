@@ -58,6 +58,11 @@ define('GROWTYPE_FORM_URL', plugin_dir_url(__FILE__));
 define('GROWTYPE_FORM_URL_PUBLIC', plugin_dir_url(__FILE__) . 'public/');
 
 /**
+ * Autoload vendors
+ */
+require_once GROWTYPE_FORM_PATH . '/vendor/autoload.php';
+
+/**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-growtype-form-activator.php
  */
@@ -105,10 +110,8 @@ function Growtype_Form()
  */
 function run_growtype_form()
 {
-
     $plugin = new Growtype_Form();
     $plugin->run();
-
 }
 
 run_growtype_form();

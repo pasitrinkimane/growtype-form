@@ -9,7 +9,7 @@ class Growtype_Form_Admin_Lead_Custom_Actions
 
     public function __construct()
     {
-        add_action('manage_posts_extra_tablenav', array ($this, 'bulk_actions_html'));
+//        add_action('manage_posts_extra_tablenav', array ($this, 'bulk_actions_html'));
 
         add_action('init', array ($this, 'process_bulk_actions'), 20);
 
@@ -99,7 +99,7 @@ class Growtype_Form_Admin_Lead_Custom_Actions
 
     function process_bulk_actions()
     {
-        if (isset($_REQUEST['post_type']) && $_REQUEST['post_type'] === self::POST_TYPE_NAME && isset($_REQUEST['lead_custom_action']) && $_REQUEST['lead_custom_action'] !== '') {
+        if (current_user_can('manage_options') && isset($_REQUEST['post_type']) && $_REQUEST['post_type'] === self::POST_TYPE_NAME && isset($_REQUEST['lead_custom_action']) && $_REQUEST['lead_custom_action'] !== '') {
             $lead_custom_action = $_REQUEST['lead_custom_action'];
             $posts = $_REQUEST['post'] ?? [$_REQUEST['post_ID'] ?? ''];
 
@@ -134,7 +134,7 @@ class Growtype_Form_Admin_Lead_Custom_Actions
 
     function process_admin_actions()
     {
-        if (isset($_REQUEST['post_type']) && $_REQUEST['post_type'] === self::POST_TYPE_NAME && isset($_REQUEST['action']) && $_REQUEST['action'] === 'send_newsletter') {
+        if (current_user_can('manage_options') && isset($_REQUEST['post_type']) && $_REQUEST['post_type'] === self::POST_TYPE_NAME && isset($_REQUEST['action']) && $_REQUEST['action'] === 'send_newsletter') {
             $post_id = isset($_REQUEST['post']) ? $_REQUEST['post'] : '';
 
             if (!empty($post_id)) {
@@ -173,6 +173,12 @@ class Growtype_Form_Admin_Lead_Custom_Actions
                 'title' => 'Events log',
                 'key' => 'events_log',
                 'type' => 'textarea',
+            ];
+
+            $meta_boxes[0]['fields'][] = [
+                'title' => 'Validation status',
+                'key' => 'validation_status',
+                'type' => 'text',
             ];
 
             if (Growtype_Form_Signup_Verification::email_verification_is_required()) {

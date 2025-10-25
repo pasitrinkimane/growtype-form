@@ -118,7 +118,7 @@ class Growtype_Form_Admin_Form
             'public' => false,
             'publicly_queryable' => false,
             'show_ui' => true,
-            'show_in_menu' => current_user_can('administrator') ? true : false,
+            'show_in_menu' => current_user_can('manage_options') ? true : false,
             'query_var' => false,
             'rewrite' => array ('slug' => self::POST_TYPE_NAME),
             'capability_type' => 'post',

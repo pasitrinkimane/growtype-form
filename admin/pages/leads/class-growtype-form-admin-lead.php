@@ -1,5 +1,7 @@
 <?php
 
+use EmailValidator\EmailValidator;
+
 /**
  *
  */
@@ -42,7 +44,7 @@ class Growtype_Form_Admin_Lead
         /**
          * Bulk actions scripts
          */
-        add_action('admin_head-edit.php', array ($this, 'custom_bulk_actions_scripts'));
+        add_action('admin_head-edit.php', array ($this, 'custom_actions_scripts'));
 
         /**
          * Disable lead translation
@@ -60,9 +62,34 @@ class Growtype_Form_Admin_Lead
         add_action('delete_user', array ($this, 'delete_lead'));
 
         /**
+         * Fetch emails
+         */
+        add_action('wp_ajax_growtype_form_admin_fetch_emails', array ($this, 'fetch_emails_callback'));
+
+        /**
+         * Validate emails
+         */
+        add_action('wp_ajax_growtype_form_admin_validate_emails', array ($this, 'validate_emails_callback'));
+
+        /**
+         * Validate emails
+         */
+        add_action('admin_post_growtype_form_admin_export_emails', array ($this, 'export_emails_callback'));
+        add_action('admin_post_growtype_form_admin_export_leads', array ($this, 'export_leads_callback'));
+
+        /**
          * Load extra methods
          */
         $this->load_methods();
+    }
+
+    public function load_methods()
+    {
+        /**
+         * Custom actions
+         */
+        include_once 'partials/class-growtype-form-admin-lead-custom-actions.php';
+        new Growtype_Form_Admin_Lead_Custom_Actions();
     }
 
     function delete_lead($user_id)
@@ -281,7 +308,7 @@ class Growtype_Form_Admin_Lead
     {
         global $wpdb;
 
-        return $wpdb->get_results($wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_type='%s' AND post_title= '%s'", self::POST_TYPE_NAME, esc_sql($title)));
+        return $wpdb->get_results($wpdb->prepare("SELECT * FROM $wpdb->posts WHERE post_type='%s' AND post_title= '%s'", self::POST_TYPE_NAME, $title));
     }
 
     public static function get_by_title($title)
@@ -296,39 +323,11 @@ class Growtype_Form_Admin_Lead
 
     function process_custom_bulk_actions()
     {
-        if (isset($_GET['post_type']) && $_GET['post_type'] === self::POST_TYPE_NAME && isset($_GET['lead_fetch_action']) && $_GET['lead_fetch_action'] !== '') {
+        if (current_user_can('manage_options') && isset($_GET['post_type']) && $_GET['post_type'] === self::POST_TYPE_NAME && isset($_GET['lead_fetch_action']) && $_GET['lead_fetch_action'] !== '') {
             $action = $_GET['lead_fetch_action'];
 
             if ($action === 'fetch_emails') {
-                $args = array (
-                    'post_type' => Growtype_Form_Admin_Submission::POST_TYPE_NAME,
-                    'posts_per_page' => -1,
-                    'post_status' => 'any',
-                );
-
-                $submissions = get_posts($args);
-
-                foreach ($submissions as $submission) {
-                    $email = Growtype_Form_Admin_Submission::get_email($submission->ID);
-
-                    if (!empty($email)) {
-                        self::insert([
-                            'title' => $email,
-                            'status' => 'publish'
-                        ]);
-                    }
-                }
-
-                $users = get_users();
-
-                foreach ($users as $user) {
-                    $email = $user->data->user_email;
-
-                    self::insert([
-                        'title' => $email,
-                        'status' => 'publish'
-                    ]);
-                }
+                self::fetch_emails();
             }
 
             wp_redirect(admin_url('edit.php?post_type=' . self::POST_TYPE_NAME));
@@ -336,21 +335,274 @@ class Growtype_Form_Admin_Lead
         }
     }
 
-    function custom_bulk_actions_scripts()
+    public static function fetch_emails($limit = 100, $offset = 0)
     {
-        global $typenow;
+        global $wpdb;
 
-        if ($typenow === self::POST_TYPE_NAME && count($_GET) < 2) {
-            $fetch_emails_url = esc_url(admin_url('edit.php?post_type=' . self::POST_TYPE_NAME . '&lead_fetch_action=fetch_emails'));
-            ?>
-            <script>
-                jQuery(document).ready(function ($) {
-                    $('<a href="<?php echo $fetch_emails_url ?>" class="button button-primary" style="top: 9px;position: relative;">Fetch emails</a>').insertBefore($('.wp-header-end'));
-                });
+        $lead_post_type = Growtype_Form_Admin_Lead::POST_TYPE_NAME;
+        $emails_to_insert = [];
+        $total_fetched = 0;
 
-            </script>
-            <?php
+        // 1. Fetch submission emails
+        $submissions_sql = $wpdb->prepare(
+            "SELECT pm.meta_value AS submitted_values
+         FROM {$wpdb->postmeta} pm
+         INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+         WHERE p.post_type = %s AND pm.meta_key = 'submitted_values'
+         LIMIT %d OFFSET %d",
+            Growtype_Form_Admin_Submission::POST_TYPE_NAME,
+            $limit,
+            $offset
+        );
+
+        $results = $wpdb->get_results($submissions_sql);
+        $total_fetched += count($results);
+
+        foreach ($results as $row) {
+            $data = json_decode($row->submitted_values, true) ?? [];
+            if (!empty($data['data']['email'])) {
+                $email = filter_var($data['data']['email'], FILTER_VALIDATE_EMAIL);
+                if ($email) {
+                    $emails_to_insert[$email] = $email;
+                }
+            }
         }
+
+        // 2. Fetch user emails
+        $user_results = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT user_email FROM {$wpdb->users} ORDER BY ID ASC LIMIT %d OFFSET %d",
+                $limit,
+                $offset
+            )
+        );
+
+        $total_fetched += count($user_results);
+
+        foreach ($user_results as $user) {
+            $email = filter_var($user->user_email, FILTER_VALIDATE_EMAIL);
+            if ($email) {
+                $emails_to_insert[$email] = $email;
+            }
+        }
+
+        // 3. Filter out emails that already exist in leads
+        if (!empty($emails_to_insert)) {
+            $placeholders = implode(',', array_fill(0, count($emails_to_insert), '%s'));
+            $existing_emails = $wpdb->get_col(
+                $wpdb->prepare(
+                    "SELECT post_title FROM {$wpdb->posts} WHERE post_type=%s AND post_title IN ($placeholders)",
+                    array_merge([$lead_post_type], array_keys($emails_to_insert))
+                )
+            );
+
+            // Remove existing emails from insert list
+            foreach ($existing_emails as $email) {
+                unset($emails_to_insert[$email]);
+            }
+        }
+
+        // 4. Insert remaining emails
+        foreach ($emails_to_insert as $email) {
+            wp_insert_post([
+                'post_type' => $lead_post_type,
+                'post_title' => $email,
+                'post_status' => 'publish'
+            ]);
+        }
+
+        return [
+            'emails_inserted' => count($emails_to_insert),
+            'total_fetched' => $total_fetched,
+        ];
+    }
+
+    function fetch_emails_callback()
+    {
+        $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
+        $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 1000;
+
+        $fetch_emails = self::fetch_emails($limit, $offset);
+
+        wp_send_json_success(
+            $fetch_emails
+        );
+    }
+
+    function validate_emails_callback()
+    {
+        $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
+        $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 100;
+
+        $args = [
+            'post_type' => 'gf_lead',
+            'posts_per_page' => $limit,
+            'offset' => $offset,
+            'meta_query' => [
+                'relation' => 'OR',
+                [
+                    'key' => 'is_validated',
+                    'value' => '1',
+                    'compare' => '!=',
+                ],
+                [
+                    'key' => 'is_validated',
+                    'compare' => 'NOT EXISTS',
+                ]
+            ],
+            'fields' => 'ids',
+        ];
+
+        $leads_query = new WP_Query($args);
+
+        if (!$leads_query->have_posts()) {
+            wp_send_json_success([
+                'emails_valid' => 0,
+                'total_fetched' => 0
+            ]);
+        }
+
+        $emails = $leads_query->posts;
+
+        $validate_emails = self::validate_emails($emails);
+
+        wp_send_json_success($validate_emails);
+    }
+
+    function export_emails_callback()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized', 'Error', ['response' => 403]);
+        }
+
+        // Get all gf_lead posts
+        $args = [
+            'post_type' => 'gf_lead',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'meta_query' => [
+                'relation' => 'AND',
+                [
+                    'key' => 'is_validated',
+                    'value' => '1',
+                    'compare' => '='
+                ],
+                [
+                    'relation' => 'OR',
+                    [
+                        'key' => 'newsletter_unsubscribed',
+                        'value' => '1',
+                        'compare' => '!='
+                    ],
+                    [
+                        'key' => 'newsletter_unsubscribed',
+                        'compare' => 'NOT EXISTS'
+                    ]
+                ]
+            ]
+        ];
+
+        $query = new WP_Query($args);
+
+        if (!$query->have_posts()) {
+            wp_die('No leads found.');
+        }
+
+        // Prepare CSV headers
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=gf_leads_exported_emails_' . date('Y-m-d_H-i-s') . '.csv');
+
+        $output = fopen('php://output', 'w');
+
+        // Define CSV column headers
+        fputcsv($output, ['ID', 'Email', 'Date']);
+
+        // Loop through posts
+        foreach ($query->posts as $lead_id) {
+            $email = get_the_title($lead_id);
+            $date = get_the_date('Y-m-d H:i:s', $lead_id);
+
+            fputcsv($output, [
+                $lead_id,
+                $email,
+                $date,
+            ]);
+        }
+
+        fclose($output);
+        exit;
+    }
+
+    function export_leads_callback()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized', 'Error', ['response' => 403]);
+        }
+
+        // Get all gf_lead posts
+        $args = [
+            'post_type' => 'gf_lead',
+            'posts_per_page' => -1,
+            'fields' => 'ids'
+        ];
+
+        $query = new WP_Query($args);
+
+        if (!$query->have_posts()) {
+            wp_die('No leads found.');
+        }
+
+        // Prepare CSV headers
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=gf_leads_exported_leads_' . date('Y-m-d_H-i-s') . '.csv');
+
+        $output = fopen('php://output', 'w');
+
+        // Define CSV column headers
+        fputcsv($output, ['ID', 'Email', 'Unsubscribed', 'Date']);
+
+        // Loop through posts
+        foreach ($query->posts as $lead_id) {
+            $email = get_the_title($lead_id);
+            $date = get_the_date('Y-m-d H:i:s', $lead_id);
+            $unsubscribed = get_post_meta($lead_id, 'newsletter_unsubscribed', true);
+
+            fputcsv($output, [
+                $lead_id,
+                $email,
+                $unsubscribed,
+                $date,
+            ]);
+        }
+
+        fclose($output);
+        exit;
+    }
+
+    public static function validate_emails($emails)
+    {
+        $countValidated = 0;
+        foreach ($emails as $lead_id) {
+            $email = get_the_title($lead_id);
+            if (!$email) {
+                continue;
+            }
+
+            $email_validation = Growtype_Form_Crud::first_level_email_validation($email);
+            $isValid = $email_validation['success'];
+
+            update_post_meta($lead_id, 'is_validated', true);
+            update_post_meta($lead_id, 'validation_status', $isValid ? 'valid' : 'invalid');
+
+            if ($isValid) {
+                $countValidated++;
+            }
+        }
+
+        return [
+            'emails_valid' => $countValidated,
+            'total_fetched' => count($emails)
+        ];
     }
 
     public static function is_edit_post_type()
@@ -358,6 +610,36 @@ class Growtype_Form_Admin_Lead
         global $post;
 
         return (isset($_GET['action']) && $_GET['action'] === 'edit') && !empty($post) && $post->post_type === self::POST_TYPE_NAME;
+    }
+
+    public static function update_events_log($id, $details)
+    {
+        $events_log = self::get_events_log($id);
+
+        /**
+         * Remove body from log
+         */
+        if (isset($details['data']['body'])) {
+            $details['data']['body'] = 'Body removed from log for security reasons.';
+        }
+
+        $success = $details['success'] ?? '';
+
+        $events_log[] = [
+            'date' => wp_date('Y-m-d H:i:s'),
+            'details' => $details['data'] ?? [],
+            'success' => $success ? 'true' : 'false'
+        ];
+
+        update_post_meta($id, 'events_log', json_encode($events_log));
+    }
+
+    public static function get_events_log($id)
+    {
+        $events_log = get_post_meta($id, 'events_log', true);
+        $events_log = !empty($events_log) ? json_decode($events_log, true) : [];
+
+        return $events_log;
     }
 
     function admin_footer_extend()
@@ -439,42 +721,140 @@ class Growtype_Form_Admin_Lead
         }
     }
 
-    public static function update_events_log($id, $details)
+    function custom_actions_scripts()
     {
-        $events_log = self::get_events_log($id);
+        global $typenow;
 
-        /**
-         * Remove body from log
-         */
-        if (isset($details['data']['body'])) {
-            $details['data']['body'] = 'Body removed from log for security reasons.';
+        if ($typenow === self::POST_TYPE_NAME) {
+            $fetch_emails_url = esc_url(admin_url('edit.php?post_type=' . self::POST_TYPE_NAME . '&lead_fetch_action=fetch_emails'));
+            ?>
+            <script>
+                jQuery(document).ready(function ($) {
+                    $('<a href="#" class="button button-primary" style="top: 9px; position: relative;">Fetch emails</a>')
+                        .insertBefore($('.wp-header-end'))
+                        .on('click', function (e) {
+                            e.preventDefault();
+
+                            var offset = 0;
+                            var batchSize = 500;
+                            var batchNr = 0;
+
+                            var alertBox = $('<div id="emails-fetch-alert" style="position: fixed; top: 50px; right: 30px; background: #008000; color: #fff; padding: 10px; border-radius: 5px; z-index: 9999;">Fetching...</div>');
+                            $('body').append(alertBox);
+
+                            function fetchBatch() {
+                                batchNr++;
+                                $.ajax({
+                                    url: window.ajaxurl,
+                                    type: 'POST',
+                                    data: {
+                                        action: 'growtype_form_admin_fetch_emails',
+                                        offset: offset,
+                                        limit: batchSize
+                                    },
+                                    success: function (response) {
+                                        var emails_inserted = response.data.emails_inserted;
+                                        var total_fetched = response.data.total_fetched;
+
+                                        if (total_fetched !== 0) {
+                                            alertBox.text('Batch ' + batchNr + '. Processed records: ' + total_fetched + '. New emails inserted:' + emails_inserted);
+                                            offset += batchSize;
+                                            fetchBatch();
+                                        } else {
+                                            alertBox.text('All emails processed.');
+                                            setTimeout(() => window.location.reload(), 5000);
+                                        }
+                                    },
+                                    error: function () {
+                                        alertBox.text('Error fetching emails!');
+                                        setTimeout(() => alertBox.fadeOut(), 5000);
+                                    }
+                                });
+                            }
+
+                            fetchBatch();
+                        });
+
+                    $('<a href="#" class="button button-primary" style="top: 9px; margin-left: 5px; position: relative;">Validate emails</a>')
+                        .insertBefore($('.wp-header-end'))
+                        .on('click', function (e) {
+                            e.preventDefault();
+
+                            var offset = 0;
+                            var batchSize = 100;
+                            var batchNr = 0;
+
+                            var alertBox = $('<div id="emails-fetch-alert" style="position: fixed; top: 50px; right: 30px; background: #008000; color: #fff; padding: 10px; border-radius: 5px; z-index: 9999;">Validating...</div>');
+                            $('body').append(alertBox);
+
+                            function fetchBatch() {
+                                batchNr++;
+
+                                $.ajax({
+                                    url: window.ajaxurl,
+                                    type: 'POST',
+                                    data: {
+                                        action: 'growtype_form_admin_validate_emails',
+                                        offset: offset,
+                                        limit: batchSize
+                                    },
+                                    success: function (response) {
+                                        var emails_valid = response.data.emails_valid;
+                                        var total_fetched = response.data.total_fetched;
+
+                                        if (total_fetched !== 0) {
+                                            alertBox.text('Batch ' + batchNr + '. Processed records: ' + total_fetched + '. New emails validated: ' + emails_valid);
+                                            offset += batchSize;
+                                            fetchBatch();
+                                        } else {
+                                            alertBox.text('All emails processed.');
+                                            setTimeout(() => window.location.reload(), 5000);
+                                        }
+                                    },
+                                    error: function () {
+                                        alertBox.text('Error validating emails!');
+                                        setTimeout(() => alertBox.fadeOut(), 5000);
+                                    }
+                                });
+                            }
+
+                            fetchBatch();
+                        });
+
+                    $('<div class="export-dropdown" style="display: inline-block;position: relative;margin-left: 5px;vertical-align: middle;margin-top: -10px;">' +
+                        '<button class="button button-primary">Export leads ▼</button>' +
+                        '<ul style="display:none; position:absolute; top:100%; left:0; background:#fff; border:1px solid #ccc; list-style:none; padding:0; margin:0; min-width:150px; z-index:9999;">' +
+                        '<li style="padding:8px; cursor:pointer;">Export emails</li>' +
+                        '<li style="padding:8px; cursor:pointer;">Export full</li>' +
+                        '</ul>' +
+                        '</div>').insertBefore($('.wp-header-end'));
+
+                    jQuery(document).ready(function ($) {
+                        $('.export-dropdown button').on('click', function (e) {
+                            e.preventDefault();
+                            $(this).next('ul').toggle();
+                        });
+
+                        // Export emails
+                        $('.export-dropdown ul li:contains("Export emails")').on('click', function () {
+                            window.location.href = '<?php echo admin_url("admin-post.php?action=growtype_form_admin_export_emails"); ?>';
+                        });
+
+                        // Export full
+                        $('.export-dropdown ul li:contains("Export full")').on('click', function () {
+                            window.location.href = '<?php echo admin_url("admin-post.php?action=growtype_form_admin_export_leads"); ?>';
+                        });
+
+                        // Hide dropdown on click outside
+                        $(document).on('click', function (e) {
+                            if (!$(e.target).closest('.export-dropdown').length) {
+                                $('.export-dropdown ul').hide();
+                            }
+                        });
+                    });
+                });
+            </script>
+            <?php
         }
-
-        $success = $details['success'] ?? '';
-
-        $events_log[] = [
-            'date' => wp_date('Y-m-d H:i:s'),
-            'details' => $details['data'] ?? [],
-            'success' => $success ? 'true' : 'false'
-        ];
-
-        update_post_meta($id, 'events_log', json_encode($events_log));
-    }
-
-    public static function get_events_log($id)
-    {
-        $events_log = get_post_meta($id, 'events_log', true);
-        $events_log = !empty($events_log) ? json_decode($events_log, true) : [];
-
-        return $events_log;
-    }
-
-    public function load_methods()
-    {
-        /**
-         * Custom actions
-         */
-        include_once 'partials/class-growtype-form-admin-lead-custom-actions.php';
-        new Growtype_Form_Admin_Lead_Custom_Actions();
     }
 }
