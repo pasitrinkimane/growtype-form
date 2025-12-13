@@ -105,6 +105,62 @@
 }
 
 .growtype-form {
+  .profile-avatar {
+    max-width: 340px;
+    position: relative;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    .profile-picture {
+      padding-top: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    input[type="file"] {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      opacity: 0;
+    }
+
+    .e-close {
+      position: absolute;
+      right: 10px;
+      border: 1px solid black;
+      padding: 4px 11px;
+      top: 10px;
+      min-width: 40px;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      cursor: pointer;
+      background: white;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .e-label {
+      text-align: center;
+      padding-top: 10px;
+      text-transform: uppercase;
+      gap: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 10px;
+    }
+  }
+
   .main-fields {
     display: flex;
     flex-wrap: wrap;
@@ -117,6 +173,10 @@
       max-width: 100%;
       padding-left: calc(1rem * .5);
       padding-right: calc(1rem * .5);
+
+      .iti {
+        width: 100%;
+      }
     }
 
     h3 {

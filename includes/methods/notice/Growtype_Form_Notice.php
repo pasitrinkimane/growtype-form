@@ -54,29 +54,36 @@ class Growtype_Form_Notice
                     } ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <script>
-                    if (jQuery('.growtype-form-alert').length > 0) {
-                        setTimeout(function () {
-                            var element = jQuery('.growtype-form-alert')[0];
-                            var headerOffset = 100;
-                            var elementPosition = element.getBoundingClientRect().top;
-                            var offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                <?php
 
-                            window.scrollTo({
-                                top: offsetPosition,
-                                behavior: "smooth"
+                add_action('wp_footer', function () {
+                    ?>
+                    <script>
+                        if (jQuery('.growtype-form-alert').length > 0) {
+                            setTimeout(function () {
+                                var element = jQuery('.growtype-form-alert')[0];
+                                var headerOffset = 100;
+                                var elementPosition = element.getBoundingClientRect().top;
+                                var offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                                window.scrollTo({
+                                    top: offsetPosition,
+                                    behavior: "smooth"
+                                });
+                            }, 500)
+
+                            /**
+                             * Close modal
+                             */
+                            jQuery('.growtype-form-alert .btn-close').on('click', function () {
+                                jQuery(this).closest('.growtype-form-alert-wrapper').fadeOut();
                             });
-                        }, 500)
+                        }
+                    </script>
+                    <?php
+                }, 99);
 
-                        /**
-                         * Close modal
-                         */
-                        jQuery('.growtype-form-alert .btn-close').on('click', function () {
-                            jQuery(this).closest('.growtype-form-alert-wrapper').fadeOut();
-                        });
-                    }
-                </script>
-                <?php if (isset($_GET['action']) && !empty($_GET['action']) && isset($_SERVER['REQUEST_URI'])) {
+                if (isset($_GET['action']) && !empty($_GET['action']) && isset($_SERVER['REQUEST_URI'])) {
 
                     $sanitized_url = $_SERVER['REQUEST_URI'];
 

@@ -40,7 +40,19 @@ class Growtype_Form_Admin_Page
         /**
          * Settings
          */
-        require_once GROWTYPE_FORM_PATH . 'admin/pages/settings/growtype-form-admin-settings.php';
+        require_once GROWTYPE_FORM_PATH . 'admin/pages/settings/class-growtype-form-admin-settings.php';
         new Growtype_Form_Admin_Settings();
+
+        /**
+         * Settings
+         */
+        require_once GROWTYPE_FORM_PATH . 'admin/pages/users/class-growtype-form-admin-user.php';
+        new Growtype_Form_Admin_User();
+
+        /**
+         * Media management
+         */
+        require GROWTYPE_FORM_PATH . '/admin/pages/media/class-growtype-form-admin-media.php';
+        new Growtype_Form_Admin_Media();
     }
 }

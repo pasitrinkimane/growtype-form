@@ -51,7 +51,7 @@ function growtype_form_signup_page_url($query_vars = [])
  */
 function growtype_form_profile_page_url()
 {
-    return home_url(Growtype_Form_Profile::URL_PATH);
+    return home_url(Growtype_Form_Profile_Edit::URL_PATH);
 }
 
 /**

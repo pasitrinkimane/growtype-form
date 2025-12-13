@@ -20,8 +20,20 @@ if ($field_type !== 'textarea') {
 $request_field_value = isset($_REQUEST[$field_name]) ? $_REQUEST[$field_name] : '';
 $request_field_value = $field_name === 'name' && isset($_REQUEST[Growtype_Form_Crud::ALTERNATIVE_SUBMITTED_DATA_KEYS[$field_name]]) ? $_REQUEST[Growtype_Form_Crud::ALTERNATIVE_SUBMITTED_DATA_KEYS[$field_name]] : $request_field_value;
 
-if (empty($field_value)) {
-    $field_value = !empty($request_field_value) && $field_type !== 'file' ? sanitize_text_field($request_field_value) : '';
+if (empty($field_value) && !empty($request_field_value)) {
+
+    if ($field_type === 'file') {
+        
+        $field_value = array (
+            'name' => sanitize_file_name($request_field_value['name'] ?? ''),
+            'url' => esc_url_raw($request_field_value['url'] ?? ''),
+            'download_id' => absint($request_field_value['download_id'] ?? 0),
+            'key' => sanitize_key($request_field_value['key'] ?? ''),
+        );
+
+    } else {
+        $field_value = sanitize_text_field($request_field_value);
+    }
 }
 
 if (strpos($field_name, 'password') !== false) {
@@ -101,52 +113,55 @@ $field_input_class = implode(" ", $field_input_class);
  * Block cat types
  */
 $block_cat_types = ['repeater', 'custom', 'shortcode', 'checkbox'];
-?>
 
-<div class="<?= in_array($field_type, $block_cat_types) ? 'b-wrapper' : 'e-wrapper'; ?> <?= $field_col_class ?>"
-     style="<?= $field_hidden ? 'display:none;' : '' ?>"
-     data-name="<?= $field_name ?>"
-     data-label="<?= !empty($field_label) ? 'true' : 'false' ?>"
-     data-group="<?= $field_group ?>"
-     data-conditions='<?= $conditions ?>'
->
-    <?php if (!empty($field_icon)) { ?>
-        <div class="input-icon">
-            <?= $field_icon ?>
-        </div>
-    <?php } ?>
+if ($field_type === 'fully_custom') {
+    echo $field['value'] ?? '';
+} else { ?>
+    <div class="<?= in_array($field_type, $block_cat_types) ? 'b-wrapper' : 'e-wrapper'; ?> <?= $field_col_class ?>"
+         style="<?= $field_hidden ? 'display:none;' : '' ?>"
+         data-name="<?= $field_name ?>"
+         data-label="<?= !empty($field_label) ? 'true' : 'false' ?>"
+         data-group="<?= $field_group ?>"
+         data-conditions='<?= $conditions ?>'
+    >
+        <?php if (!empty($field_icon)) { ?>
+            <div class="input-icon">
+                <?= $field_icon ?>
+            </div>
+        <?php } ?>
 
-    <?php if (!in_array($field_type, ['checkbox']) && !empty($field_label)) { ?>
-        <label for="<?= $field_name ?>" class="form-label">
-            <?= $field_label ?>
-        </label>
-    <?php } ?>
+        <?php if (!in_array($field_type, ['checkbox']) && !empty($field_label)) { ?>
+            <label for="<?= $field_name ?>" class="form-label">
+                <?= $field_label ?>
+            </label>
+        <?php } ?>
 
-    <?php if (!empty($field_description) && $field_type !== 'custom') { ?>
-        <p class="field-description"><?= $field_description ?></p>
-    <?php } ?>
+        <?php if (!empty($field_description) && $field_type !== 'custom') { ?>
+            <p class="field-description"><?= $field_description ?></p>
+        <?php } ?>
 
-    <?php if ($field_type === 'select') {
-        include 'partials/select.php';
-    } elseif ($field_type === 'radio') {
-        include 'partials/radio.php';
-    } elseif ($field_type === 'checkbox') {
-        include 'partials/checkbox.php';
-    } elseif ($field_type === 'textarea') {
-        include 'partials/textarea.php';
-    } elseif ($field_type === 'file') {
-        include 'partials/file.php';
-    } elseif ($field_type === 'custom') {
-        include 'partials/custom.php';
-    } elseif ($field_type === 'shortcode') {
-        include 'partials/shortcode.php';
-    } elseif ($field_type === 'repeater') {
-        include 'partials/repeater.php';
-    } else {
-        include 'partials/general.php';
-    } ?>
+        <?php if ($field_type === 'select') {
+            include 'partials/select.php';
+        } elseif ($field_type === 'radio') {
+            include 'partials/radio.php';
+        } elseif ($field_type === 'checkbox') {
+            include 'partials/checkbox.php';
+        } elseif ($field_type === 'textarea') {
+            include 'partials/textarea.php';
+        } elseif ($field_type === 'file') {
+            include 'partials/file.php';
+        } elseif ($field_type === 'custom') {
+            include 'partials/custom.php';
+        } elseif ($field_type === 'shortcode') {
+            include 'partials/shortcode.php';
+        } elseif ($field_type === 'repeater') {
+            include 'partials/repeater.php';
+        } else {
+            include 'partials/general.php';
+        } ?>
 
-    <?php if (!empty($field_explanation)) { ?>
-        <p class="field-explanation"><?= $field_explanation ?></p>
-    <?php } ?>
-</div>
+        <?php if (!empty($field_explanation)) { ?>
+            <p class="field-explanation"><?= $field_explanation ?></p>
+        <?php } ?>
+    </div>
+<?php } ?>

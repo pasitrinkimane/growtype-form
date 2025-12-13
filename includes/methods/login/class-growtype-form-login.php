@@ -48,6 +48,18 @@ class Growtype_Form_Login
         add_filter('login_message', array ($this, 'custom_lost_password_prompt'));
 
         add_action('login_enqueue_scripts', array ($this, 'custom_lostpassword_label_script'));
+
+        /**
+         * Redirect after login or signup
+         */
+        add_action('wp_loaded', function () {
+            if (is_user_logged_in() && !is_admin() && !isset($_GET['action']) && !empty(growtype_form_redirect_url_after_login())) {
+                if (growtype_form_current_page_is_login_page() || growtype_form_current_page_is_signup_page()) {
+                    wp_redirect(growtype_form_redirect_url_after_login());
+                    exit();
+                }
+            }
+        });
     }
 
     function custom_logout_redirect($redirect_to, $requested_redirect_to, $user)
@@ -165,7 +177,12 @@ class Growtype_Form_Login
     function custom_url()
     {
         if (growtype_form_login_page_ID() === 'default') {
-            add_rewrite_endpoint(self::URL_PATH, EP_ROOT);
+            add_rewrite_rule(
+                '^' . self::URL_PATH . '/?$',
+                'index.php?' . self::URL_PATH . '_page=1',
+                'top'
+            );
+            add_rewrite_tag('%' . self::URL_PATH . '_page%', '([0-1])');
         }
     }
 
@@ -174,7 +191,13 @@ class Growtype_Form_Login
      */
     function custom_url_template()
     {
-        if (!empty($_SERVER['REQUEST_URI'])) {
+        if (empty($_SERVER['REQUEST_URI'])) {
+            return;
+        }
+
+        $request_path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+
+        if ($request_path === self::URL_PATH) {
             if (growtype_form_login_page_is_active() && growtype_form_login_page_ID() === 'default') {
                 if (is_user_logged_in()) {
                     echo growtype_form_include_view('login.success');

@@ -2,6 +2,8 @@
 
 class Growtype_Form_Admin_Settings_Signup
 {
+    const TAB_SLUG = 'signup';
+
     public function __construct()
     {
         add_action('admin_init', array ($this, 'admin_settings'));
@@ -11,7 +13,7 @@ class Growtype_Form_Admin_Settings_Signup
 
     function settings_tab($tabs)
     {
-        $tabs['signup'] = 'Signup';
+        $tabs[self::TAB_SLUG] = 'Signup';
 
         return $tabs;
     }
@@ -256,7 +258,7 @@ class Growtype_Form_Admin_Settings_Signup
         );
 
         /**
-         *
+         * Add Users section
          */
         add_settings_section(
             'growtype_form_settings_signup_users_section_id',
@@ -282,6 +284,35 @@ class Growtype_Form_Admin_Settings_Signup
             array ($this, 'growtype_form_settings_signups_enabled_callback'),
             'growtype_form_settings_signup_users_section',
             'growtype_form_settings_signup_users_section_id'
+        );
+
+        /**
+         * Add Users section
+         */
+        add_settings_section(
+            'growtype_form_settings_signup_onboarding_section_id',
+            'Onboarding',
+            function () {
+                echo '<p>Onboarding settings</p>';
+            },
+            'growtype_form_settings_signup_onboarding_section'
+        );
+
+        /**
+         * Signups enabled
+         */
+        register_setting(
+            'growtype_form_settings_signup', // settings group name
+            'growtype_form_settings_signups_onboarding_enabled', // option name
+            'sanitize_text_field' // sanitization function
+        );
+
+        add_settings_field(
+            'growtype_form_settings_signups_onboarding_enabled',
+            'Signups onboarding enabled',
+            array ($this, 'growtype_form_settings_signups_onboarding_enabled_callback'),
+            'growtype_form_settings_signup_onboarding_section',
+            'growtype_form_settings_signup_onboarding_section_id'
         );
     }
 
@@ -504,6 +535,14 @@ class Growtype_Form_Admin_Settings_Signup
         $enabled = get_option('growtype_form_settings_signups_enabled');
         ?>
         <input type="checkbox" name="growtype_form_settings_signups_enabled" value="1" <?php echo checked(1, $enabled, false) ?> />
+        <?php
+    }
+
+    function growtype_form_settings_signups_onboarding_enabled_callback()
+    {
+        $enabled = get_option('growtype_form_settings_signups_onboarding_enabled');
+        ?>
+        <input type="checkbox" name="growtype_form_settings_signups_onboarding_enabled" value="1" <?php echo checked(1, $enabled, false) ?> />
         <?php
     }
 }

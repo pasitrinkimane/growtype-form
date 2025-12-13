@@ -16,6 +16,20 @@ import {conditions} from "./partials/actions/conditions";
 $('document').ready(function () {
 
     /**
+     * Input checkbox reset
+     */
+    $('.growtype-form-container').on('change', 'input[type="checkbox"]', function () {
+        var form = $(this).closest('.growtype-form');
+        var isReset = $(this).closest('.growtype-form-reset-other-checkboxes').length > 0;
+
+        if (isReset) {
+            form.find('input[type="checkbox"]').not(this).prop('checked', false);
+        } else {
+            form.find('.growtype-form-reset-other-checkboxes input[type="checkbox"]').prop('checked', false);
+        }
+    });
+
+    /**
      * Set repeater
      */
     repeater();
@@ -126,14 +140,21 @@ $('document').ready(function () {
     /**
      * Img remove
      */
-    $('.e-wrapper .btn-img-remove').click(function () {
+    $('.growtype-form .input-file-wrapper input[type="file"]').filestyle({buttonBefore: true})
+
+    $('.growtype-form .e-wrapper .btn-img-remove').click(function () {
         let inputType = $(this).attr('data-type');
         let inputId = $(this).attr('data-id');
         let inputClass = $(this).attr('data-class');
         let inputName = $(this).attr('data-name');
         let inputAccept = $(this).attr('data-accept');
         let inputRequired = $(this).attr('data-required');
-        let newInput = $('<input type="' + inputType + '" id="' + inputId + '" class="' + inputClass + '" name="' + inputName + '"  accept="' + inputAccept + '"  ' + inputRequired + '>');
+
+        let newInput = $('<input type="' + inputType + '" id="' + inputId + '" class="' + inputClass + '" name="' + inputName + '"  accept="' + inputAccept + '">');
+
+        if (inputRequired) {
+            newInput.prop('required', true);
+        }
 
         newInput.removeClass('has-value');
 

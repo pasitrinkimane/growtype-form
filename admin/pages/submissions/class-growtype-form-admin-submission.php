@@ -165,6 +165,7 @@ class Growtype_Form_Admin_Submission
     {
         ?>
         <div style="display:flex;gap: 10px; flex-direction: column;">
+            <?php wp_nonce_field('growtype_form_submission_meta', 'growtype_form_submission_meta_nonce'); ?>
             <?php
             foreach ($params['args']['fields'] as $field) {
                 $meta_value = get_post_meta($post->ID, $field['key'], true); ?>
@@ -186,6 +187,10 @@ class Growtype_Form_Admin_Submission
     function save_custom_meta_boxes($post_id)
     {
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
+        }
+
+        if (!isset($_POST['growtype_form_submission_meta_nonce']) || !wp_verify_nonce($_POST['growtype_form_submission_meta_nonce'], 'growtype_form_submission_meta')) {
             return;
         }
 
@@ -217,7 +222,7 @@ class Growtype_Form_Admin_Submission
         foreach (self::get_meta_boxes() as $box) {
             foreach ($box['fields'] as $field) {
                 if ($column === $field['key']) {
-                    echo get_post_meta($post_id, $field['key'], true);
+                    echo esc_html(get_post_meta($post_id, $field['key'], true));
                 }
             }
         }

@@ -1,0 +1,15 @@
+.profile-edit-page {
+  .main-fields {
+    align-items: flex-start;
+  }
+
+  .col-left {
+    width: 30%;
+  }
+
+  .col-right {
+    width: 70%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+}

@@ -515,14 +515,15 @@ class Growtype_Form_Admin_Lead
         $output = fopen('php://output', 'w');
 
         // Define CSV column headers
-        fputcsv($output, ['ID', 'Email', 'Date']);
+        fputcsv($output, ['Nr', 'ID', 'Email', 'Date']);
 
         // Loop through posts
-        foreach ($query->posts as $lead_id) {
+        foreach ($query->posts as $index => $lead_id) {
             $email = get_the_title($lead_id);
             $date = get_the_date('Y-m-d H:i:s', $lead_id);
 
             fputcsv($output, [
+                $index + 1,
                 $lead_id,
                 $email,
                 $date,
@@ -559,15 +560,16 @@ class Growtype_Form_Admin_Lead
         $output = fopen('php://output', 'w');
 
         // Define CSV column headers
-        fputcsv($output, ['ID', 'Email', 'Unsubscribed', 'Date']);
+        fputcsv($output, ['Nr', 'ID', 'Email', 'Unsubscribed', 'Date']);
 
         // Loop through posts
-        foreach ($query->posts as $lead_id) {
+        foreach ($query->posts as $index => $lead_id) {
             $email = get_the_title($lead_id);
             $date = get_the_date('Y-m-d H:i:s', $lead_id);
             $unsubscribed = get_post_meta($lead_id, 'newsletter_unsubscribed', true);
 
             fputcsv($output, [
+                $index + 1,
                 $lead_id,
                 $email,
                 $unsubscribed,

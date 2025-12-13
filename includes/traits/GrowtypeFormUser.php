@@ -19,13 +19,24 @@ trait GrowtypeFormUser
      */
     public function get_user_data($user_id = null)
     {
-        $user = !empty($user_id) ? get_user_by('id', $user_id) : wp_get_current_user();
+        $user_id = !empty($user_id) ? $user_id : get_current_user_id();
+
+        $user = get_user_by('id', $user_id);
+
         $user_data['profile'] = $user->data;
         $user_data['signup'] = Growtype_Form_Signup::get_signup_data($user_id);
-        $user_data['child_users'] = $this->get_user_child_users($user->ID);
+        $user_data['child_users'] = $this->get_user_child_users($user_id);
 
         if (class_exists('Growtype_Quiz') && function_exists('growtype_quiz_get_user_results')) {
-            $user_data['quiz'] = growtype_quiz_get_user_results($user->ID);
+            $user_data['quiz'] = growtype_quiz_get_user_results($user_id);
+        }
+
+        $user_meta = get_user_meta($user_id);
+
+        foreach ($user_meta as $key => $user_meta_value) {
+            if (in_array($key, ['first_name', 'last_name'])) {
+                $user_data['profile']->$key = $user_meta_value[0];
+            }
         }
 
         $user_data = apply_filters('growtype_form_user_data', $user_data, $user_id);

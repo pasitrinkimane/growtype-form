@@ -42,201 +42,258 @@ trait GrowtypeFormProduct
     public function create_or_update_product($product_data)
     {
         if (!class_exists('Growtype_Wc_Product')) {
-            die('Class Growtype_Wc_Product not found');
+            return [
+                'success' => false,
+                'message' => 'Class Growtype_Wc_Product not found'
+            ];
         }
 
         /**
-         * Price per unit buy now
+         * Validate ownership (update only)
          */
-        $price_per_unit_buy_now = isset($product_data['data']['_price_per_unit_buy_now']) ? $product_data['data']['_price_per_unit_buy_now'] : '';
+        if (!empty($product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR])) {
+            if (!Growtype_Wc_Product::user_has_created_product(
+                $product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR]
+            )) {
+                return [
+                    'success' => false,
+                    'message' => 'User has not created product'
+                ];
+            }
+        }
 
         /**
-         * Amount in units
+         * Prices
          */
-        $amount_in_units = isset($product_data['data']['_amount_in_units']) ? $product_data['data']['_amount_in_units'] : null;
-
-        /**
-         * Price
-         */
-        $price = isset($product_data['data']['price']) ? $product_data['data']['price'] : '';
-
-        /**
-         * Regular price
-         */
-        $regular_price = isset($product_data['data']['regular_price']) ? $product_data['data']['regular_price'] : '';
+        $price_per_unit_buy_now = $product_data['data']['_price_per_unit_buy_now'] ?? null;
+        $amount_in_units = $product_data['data']['_amount_in_units'] ?? null;
+        $price = $product_data['data']['price'] ?? null;
+        $regular_price = $product_data['data']['regular_price'] ?? null;
 
         if (!empty($price_per_unit_buy_now) && !empty($amount_in_units)) {
             $regular_price = $price_per_unit_buy_now * $amount_in_units;
         }
 
         /**
-         * Meta keys to update
+         * Meta fields
          */
         $meta_details = [];
-        $meta_keys_to_update = $this->get_product_meta_keys(growtype_form_default_product_type());
-
-        foreach ($meta_keys_to_update as $meta_key) {
-            $meta_value = isset($product_data['data'][$meta_key]) ? $product_data['data'][$meta_key] : null;
-
-            $meta_value = apply_filters('growtype_form_wc_crud_update_meta_data', $meta_value, $meta_key, $product_data);
-
-            $meta_details[$meta_key] = $meta_value;
+        foreach ($this->get_product_meta_keys(growtype_form_default_product_type()) as $meta_key) {
+            $meta_details[$meta_key] = apply_filters(
+                'growtype_form_wc_crud_update_meta_data',
+                $product_data['data'][$meta_key] ?? null,
+                $meta_key,
+                $product_data
+            );
         }
 
         /**
-         * Get gallery ids
+         * Upload new gallery images and create a mapping
          */
-        $gallery_data = $product_data['files']['gallery'] ?? null;
-        $gallery_ids = [];
+        $uploaded_gallery_map = []; // Map by file name and size for matching
 
-        if (!empty($gallery_data)) {
+        if (!empty($product_data['files']['gallery']['name'])) {
+            foreach ($product_data['files']['gallery']['name'] as $i => $name) {
+                if (empty($name)) {
+                    continue;
+                }
 
-            $filter_files = array_filter($gallery_data['name'], function ($value) {
-                return !empty($value);
-            });
+                $file = [];
+                foreach ($product_data['files']['gallery'] as $key => $values) {
+                    $file[$key] = $values[$i];
+                }
 
-            $files_amount = is_array($filter_files) ? count($filter_files) : null;
+                $upload = self::upload_file_to_media_library($file);
 
-            if (!empty($files_amount)) {
-                $files_data = [];
-                for ($index = 0; $index < $files_amount; $index++) {
-                    foreach ($gallery_data as $key => $file) {
-                        $files_data[$index][$key] = $file[$index];
-                    }
-
-                    $uploaded_attachment = self::upload_file_to_media_library($files_data[$index]);
-
-                    if (isset($uploaded_attachment['attachment_id'])) {
-                        array_push($gallery_ids, $uploaded_attachment['attachment_id']);
-                    }
+                if (!empty($upload['attachment_id'])) {
+                    $attachment_id = (int)$upload['attachment_id'];
+                    
+                    // Add meta tag to mark this as a product gallery image
+                    update_post_meta($attachment_id, '_growtype_form_product_gallery', 'yes');
+                    
+                    // Create a key based on file name and size for matching with order data
+                    $key = $name . '_' . $file['size'];
+                    $uploaded_gallery_map[$key] = $attachment_id;
                 }
             }
         }
 
-        $gallery_preloaded = isset($product_data['data']['preloaded']) ? $product_data['data']['preloaded'] : null;
-
-        $all_ids = $gallery_ids;
-
-        if (!empty($gallery_preloaded)) {
-            $all_ids = array_merge($gallery_ids, $gallery_preloaded);
-        }
-
-        $gallery_ids = $all_ids;
-
         /**
-         * Update gallery ids
+         * Parse gallery order from frontend
          */
-        if (isset($all_ids)) {
-            unset($all_ids[0]);
+        $gallery_order = [];
+        if (!empty($product_data['data']['gallery_order'])) {
+            // The JSON comes with escaped quotes, so we need to stripslashes first
+            $gallery_order_json = stripslashes($product_data['data']['gallery_order']);
+            $gallery_order = json_decode($gallery_order_json, true);
         }
 
         /**
-         * Save featured image
+         * Build ordered gallery array based on frontend order
          */
-        $featured_image_data = $product_data['files']['featured_image'] ?? null;
-
-        if (!empty($featured_image_data)) {
-            $featured_image = self::upload_file_to_media_library($featured_image_data);
+        $all_image_ids = [];
+        
+        if (!empty($gallery_order) && is_array($gallery_order)) {
+            foreach ($gallery_order as $item) {
+                if ($item['type'] === 'preloaded' && !empty($item['id'])) {
+                    // Add preloaded image ID
+                    $all_image_ids[] = (int)$item['id'];
+                } elseif ($item['type'] === 'new' && !empty($item['name'])) {
+                    // Match newly uploaded image by name and size
+                    $key = $item['name'] . '_' . $item['size'];
+                    if (isset($uploaded_gallery_map[$key])) {
+                        $all_image_ids[] = $uploaded_gallery_map[$key];
+                    }
+                }
+            }
+            
+            /**
+             * Delete images that were removed from gallery
+             * Get the actual current gallery from database, not from form
+             */
+            if (!empty($product_data['data']['growtype_form_post_id'])) {
+                $product_id_for_check = $product_data['data']['growtype_form_post_id'];
+                
+                // Get current gallery from database
+                $current_gallery_string = get_post_meta($product_id_for_check, '_product_image_gallery', true);
+                $current_gallery_ids = !empty($current_gallery_string) 
+                    ? array_map('intval', explode(',', $current_gallery_string))
+                    : [];
+                
+                // Also include current featured image
+                $current_featured_id = get_post_thumbnail_id($product_id_for_check);
+                if ($current_featured_id) {
+                    $current_gallery_ids[] = (int)$current_featured_id;
+                }
+                
+                // Find images that were in current gallery but not in new gallery
+                $removed_image_ids = array_diff($current_gallery_ids, $all_image_ids);
+                
+                if (!empty($removed_image_ids)) {
+                    foreach ($removed_image_ids as $removed_id) {
+                        // Delete the attachment from WordPress
+                        wp_delete_attachment($removed_id, true);
+                    }
+                }
+            }
+        } else {
+            // Fallback: if no order data, merge preloaded and uploaded
+            $preloaded_ids = array_map(
+                'intval',
+                $product_data['data']['image_uploader_old_gallery'] ?? []
+            );
+            $all_image_ids = array_values(array_unique(array_merge(
+                $preloaded_ids,
+                array_values($uploaded_gallery_map)
+            )));
         }
 
         /**
-         * Set featured image
+         * Featured image logic
          */
-        $image_id = null;
-        if (isset($featured_image) && !empty($featured_image)) {
-            $image_id = $featured_image['attachment_id'];
-        } elseif (isset($gallery_ids) && !empty($gallery_ids)) {
-            $image_id = $gallery_ids[0];
+        $featured_image_id = null;
+
+        if (!empty($product_data['files']['featured_image'])) {
+            $upload = self::upload_file_to_media_library(
+                $product_data['files']['featured_image']
+            );
+            $featured_image_id = $upload['attachment_id'] ?? null;
         }
 
         /**
-         * Save downloadable files
+         * Downloadable files
          */
-        $downloadable_files_data = isset($product_data['files']['downloadable_files']) ? $product_data['files']['downloadable_files'] : null;
-
         $downloadable_files = [];
-        if (!empty($downloadable_files_data)) {
-            foreach ($downloadable_files_data as $downloadable_file_data) {
-                $downloadable_file = self::upload_file_to_media_library($downloadable_file_data);
-
-                if (!empty($downloadable_file)) {
-                    array_push($downloadable_files, $downloadable_file);
-                }
+        foreach ($product_data['files']['downloadable_files'] ?? [] as $file) {
+            $upload = self::upload_file_to_media_library($file);
+            if ($upload) {
+                $downloadable_files[] = $upload;
             }
         }
 
         /**
-         * Add product creator id
+         * Extra meta
          */
-        $creator_id = isset($product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID]) ? $product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID] : null;
-
-        if (!empty($creator_id)) {
-            $meta_details['_product_creator_id'] = $creator_id;
+        if (!empty($product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID])) {
+            $meta_details['_product_creator_id'] =
+                $product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_SUBMITTER_ID];
         }
 
-        /**
-         * Add product
-         */
-        $extra_details = isset($product_data['data']['extra_details']) ? $product_data['data']['extra_details'] : null;
-
-        if (!empty($extra_details)) {
-            $meta_details['_extra_details'] = implode(',', $extra_details);
+        if (!empty($product_data['data']['extra_details'])) {
+            $meta_details['_extra_details'] =
+                implode(',', (array)$product_data['data']['extra_details']);
         }
 
-        /**
-         * Enable image placeholder
-         */
         $meta_details['_img_placeholder_enabled'] = true;
 
         /**
-         * Create product
+         * Create or update product
          */
-        $product_class = new Growtype_Wc_Product;
-
-        $product_args = [
-            'post_id' => isset($product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR]) ? $product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR] : null,
+        $product = (new Growtype_Wc_Product)->create([
+            'post_id' => $product_data['data'][Growtype_Form_Crud::GROWTYPE_FORM_POST_IDENTIFICATOR] ?? null,
             'product_type' => growtype_form_default_product_type(),
-            'post_title' => isset($product_data['data']['title']) ? $product_data['data']['title'] : __('New product', 'growtype-form'),
-            'post_status' => isset($product_data['data']['status']) ? $product_data['data']['status'] : growtype_form_default_product_status(),
-            'categories' => isset($product_data['data']['categories']) ? $product_data['data']['categories'] : null,
-            'tags' => isset($product_data['data']['tags']) ? $product_data['data']['tags'] : '',
+            'post_title' => $product_data['data']['title'] ?? __('New product', 'growtype-form'),
+            'post_status' => $product_data['data']['status'] ?? growtype_form_default_product_status(),
+            'categories' => $product_data['data']['categories'] ?? null,
+            'tags' => $product_data['data']['tags'] ?? '',
             'catalog_visibility' => growtype_form_default_product_catalog_visibility(),
-            'short_description' => isset($product_data['data']['short_description']) ? $product_data['data']['short_description'] : '',
-            'description' => isset($product_data['data']['description']) ? $product_data['data']['description'] : '',
-            'gallery_image_ids' => $all_ids,
-            'image_id' => $image_id,
+            'short_description' => $product_data['data']['short_description'] ?? '',
+            'description' => $product_data['data']['description'] ?? '',
             'downloadable_files' => $downloadable_files,
             'meta_details' => $meta_details,
-            'regular_price' => !empty($regular_price) ? $regular_price : null,
-            'price' => !empty($price) ? $price : null,
-        ];
+            'regular_price' => $regular_price,
+            'price' => $price,
+        ]);
 
-        $product = $product_class->create($product_args);
-
-        /**
-         * Apply external changes
-         */
-        $product = apply_filters('growtype_form_wc_crud_product_after_save', $product, $product_data);
+        $product_id = $product->get_id();
 
         /**
-         * Response
+         * Only update gallery if there's order data (meaning user interacted with gallery)
          */
-        if ($product->get_id() === 0) {
-            $response['success'] = false;
-            $response['message'] = growtype_form_message();
-        } else {
-            $response['product_id'] = $product->get_id();
+        if (!empty($gallery_order) && is_array($gallery_order) && count($all_image_ids) > 0) {
+            
+            // Always use first image from ordered gallery as featured image when order is changed
+            $featured_image_id = $all_image_ids[0] ?? null;
 
-            if (!empty($existing_product)) {
-                $response['message'] = __("Product updated.", "growtype-form");
-            } else {
-                $response['message'] = __("Product created.", "growtype-form");
+            /**
+             * Remove featured image from gallery
+             */
+            $gallery_ids = array_values(array_diff($all_image_ids, [$featured_image_id]));
+
+            /**
+             * Set featured image
+             */
+            if ($featured_image_id) {
+                set_post_thumbnail($product_id, $featured_image_id);
             }
 
-            $response['success'] = true;
+            /**
+             * Set gallery only if we have images
+             */
+            if (!empty($gallery_ids)) {
+                update_post_meta($product_id, '_product_image_gallery', implode(',', $gallery_ids));
+            } elseif (isset($gallery_ids)) {
+                // Clear gallery if explicitly empty
+                delete_post_meta($product_id, '_product_image_gallery');
+            }
         }
 
-        return $response;
+        /**
+         * Filters
+         */
+        $product = apply_filters(
+            'growtype_form_wc_crud_product_after_save',
+            $product,
+            $product_data
+        );
+
+//        d($product);
+
+        return [
+            'success' => true,
+            'product_id' => $product->get_id(),
+            'message' => __('Product saved.', 'growtype-form')
+        ];
     }
 
     /**
@@ -288,9 +345,9 @@ trait GrowtypeFormProduct
      * @param $user_id
      * @return bool
      */
-    public function user_has_uploaded_product($product_id, $user_id = null)
+    public static function user_has_uploaded_product($product_id, $user_id = null)
     {
-        $user_id = $user_id ?? wp_get_current_user()->ID ?? null;
+        $user_id = $user_id ?? get_current_user_id();
 
         if (empty($user_id)) {
             return false;

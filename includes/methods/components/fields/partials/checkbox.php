@@ -28,7 +28,7 @@
                placeholder="<?php echo $placeholder ?>"
             <?php echo $field_required ? 'required' : '' ?>
                value="<?php echo $field_value ?>"
-            <?php echo in_array('true', $selected_options) ? 'checked' : '' ?>
+            <?php echo (in_array('true', $selected_options) || in_array('1', $selected_options)) ? 'checked' : '' ?>
         >
         <?php if (!empty($field_label)) { ?>
             <label for="<?php echo $field_id ?>" class="form-label">

@@ -16,26 +16,27 @@ class Growtype_Form_Signup_Details
 {
     use GrowtypeFormUser;
 
-    /**
-     * URL to the BP Members Admin directory.
-     *
-     * @var string $admin_url
-     */
-    public $admin_url = '';
+    public $admin_url;
 
-    /**
-     * URL to the BP Members Admin CSS directory.
-     *
-     * @var string $css_url
-     */
-    public $css_url = '';
+    public $user_page;
 
-    /**
-     * Screen id for edit user's profile page.
-     *
-     * @var string
-     */
-    public $user_page = '';
+    public $capability;
+
+    public $user_profile;
+
+    public $current_user_id;
+
+    public $is_self_profile;
+
+    public $edit_profile_args;
+
+    public $users_url;
+
+    public $signups_page;
+
+    public $users_page;
+
+    public $screen_id;
 
     /**
      * Constructor method.

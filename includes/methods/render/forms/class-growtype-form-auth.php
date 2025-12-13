@@ -23,7 +23,7 @@ class Growtype_Form_Auth
     function growtype_form_shortcode_function($args)
     {
         $args = !empty($args) ? $args : [];
-        $default = $args['default'] ?? 'login';
+        $auth_type = $args['default'] ?? 'login';
 
         if (is_user_logged_in()) {
             return growtype_form_include_view('login.partials.success-content');
@@ -31,7 +31,6 @@ class Growtype_Form_Auth
 
         add_filter('body_class', function ($classes) {
             $classes[] = 'page-gf-auth';
-
             return $classes;
         });
 
@@ -48,6 +47,9 @@ class Growtype_Form_Auth
                 display: block;
             }
         </style>
+
+        <?php echo do_action('growtype_form_auth_before', $auth_type) ?>
+
         <div class="growtype-form-auth">
             <?php
             $growtype_form_general = new Growtype_Form_General();
@@ -56,13 +58,13 @@ class Growtype_Form_Auth
 
             $args_login = $args;
             $args_login['name'] = 'login';
-            $args_login['class'] = ($default === 'login' ? 'is-active' : '');
+            $args_login['class'] = ($auth_type === 'login' ? 'is-active' : '');
 
             echo $growtype_form_general->form_init($args_login);
 
             $args_signup = $args;
             $args_signup['name'] = 'signup';
-            $args_signup['class'] = ($default === 'signup' ? 'is-active' : '');
+            $args_signup['class'] = ($auth_type === 'signup' ? 'is-active' : '');
 
             echo $growtype_form_general->form_init($args_signup);
             ?>

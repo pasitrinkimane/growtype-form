@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="container">
-        <?php echo do_shortcode('[growtype_form name="signup" action="update"]') ?>
+        <h2>Settings page</h2>
     </div>
 @endsection
 

@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    {!! do_shortcode('[growtype_form_auth default="signup"]') !!}
+    {!! do_shortcode('[growtype_form_auth default="signup" purpose="'. ($purpose ?? 'default') .'"]') !!}
 @endsection
 
 @section('footer')

@@ -14,7 +14,7 @@ if (isset($_REQUEST['repeater']) && !empty($_REQUEST['repeater'])) {
 
             foreach ($field_fields as $single_field) {
                 $field_name = $single_field['name'] ?? null;
-                if (strpos($field_name, '[') !== false) {
+                if (!empty($field_name) && strpos($field_name, '[') !== false) {
                     $cat_p = explode('[', $field_name)[0] ?? null;
                     $cat_c = explode('[', $field_name)[1] ?? null;
                     $cat_c = str_replace(']', '', $cat_c);

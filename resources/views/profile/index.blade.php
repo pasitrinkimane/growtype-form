@@ -5,9 +5,15 @@
 @endsection
 
 @section('content')
-    <div class="container">
-        <h2>{!! $data['user']['profile']->display_name !!}</h2>
-        <a href="{!! wp_logout_url() !!}">Log out</a>
+    <div class="container py-5">
+        @foreach(Growtype_Form_Profile::custom_pages() as $page)
+
+            @if($page['key'] === 'profile')
+                @continue
+            @endif
+
+            <a href="{!! home_url($page['url']) !!}" class="btn-primary">{!! $page['title'] ?? 'test' !!}</a>
+        @endforeach
     </div>
 @endsection
 

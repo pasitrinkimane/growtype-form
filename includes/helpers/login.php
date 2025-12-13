@@ -86,7 +86,7 @@ function growtype_form_redirect_url_after_login()
     } elseif ($redirect_page === 'dashboard') {
         $redirect_url = get_dashboard_url();
     } elseif ($redirect_page === 'default-profile') {
-        $redirect_url = home_url(Growtype_Form_Profile::URL_PATH);
+        $redirect_url = home_url(Growtype_Form_Profile_Edit::URL_PATH);
     } else {
         $redirect_url = get_permalink($redirect_page);
     }
@@ -94,16 +94,22 @@ function growtype_form_redirect_url_after_login()
     return apply_filters('growtype_form_redirect_url_after_login', $redirect_url);
 }
 
-if (!function_exists('growtype_form_current_page_is_login_page')) {
-    function growtype_form_current_page_is_login_page()
+if (!function_exists('growtype_form_current_page_is_signup_page')) {
+    function growtype_form_current_page_is_signup_page(): bool
     {
-        return strpos($_SERVER['REQUEST_URI'], Growtype_Form_Login::URL_PATH) !== false;
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+
+        return !is_admin()
+            && preg_match('#^/signup/?$#', $uri) === 1;
     }
 }
 
-if (!function_exists('growtype_form_current_page_is_signup_page')) {
-    function growtype_form_current_page_is_signup_page()
+if (!function_exists('growtype_form_current_page_is_login_page')) {
+    function growtype_form_current_page_is_login_page(): bool
     {
-        return strpos($_SERVER['REQUEST_URI'], Growtype_Form_Signup::URL_PATH) !== false;
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+
+        return !is_admin()
+            && preg_match('#^/login/?$#', $uri) === 1;
     }
 }

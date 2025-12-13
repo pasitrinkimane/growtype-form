@@ -4,7 +4,6 @@
  */
 
 (function ($) {
-
     $.fn.imageUploader = function (options) {
 
         // Default settings
@@ -53,7 +52,13 @@
                             true
                         ));
                     }
-                    $uploadedContainer.sortable();
+                    $uploadedContainer.sortable({
+                        update: function (event, ui) {
+                            updateImageOrder($container);
+                        }
+                    });
+                    // Initial order update
+                    updateImageOrder($container);
                 }
             });
         };
@@ -62,7 +67,7 @@
         // Container creation
         // -------------------------------
         let createContainer = function () {
-            let $container = $('<div>', {class: 'image-uploader-inner'});
+            let $container = $('<div>', { class: 'image-uploader-inner' });
 
             let inputParams = {
                 type: 'file',
@@ -74,10 +79,20 @@
             if (plugin.settings.capture) inputParams.capture = plugin.settings.capture;
 
             $input = $('<input>', inputParams).appendTo($container);
-            let $uploadedContainer = $('<div>', {class: 'uploaded'}).appendTo($container);
-            let $textContainer = $('<div>', {class: 'upload-text'}).appendTo($container);
-            $('<i>', {class: 'iui-cloud-upload'}).appendTo($textContainer);
-            $('<span>', {text: plugin.settings.label}).appendTo($textContainer);
+
+            // Create hidden input for image order
+            let $orderInput = $('<input>', {
+                type: 'hidden',
+                name: plugin.settings.imagesInputName + '_order',
+                class: 'image-order-input'
+            }).appendTo($container);
+
+
+
+            let $uploadedContainer = $('<div>', { class: 'uploaded' }).appendTo($container);
+            let $textContainer = $('<div>', { class: 'upload-text' }).appendTo($container);
+            $('<i>', { class: 'iui-cloud-upload' }).appendTo($textContainer);
+            $('<span>', { text: plugin.settings.label }).appendTo($textContainer);
 
             $container.on('click', function (e) {
                 prevent(e);
@@ -96,13 +111,40 @@
         let prevent = e => { e.preventDefault(); e.stopPropagation(); };
 
         // -------------------------------
+        // Update image order
+        // -------------------------------
+        let updateImageOrder = function ($container) {
+            let order = [];
+            $container.find('.uploaded .uploaded-image').each(function () {
+                let $img = $(this);
+                if ($img.data('preloaded')) {
+                    // For preloaded images, use the hidden input value (image ID)
+                    let imageId = $img.find('input[type="hidden"]').val();
+                    order.push({ type: 'preloaded', id: imageId });
+                } else {
+                    // For new uploads, include index, name, and size
+                    let index = $img.data('index');
+                    let fileName = $img.attr('data-file-name');
+                    let fileSize = $img.attr('data-file-size');
+                    order.push({
+                        type: 'new',
+                        index: index,
+                        name: fileName,
+                        size: parseInt(fileSize)
+                    });
+                }
+            });
+            $container.find('.image-order-input').val(JSON.stringify(order));
+        };
+
+        // -------------------------------
         // Exposed: createImg
         // -------------------------------
-        plugin.createImg = function (src, id, preloaded) {
-            let $container = $('<div>', {class: 'uploaded-image'});
-            $('<img>', {src: src}).appendTo($container);
-            let $button = $('<button>', {class: 'delete-image'}).appendTo($container);
-            $('<i>', {class: 'iui-close'}).appendTo($button);
+        plugin.createImg = function (src, id, preloaded, fileMetadata) {
+            let $container = $('<div>', { class: 'uploaded-image' });
+            $('<img>', { src: src }).appendTo($container);
+            let $button = $('<button>', { class: 'delete-image' }).appendTo($container);
+            $('<i>', { class: 'iui-close' }).appendTo($button);
 
             if (preloaded) {
                 $container.attr('data-preloaded', true);
@@ -113,6 +155,11 @@
                 }).appendTo($container);
             } else {
                 $container.attr('data-index', id);
+                // Store file metadata if provided
+                if (fileMetadata) {
+                    $container.attr('data-file-name', fileMetadata.name);
+                    $container.attr('data-file-size', fileMetadata.size);
+                }
             }
 
             $container.on("click", e => prevent(e));
@@ -132,6 +179,9 @@
                 }
                 $container.remove();
                 if (!$parent.children().length) $parent.parent().removeClass('has-files');
+
+                // Update image order after deletion
+                updateImageOrder($parent.parent());
             });
 
             // ----- EXTENSION POINT -----
@@ -222,11 +272,26 @@
             $(files).each((i, file) => {
                 dataTransfer.items.add(file);
                 imgSrc = file.type === 'application/pdf' ? window.growtype_form.public_url + 'images/pdf.png' : URL.createObjectURL(file);
-                $uploadedContainer.append(plugin.createImg(imgSrc, dataTransfer.items.length - 1, false));
+                // Pass file metadata (name and size) to createImg
+                $uploadedContainer.append(plugin.createImg(imgSrc, dataTransfer.items.length - 1, false, {
+                    name: file.name,
+                    size: file.size
+                }));
             });
 
             $input.prop('files', dataTransfer.files);
-            $uploadedContainer.sortable();
+
+            // Configure sortable with update callback if not already configured
+            if (!$uploadedContainer.hasClass('ui-sortable')) {
+                $uploadedContainer.sortable({
+                    update: function (event, ui) {
+                        updateImageOrder($container);
+                    }
+                });
+            }
+
+            // Update image order after adding new images
+            updateImageOrder($container);
 
             // ----- EXTENSION POINT -----
             $(document).trigger('imageUploader:setPreview', [$container, files, plugin]);

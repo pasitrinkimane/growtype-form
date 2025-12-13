@@ -11,11 +11,9 @@ mix
 
 mix
     .js('resources/scripts/growtype-form.js', 'scripts')
-    .js('resources/scripts/growtype-form-render.js', 'scripts');
-
-mix
-    .copyDirectory('resources/plugins', 'public/plugins')
-    .copyDirectory('resources/images', 'public/images')
+    .js('resources/scripts/growtype-form-render.js', 'scripts')
+    .js('resources/scripts/growtype-form-profile-edit.js', 'scripts')
+    .js('resources/scripts/growtype-form-profile-security.js', 'scripts');
 
 mix
     .sourceMaps()

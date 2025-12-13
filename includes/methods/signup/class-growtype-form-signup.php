@@ -18,6 +18,26 @@ class Growtype_Form_Signup
         $this->load_partials();
 
         add_filter('growtype_auth_success_redirect_url', array ($this, 'growtype_auth_success_redirect_url_extend'));
+
+        $this->set_default_user_role();
+    }
+
+    public function set_default_user_role()
+    {
+        add_filter('woocommerce_new_customer_data', function ($args) {
+            $default_user_role = self::default_user_role();
+
+            if (!empty($default_user_role)) {
+                $args['role'] = $default_user_role;
+            }
+
+            return $args;
+        });
+    }
+
+    public static function default_user_role()
+    {
+        return get_option('growtype_form_default_user_role');
     }
 
     function growtype_auth_success_redirect_url_extend($redirect_url)
@@ -44,7 +64,12 @@ class Growtype_Form_Signup
     function custom_url()
     {
         if (growtype_form_signup_page_id() === 'default') {
-            add_rewrite_endpoint(self::URL_PATH, EP_ROOT);
+            add_rewrite_rule(
+                '^' . self::URL_PATH . '/?$',
+                'index.php?' . self::URL_PATH . '_page=1',
+                'top'
+            );
+            add_rewrite_tag('%' . self::URL_PATH . '_page%', '([0-1])');
         }
     }
 
@@ -53,7 +78,13 @@ class Growtype_Form_Signup
      */
     function custom_url_template()
     {
-        if (!empty($_SERVER['REQUEST_URI'])) {
+        if (empty($_SERVER['REQUEST_URI'])) {
+            return;
+        }
+
+        $request_path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+
+        if ($request_path === self::URL_PATH) {
             if (growtype_form_signup_page_is_active() && growtype_form_signup_page_id() === 'default') {
                 if (is_user_logged_in()) {
                     echo growtype_form_include_view('login.success');
@@ -159,7 +190,12 @@ Please review your username and make the necessary corrections to meet these req
         if (class_exists('woocommerce') && !empty($email)) {
             $user_id = wc_create_new_customer(sanitize_email($email), wc_clean($username), $password);
         } else {
-            $user_id = wp_create_user($username, $password, sanitize_email($email));
+            $user_id = wp_insert_user([
+                'user_login' => $username,
+                'user_email' => sanitize_email($email),
+                'user_pass' => $password,
+                'role' => self::default_user_role()
+            ]);
         }
 
         if (is_wp_error($user_id)) {
@@ -232,7 +268,10 @@ Please review your username and make the necessary corrections to meet these req
 
     function load_partials()
     {
-        include_once __DIR__ . '/partials/class-growtype-form-verification.php';
+        include_once __DIR__ . '/partials/class-growtype-form-signup-verification.php';
         new Growtype_Form_Signup_Verification();
+
+        include_once __DIR__ . '/partials/class-growtype-form-signup-onboarding.php';
+        new Growtype_Form_Signup_Onboarding();
     }
 }

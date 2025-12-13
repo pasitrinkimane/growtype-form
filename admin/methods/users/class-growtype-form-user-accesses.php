@@ -21,7 +21,7 @@ class Growtype_Form_User_Accesses
      */
     public function __construct()
     {
-        add_action('admin_init', array ($this, 'admin_access'), 100);
+         add_action('admin_init', array ($this, 'admin_access'), 100);
     }
 
     function admin_access()
@@ -42,7 +42,7 @@ class Growtype_Form_User_Accesses
             if (
                 !defined('DOING_AJAX')
                 &&
-                $role_is_prevented
+                !empty($role_is_prevented)
             ) {
                 if (is_user_logged_in()) {
                     wp_redirect(growtype_form_profile_page_url());
