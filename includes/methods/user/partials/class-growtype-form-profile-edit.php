@@ -124,15 +124,6 @@ class Growtype_Form_Profile_Edit extends Growtype_Form_Profile
             return $form_data;
         }, 0, 3);
 
-        add_action('growtype_form_delete', function ($post_id) {
-            if (isset($_POST['growtype_form_name']) && $_POST['growtype_form_name'] === self::EDIT_FORM_KEY) {
-                if (!function_exists('wp_delete_user')) {
-                    require_once ABSPATH . 'wp-admin/includes/user.php';
-                }
-                wp_delete_user(get_current_user_id());
-            }
-        });
-
         // Add nonce field to the form
         add_filter('growtype_form_before_fields', function ($form_name) {
             if ($form_name === self::EDIT_FORM_KEY) {
@@ -197,59 +188,223 @@ class Growtype_Form_Profile_Edit extends Growtype_Form_Profile
                 true
             );
         });
+
+        add_action('growtype_form_delete', [$this, 'handle_delete_user']);
+        add_action('wp_footer', [$this, 'render_delete_confirmation_script']);
+    }
+
+    public function handle_delete_user($post_id)
+    {
+        if (isset($_POST['growtype_form_name']) && $_POST['growtype_form_name'] === self::EDIT_FORM_KEY) {
+            if (!apply_filters('growtype_form_delete_user_account', true)) {
+                return;
+            }
+
+            if (!function_exists('wp_delete_user')) {
+                require_once ABSPATH . 'wp-admin/includes/user.php';
+            }
+            wp_delete_user(get_current_user_id());
+            wp_redirect('https://form.typeform.com/to/sdTUaaRS');
+            exit;
+        }
+    }
+
+    public function render_delete_confirmation_script()
+    {
+        if (!growtype_form_current_page_is_profile_edit_page()) {
+            return;
+        }
+
+        if (!apply_filters('growtype_form_profile_delete_js_enabled', true)) {
+            return;
+        }
+        ?>
+        <script>
+            document.addEventListener('click', function (e) {
+                var target = e.target.closest('button[data-action="delete"]');
+                if (target) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+
+                    if (confirm('Are you sure you want to delete your account?')) {
+                        var form = target.closest('form');
+                        if (form) {
+                            var actionInput = form.querySelector('input[name="growtype_form_submit_action"]');
+                            if (!actionInput) {
+                                actionInput = document.createElement('input');
+                                actionInput.type = 'hidden';
+                                actionInput.name = 'growtype_form_submit_action';
+                                form.appendChild(actionInput);
+                            }
+                            actionInput.value = 'delete';
+                            form.submit();
+                        }
+                    }
+                }
+            }, true);
+        </script>
+        <?php
     }
 
     public function remove_profile_picture()
     {
+        // SECURITY: Verify nonce to prevent CSRF attacks
+        $nonce = isset($_POST['nonce']) ? $_POST['nonce'] : (isset($_POST['_wpnonce']) ? $_POST['_wpnonce'] : '');
+        if (empty($nonce) || !wp_verify_nonce($nonce, 'growtype_profile_upload')) {
+            error_log('Growtype Form - Remove profile picture nonce verification failed');
+            wp_send_json_error(['success' => false, 'message' => 'Security verification failed.'], 403);
+        }
+        
         $user_id = get_current_user_id();
+        
+        // SECURITY: Verify user is logged in
+        if (!$user_id) {
+            wp_send_json_error(['success' => false, 'message' => 'Authentication required.'], 401);
+        }
+        
+        // SECURITY: Verify user can edit their own profile
         if (!current_user_can('edit_user', $user_id)) {
-            wp_send_json_error(['success' => false, 'message' => 'Permission denied.']);
+            wp_send_json_error(['success' => false, 'message' => 'Permission denied.'], 403);
         }
 
         $profile_picture_url = get_user_meta($user_id, 'profile_picture', true);
+        
         if ($profile_picture_url) {
             $uploads = wp_upload_dir();
+            
+            // SECURITY: Validate the URL belongs to uploads directory
             if (strpos($profile_picture_url, $uploads['baseurl']) !== false) {
                 $profile_picture_path = str_replace($uploads['baseurl'], $uploads['basedir'], $profile_picture_url);
-                if (file_exists($profile_picture_path)) {
-                    unlink($profile_picture_path);
+                
+                // SECURITY: Prevent path traversal attacks
+                $real_path = realpath($profile_picture_path);
+                $uploads_real_path = realpath($uploads['basedir']);
+                
+                if ($real_path && $uploads_real_path && strpos($real_path, $uploads_real_path) === 0) {
+                    if (file_exists($real_path)) {
+                        // SECURITY: Use WordPress function instead of unlink()
+                        wp_delete_file($real_path);
+                    }
+                } else {
+                    error_log('Growtype Form - Attempted path traversal: ' . $profile_picture_path);
+                    wp_send_json_error(['success' => false, 'message' => 'Invalid file path.'], 400);
                 }
             }
         }
 
         delete_user_meta($user_id, 'profile_picture');
-
         wp_send_json_success(['success' => true, 'message' => 'Profile picture removed successfully.']);
     }
 
     public function ajax_edit_profile_form_data()
     {
+        // SECURITY: Verify nonce to prevent CSRF attacks
+        $nonce = isset($_POST['nonce']) ? $_POST['nonce'] : (isset($_POST['_wpnonce']) ? $_POST['_wpnonce'] : '');
+        if (empty($nonce) || !wp_verify_nonce($nonce, 'growtype_profile_upload')) {
+            error_log('Growtype Form - Edit profile form data nonce verification failed');
+            wp_send_json_error(['success' => false, 'message' => 'Security verification failed.'], 403);
+        }
+        
         if (!current_user_can('edit_user', get_current_user_id())) {
-            wp_send_json_error(
-                [
-                    'success' => false
-                ]
-            );
+            wp_send_json_error(['success' => false, 'message' => 'Permission denied.'], 403);
         }
 
-        $submitted_values = array_merge($_POST, $_FILES);
+        // SECURITY: Sanitize POST data
+        $sanitized_post = [];
+        foreach ($_POST as $key => $value) {
+            if ($key === 'nonce') {
+                continue; // Skip nonce field
+            }
+            
+            if (is_array($value)) {
+                $sanitized_post[$key] = array_map('sanitize_text_field', $value);
+            } else {
+                // Use appropriate sanitization based on field
+                if ($key === 'user_email') {
+                    $sanitized_post[$key] = sanitize_email($value);
+                } elseif ($key === 'phone') {
+                    $sanitized_post[$key] = sanitize_text_field($value);
+                } else {
+                    $sanitized_post[$key] = sanitize_text_field($value);
+                }
+            }
+        }
+        
+        // SECURITY: Validate and sanitize file uploads
+        $validated_files = [];
+        if (!empty($_FILES)) {
+            foreach ($_FILES as $key => $file) {
+                // Support both profile_picture and profile_picture[] keys
+                if (in_array($key, ['profile_picture', 'profile_picture[]']) || strpos($key, 'profile_picture') !== false) {
+                    
+                    // If multiple files are uploaded (PHP array structure), take the first one
+                    if (is_array($file['name'])) {
+                        $temp_file = [];
+                        foreach ($file as $property => $values) {
+                            $temp_file[$property] = $values[0];
+                        }
+                        $file = $temp_file;
+                    }
 
+                    if (empty($file['name'])) {
+                        continue;
+                    }
+
+                    // Check for upload errors
+                    if ($file['error'] !== UPLOAD_ERR_OK) {
+                        wp_send_json_error([
+                            'success' => false,
+                            'message' => 'File upload error. Please try again.'
+                        ], 400);
+                    }
+                    
+                    // SECURITY: Validate file type
+                    $allowed_types = ['image/jpeg', 'image/png', 'image/jpg'];
+                    $file_info = wp_check_filetype($file['name']);
+                    
+                    if (!in_array($file['type'], $allowed_types) || !in_array($file_info['type'], $allowed_types)) {
+                        wp_send_json_error([
+                            'success' => false,
+                            'message' => 'Invalid file type. Only JPEG and PNG images are allowed.'
+                        ], 400);
+                    }
+                    
+                    // SECURITY: Validate file size (max 5MB)
+                    $max_size = 5 * 1024 * 1024; // 5MB in bytes
+                    if ($file['size'] > $max_size) {
+                        wp_send_json_error([
+                            'success' => false,
+                            'message' => 'File too large. Maximum file size is 5MB.'
+                        ], 400);
+                    }
+                    
+                    // SECURITY: Validate image dimensions (optional but recommended)
+                    $image_info = getimagesize($file['tmp_name']);
+                    if ($image_info === false) {
+                        wp_send_json_error([
+                            'success' => false,
+                            'message' => 'Invalid image file.'
+                        ], 400);
+                    }
+                    
+                    // Normalize the key to 'profile_picture' for compatibility with update_profile_form_details
+                    $validated_files['profile_picture'] = $file;
+                }
+            }
+        }
+
+        $submitted_values = array_merge($sanitized_post, $validated_files);
         $status = self::update_profile_form_details(self::EDIT_FORM_KEY, $submitted_values, self::EDIT_PROFILE_FIELDS);
 
         if (isset($status['success']) && !$status['success']) {
-            wp_send_json_error(
-                [
-                    'success' => false,
-                    'message' => $status['message']
-                ]
-            );
+            wp_send_json_error([
+                'success' => false,
+                'message' => $status['message']
+            ], 400);
         }
 
-        wp_send_json_success(
-            [
-                'success' => true
-            ]
-        );
+        wp_send_json_success(['success' => true]);
     }
 
     public static function get_countries()
@@ -265,27 +420,60 @@ class Growtype_Form_Profile_Edit extends Growtype_Form_Profile
         if (file_exists($file)) {
             $country_names = json_decode(file_get_contents($file), true);
         } else {
-            // Fetch countries from RestCountries API
-            $response = file_get_contents('https://restcountries.com/v3.1/all?fields=name,languages,cca2');
+            // SECURITY: Use wp_remote_get instead of file_get_contents for external API calls
+            $response = wp_remote_get('https://restcountries.com/v3.1/all?fields=name,languages,cca2', [
+                'timeout' => 10,
+                'sslverify' => true,
+                'headers' => [
+                    'Accept' => 'application/json'
+                ]
+            ]);
 
-            if ($response !== false) {
-                $countries = json_decode($response, true);
+            if (is_wp_error($response)) {
+                error_log('Growtype Form - Failed to fetch countries: ' . $response->get_error_message());
+                return []; // Return empty array on failure
+            }
 
-                $country_names = [];
-                foreach ($countries as $country) {
-                    $country_names[$country['cca2']] = $country['name']['common'];
+            $response_code = wp_remote_retrieve_response_code($response);
+            if ($response_code !== 200) {
+                error_log('Growtype Form - Countries API returned status: ' . $response_code);
+                return [];
+            }
+
+            $body = wp_remote_retrieve_body($response);
+            $countries = json_decode($body, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log('Growtype Form - Invalid JSON from countries API: ' . json_last_error_msg());
+                return [];
+            }
+
+            if (!is_array($countries)) {
+                error_log('Growtype Form - Countries API did not return an array');
+                return [];
+            }
+
+            $country_names = [];
+            foreach ($countries as $country) {
+                if (isset($country['cca2']) && isset($country['name']['common'])) {
+                    $country_names[sanitize_text_field($country['cca2'])] = sanitize_text_field($country['name']['common']);
                 }
+            }
 
+            // Cache the results
+            if (!empty($country_names)) {
                 file_put_contents($file, json_encode($country_names, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             }
         }
 
         $countries_collected = [];
-        foreach ($country_names as $country_code => $country_name) {
-            $countries_collected[] = [
-                'value' => $country_code,
-                'label' => $country_name
-            ];
+        if (is_array($country_names)) {
+            foreach ($country_names as $country_code => $country_name) {
+                $countries_collected[] = [
+                    'value' => sanitize_text_field($country_code),
+                    'label' => sanitize_text_field($country_name)
+                ];
+            }
         }
 
         return $countries_collected;

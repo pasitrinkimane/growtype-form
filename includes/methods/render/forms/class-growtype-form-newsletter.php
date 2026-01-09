@@ -42,7 +42,22 @@ class Growtype_Form_Newsletter
      */
     function growtype_form_newsletter_submission_callback()
     {
-        $newsletter_email = isset($_REQUEST['newsletter_email']) ? $_REQUEST['newsletter_email'] : '';
+        // SECURITY: Verify nonce to prevent CSRF attacks
+        if (!isset($_REQUEST['nonce']) || !wp_verify_nonce($_REQUEST['nonce'], 'growtype_form_newsletter_nonce')) {
+            error_log('Growtype Form - Newsletter submission nonce verification failed');
+            return wp_send_json([
+                'message' => __('Security verification failed. Please refresh the page and try again.', 'growtype-form')
+            ], 403);
+        }
+        
+        $newsletter_email = isset($_REQUEST['newsletter_email']) ? sanitize_email($_REQUEST['newsletter_email']) : '';
+        
+        // SECURITY: Validate email format
+        if (empty($newsletter_email) || !is_email($newsletter_email)) {
+            return wp_send_json([
+                'message' => __('Please provide a valid email address.', 'growtype-form')
+            ], 400);
+        }
 
         $data = [
             'email' => $newsletter_email
@@ -100,8 +115,9 @@ class Growtype_Form_Newsletter
     {
         $encoded_email = str_replace('+', '%2B', $email);
         $encoded_email = urlencode($encoded_email);
+        $nonce = wp_create_nonce('newsletter_unsubscribe');
 
-        return home_url() . '/growtype-form/newsletter/unsubscribe/user/?email=' . $encoded_email;
+        return home_url() . '/growtype-form/newsletter/unsubscribe/user/?email=' . $encoded_email . '&nonce=' . $nonce;
     }
 
     function growtype_form_newsletter_unsubscribe()
@@ -110,10 +126,16 @@ class Growtype_Form_Newsletter
          * Unsubscribe
          */
         if (strpos($_SERVER['REQUEST_URI'], '/growtype-form/newsletter/unsubscribe/user/') !== false) {
-            $email = isset($_GET['email']) ? urldecode($_GET['email']) : null;
+            // SECURITY: Verify nonce to prevent CSRF attacks
+            if (!isset($_GET['nonce']) || !wp_verify_nonce($_GET['nonce'], 'newsletter_unsubscribe')) {
+                error_log('Growtype Form - Newsletter unsubscribe nonce verification failed');
+                wp_die(__('Security verification failed. Invalid unsubscribe link.', 'growtype-form'));
+            }
+            
+            $email = isset($_GET['email']) ? sanitize_email(urldecode($_GET['email'])) : null;
 
-            if (empty($email)) {
-                return;
+            if (empty($email) || !is_email($email)) {
+                wp_die(__('Invalid email address.', 'growtype-form'));
             }
 
             $leads = growtype_form_get_lead_by_email($email, false);

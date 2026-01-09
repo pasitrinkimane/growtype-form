@@ -287,8 +287,6 @@ trait GrowtypeFormProduct
             $product_data
         );
 
-//        d($product);
-
         return [
             'success' => true,
             'product_id' => $product->get_id(),

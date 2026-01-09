@@ -130,10 +130,17 @@ class Growtype_Form_Profile
 
             if (!empty($field_name) && isset($submitted_values[$field_name])) {
                 if ($field_name === 'user_email') {
-                    wp_update_user([
+                    $update_result = wp_update_user([
                         'ID' => $user_id,
                         'user_email' => $submitted_values[$field_name],
                     ]);
+
+                    if (is_wp_error($update_result)) {
+                        return [
+                            'success' => false,
+                            'message' => $update_result->get_error_message()
+                        ];
+                    }
                 } elseif ($field_name === 'profile_picture') {
                     $status = self::handle_file_upload($submitted_values[$field_name], 'profile_picture');
 
@@ -151,6 +158,11 @@ class Growtype_Form_Profile
                 }
             }
         }
+
+        return [
+            'success' => true,
+            'message' => 'Profile updated successfully.'
+        ];
     }
 
     public static function handle_file_upload($uploadedfile, $meta_key)
@@ -163,19 +175,29 @@ class Growtype_Form_Profile
         $old_photo_url = get_user_meta($user_id, $meta_key, true);
         $uploads = wp_upload_dir();
 
-        $files = isset($uploadedfile['name']) && is_array($uploadedfile['name']) ? $uploadedfile['name'] : [$uploadedfile['name']];
-        foreach ($files as $i => $name) {
-            $single_file = [
-                'name' => $uploadedfile['name'][$i] ?? $uploadedfile['name'],
-                'type' => $uploadedfile['type'][$i] ?? $uploadedfile['type'],
-                'tmp_name' => $uploadedfile['tmp_name'][$i] ?? $uploadedfile['tmp_name'],
-                'error' => $uploadedfile['error'][$i] ?? $uploadedfile['error'],
-                'size' => $uploadedfile['size'][$i] ?? $uploadedfile['size'],
-            ];
+        $files_to_process = [];
+        if (isset($uploadedfile['name']) && is_array($uploadedfile['name'])) {
+            foreach ($uploadedfile['name'] as $i => $name) {
+                $files_to_process[] = [
+                    'name' => $uploadedfile['name'][$i],
+                    'type' => $uploadedfile['type'][$i],
+                    'tmp_name' => $uploadedfile['tmp_name'][$i],
+                    'error' => $uploadedfile['error'][$i],
+                    'size' => $uploadedfile['size'][$i],
+                ];
+            }
+        } else {
+            $files_to_process = [$uploadedfile];
+        }
 
-            $maximum_file_size = 2;
+        foreach ($files_to_process as $single_file) {
+            if (empty($single_file['name'])) {
+                continue;
+            }
 
-            // Limit file size to 2MB (2 * 1024 * 1024 bytes)
+            $maximum_file_size = 5;
+
+            // Limit file size to 5MB
             if ($single_file['size'] > $maximum_file_size * 1024 * 1024) {
                 return [
                     'success' => false,
@@ -190,13 +212,18 @@ class Growtype_Form_Profile
                 if ($old_photo_url && strpos($old_photo_url, $uploads['baseurl']) !== false) {
                     $old_photo_path = str_replace($uploads['baseurl'], $uploads['basedir'], $old_photo_url);
                     if (file_exists($old_photo_path)) {
-                        unlink($old_photo_path);
+                        wp_delete_file($old_photo_path);
                     }
                 }
 
                 update_user_meta($user_id, $meta_key, $movefile['url']);
 
                 break; // only save first uploaded
+            } else {
+                return [
+                    'success' => false,
+                    'message' => $movefile['error'] ?? 'Error uploading file.'
+                ];
             }
         }
 

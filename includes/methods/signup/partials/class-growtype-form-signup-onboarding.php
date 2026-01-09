@@ -173,7 +173,10 @@ class Growtype_Form_Signup_Onboarding
 
     function is_enabled()
     {
-        return get_option('growtype_form_settings_signups_onboarding_enabled');
+        $onboarding_completed = get_user_meta(get_current_user_id(), 'onboarding_completed', true);
+        $onboarding_completed = !empty($onboarding_completed) && filter_var($onboarding_completed, FILTER_VALIDATE_BOOLEAN) ? true : false;
+
+        return !$onboarding_completed && get_option('growtype_form_settings_signups_onboarding_enabled');
     }
 
     public static function get_steps()
@@ -215,7 +218,7 @@ class Growtype_Form_Signup_Onboarding
                             "placeholder" => "Country",
                             "class" => "col-12",
                             "options" => [],
-                            "required" => false,
+                            "required" => true,
                         ],
                         [
                             "type" => "tel",

@@ -234,6 +234,10 @@ class Growtype_Form_Profile_Security extends Growtype_Form_Profile
             return new WP_Error('incorrect_password', 'The current password you entered is incorrect.');
         }
 
+        if ($current_password === $new_password && $new_password === $repeat_new_password) {
+            return new WP_Error('incorrect_password', 'New password is the same as the current password.');
+        }
+
         if ($new_password !== $repeat_new_password) {
             return new WP_Error('password_mismatch', 'New passwords do not match.');
         }

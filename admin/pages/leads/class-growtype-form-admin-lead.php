@@ -75,6 +75,7 @@ class Growtype_Form_Admin_Lead
          * Validate emails
          */
         add_action('admin_post_growtype_form_admin_export_emails', array ($this, 'export_emails_callback'));
+        add_action('admin_post_growtype_form_admin_export_validated_emails', array ($this, 'export_validated_emails_callback'));
         add_action('admin_post_growtype_form_admin_export_leads', array ($this, 'export_leads_callback'));
 
         /**
@@ -482,11 +483,11 @@ class Growtype_Form_Admin_Lead
             'fields' => 'ids',
             'meta_query' => [
                 'relation' => 'AND',
-                [
-                    'key' => 'is_validated',
-                    'value' => '1',
-                    'compare' => '='
-                ],
+//                [
+//                    'key' => 'is_validated',
+//                    'value' => '1',
+//                    'compare' => '='
+//                ],
                 [
                     'relation' => 'OR',
                     [
@@ -533,6 +534,71 @@ class Growtype_Form_Admin_Lead
         fclose($output);
         exit;
     }
+    
+    function export_validated_emails_callback()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized', 'Error', ['response' => 403]);
+        }
+
+        // Get all gf_lead posts that are validated as 'valid'
+        $args = [
+            'post_type' => 'gf_lead',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'meta_query' => [
+                'relation' => 'AND',
+                [
+                    'key' => 'validation_status',
+                    'value' => 'valid',
+                    'compare' => '='
+                ],
+                [
+                    'relation' => 'OR',
+                    [
+                        'key' => 'newsletter_unsubscribed',
+                        'value' => '1',
+                        'compare' => '!='
+                    ],
+                    [
+                        'key' => 'newsletter_unsubscribed',
+                        'compare' => 'NOT EXISTS'
+                    ]
+                ]
+            ]
+        ];
+
+        $query = new WP_Query($args);
+
+        if (!$query->have_posts()) {
+            wp_die('No validated leads found.');
+        }
+
+        // Prepare CSV headers
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=gf_leads_exported_validated_emails_' . date('Y-m-d_H-i-s') . '.csv');
+
+        $output = fopen('php://output', 'w');
+
+        // Define CSV column headers
+        fputcsv($output, ['Nr', 'ID', 'Email', 'Date']);
+
+        // Loop through posts
+        foreach ($query->posts as $index => $lead_id) {
+            $email = get_the_title($lead_id);
+            $date = get_the_date('Y-m-d H:i:s', $lead_id);
+
+            fputcsv($output, [
+                $index + 1,
+                $lead_id,
+                $email,
+                $date,
+            ]);
+        }
+
+        fclose($output);
+        exit;
+    }
 
     function export_leads_callback()
     {
@@ -553,6 +619,29 @@ class Growtype_Form_Admin_Lead
             wp_die('No leads found.');
         }
 
+        // Define base fields
+        $fields = [
+            'nr' => 'Nr',
+            'id' => 'ID',
+            'email' => 'Email',
+            'date' => 'Date'
+        ];
+
+        // Add fields from meta boxes
+        foreach (self::get_meta_boxes() as $box) {
+            foreach ($box['fields'] as $field) {
+                $fields[$field['key']] = $field['title'];
+            }
+        }
+
+        // Add common meta fields not in boxes
+        $fields['is_validated'] = 'Is Validated';
+        $fields['validation_status'] = 'Validation Status';
+        $fields['newsletter_unsubscribed'] = 'Unsubscribed';
+
+        // Filter fields to allow extension
+        $fields = apply_filters('growtype_form_export_leads_fields', $fields);
+
         // Prepare CSV headers
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename=gf_leads_exported_leads_' . date('Y-m-d_H-i-s') . '.csv');
@@ -560,21 +649,35 @@ class Growtype_Form_Admin_Lead
         $output = fopen('php://output', 'w');
 
         // Define CSV column headers
-        fputcsv($output, ['Nr', 'ID', 'Email', 'Unsubscribed', 'Date']);
+        fputcsv($output, array_values($fields));
 
         // Loop through posts
         foreach ($query->posts as $index => $lead_id) {
+            $row = [];
             $email = get_the_title($lead_id);
-            $date = get_the_date('Y-m-d H:i:s', $lead_id);
-            $unsubscribed = get_post_meta($lead_id, 'newsletter_unsubscribed', true);
+            $user = get_user_by('email', $email);
 
-            fputcsv($output, [
-                $index + 1,
-                $lead_id,
-                $email,
-                $unsubscribed,
-                $date,
-            ]);
+            foreach ($fields as $key => $label) {
+                if ($key === 'nr') {
+                    $row[] = $index + 1;
+                } elseif ($key === 'id') {
+                    $row[] = $lead_id;
+                } elseif ($key === 'email') {
+                    $row[] = $email;
+                } elseif ($key === 'date') {
+                    $row[] = get_the_date('Y-m-d H:i:s', $lead_id);
+                } else {
+                    $value = get_post_meta($lead_id, $key, true);
+
+                    // Fallback to user meta if lead meta is empty and user exists
+                    if (($value === '' || $value === null) && !empty($user)) {
+                        $value = get_user_meta($user->ID, $key, true);
+                    }
+
+                    $row[] = $value;
+                }
+            }
+            fputcsv($output, $row);
         }
 
         fclose($output);
@@ -825,9 +928,10 @@ class Growtype_Form_Admin_Lead
 
                     $('<div class="export-dropdown" style="display: inline-block;position: relative;margin-left: 5px;vertical-align: middle;margin-top: -10px;">' +
                         '<button class="button button-primary">Export leads ▼</button>' +
-                        '<ul style="display:none; position:absolute; top:100%; left:0; background:#fff; border:1px solid #ccc; list-style:none; padding:0; margin:0; min-width:150px; z-index:9999;">' +
-                        '<li style="padding:8px; cursor:pointer;">Export emails</li>' +
-                        '<li style="padding:8px; cursor:pointer;">Export full</li>' +
+                        '<ul style="display:none; position:absolute; top:100%; left:0; background:#fff; border:1px solid #ccc; list-style:none; padding:0; margin:0; min-width:170px; z-index:9999;">' +
+                        '<li data-action="emails" style="padding:8px; cursor:pointer; border-bottom: 1px solid #eee;">Export all emails</li>' +
+                        '<li data-action="validated" style="padding:8px; cursor:pointer; border-bottom: 1px solid #eee;">Export validated emails</li>' +
+                        '<li data-action="full" style="padding:8px; cursor:pointer;">Export all data</li>' +
                         '</ul>' +
                         '</div>').insertBefore($('.wp-header-end'));
 
@@ -838,12 +942,17 @@ class Growtype_Form_Admin_Lead
                         });
 
                         // Export emails
-                        $('.export-dropdown ul li:contains("Export emails")').on('click', function () {
+                        $('.export-dropdown ul li[data-action="emails"]').on('click', function () {
                             window.location.href = '<?php echo admin_url("admin-post.php?action=growtype_form_admin_export_emails"); ?>';
                         });
 
+                        // Export validated emails
+                        $('.export-dropdown ul li[data-action="validated"]').on('click', function () {
+                            window.location.href = '<?php echo admin_url("admin-post.php?action=growtype_form_admin_export_validated_emails"); ?>';
+                        });
+
                         // Export full
-                        $('.export-dropdown ul li:contains("Export full")').on('click', function () {
+                        $('.export-dropdown ul li[data-action="full"]').on('click', function () {
                             window.location.href = '<?php echo admin_url("admin-post.php?action=growtype_form_admin_export_leads"); ?>';
                         });
 

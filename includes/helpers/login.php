@@ -97,19 +97,21 @@ function growtype_form_redirect_url_after_login()
 if (!function_exists('growtype_form_current_page_is_signup_page')) {
     function growtype_form_current_page_is_signup_page(): bool
     {
-        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        // Get the request URI path only (ignores query string)
+        $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
 
-        return !is_admin()
-            && preg_match('#^/signup/?$#', $uri) === 1;
+        return !empty($path) && !is_admin()
+            && preg_match('#^/signup/?$#', $path) === 1;
     }
 }
 
 if (!function_exists('growtype_form_current_page_is_login_page')) {
     function growtype_form_current_page_is_login_page(): bool
     {
-        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        // Extract the path only (ignores query string)
+        $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
 
-        return !is_admin()
-            && preg_match('#^/login/?$#', $uri) === 1;
+        return !empty($path) && !is_admin()
+            && preg_match('#^/login/?$#', $path) === 1;
     }
 }

@@ -61,6 +61,7 @@ class Growtype_Form_Crud
         self::GROWTYPE_FORM_WP_HTTP_REFERER,
         self::GROWTYPE_FORM_PURPOSE,
         'preloaded',
+        'upload_file_order',
     ];
 
     const INCLUDED_VALUES_AFTER_VALIDATION = [

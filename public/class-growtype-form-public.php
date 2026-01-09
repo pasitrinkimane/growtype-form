@@ -76,6 +76,7 @@ class Growtype_Form_Public
         wp_localize_script($this->growtype_form, 'growtype_form',
             array (
                 'ajax_url' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('growtype_form_newsletter_nonce'), // SECURITY: Added nonce for CSRF protection
                 'date' => Growtype_Form_General::get_date_time_data(),
                 'currency' => Growtype_Form_General::get_currency_data(),
                 'public_url' => GROWTYPE_FORM_URL_PUBLIC,

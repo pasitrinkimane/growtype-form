@@ -152,7 +152,7 @@ class Growtype_Form_General
          * Image uploader
          */
         if (!wp_script_is('image-uploader', 'enqueued')) {
-            wp_enqueue_script('image-uploader', GROWTYPE_FORM_URL_PUBLIC . 'plugins/image-uploader/image-uploader.js', array ('jquery'), time(), true);
+            wp_enqueue_script('image-uploader', GROWTYPE_FORM_URL_PUBLIC . 'plugins/image-uploader/image-uploader.js', array ('jquery'), '1.22', true);
         }
 
         /**
@@ -758,30 +758,32 @@ class Growtype_Form_General
     {
         ?>
         <script>
-            jQuery.validator.setDefaults({
-                errorClass: "error error-label",
-                ignore: ":hidden:not(.e-wrapper:visible select),.chosen-search-input",
-                errorPlacement: function (error, element) {
-                    if (element.is(".growtype-form select")) {
-                        element.parent().append(error);
-                    } else if (element.is(".growtype-form input[type='checkbox']")) {
-                        element.parent().append(error);
-                    } else if (element.is(".growtype-form .filestyle")) {
-                        element.parent().append(error);
-                    } else {
-                        error.insertAfter(element);
-                    }
-                }
-            });
-
-            if ($(".growtype-form select:visible").length > 0) {
-                $(".growtype-form select:visible").each(function () {
-                    if ($(this).attr('required') !== undefined) {
-                        $(this).on("change", function () {
-                            $(this).valid();
-                        });
+            if (typeof jQuery.validator !== 'undefined') {
+                jQuery.validator.setDefaults({
+                    errorClass: "error error-label",
+                    ignore: ":hidden:not(.e-wrapper:visible select),.chosen-search-input",
+                    errorPlacement: function (error, element) {
+                        if (element.is(".growtype-form select")) {
+                            element.parent().append(error);
+                        } else if (element.is(".growtype-form input[type='checkbox']")) {
+                            element.parent().append(error);
+                        } else if (element.is(".growtype-form .filestyle")) {
+                            element.parent().append(error);
+                        } else {
+                            error.insertAfter(element);
+                        }
                     }
                 });
+
+                if ($(".growtype-form select:visible").length > 0) {
+                    $(".growtype-form select:visible").each(function () {
+                        if ($(this).attr('required') !== undefined) {
+                            $(this).on("change", function () {
+                                $(this).valid();
+                            });
+                        }
+                    });
+                }
             }
         </script>
         <?php
@@ -794,7 +796,9 @@ class Growtype_Form_General
     {
         ?>
         <script>
-            jQuery('form[name="loginform-custom"]').validate();
+            if (typeof jQuery.fn.validate !== 'undefined') {
+                jQuery('form[name="loginform-custom"]').validate();
+            }
         </script>
         <?php
     }
@@ -809,53 +813,55 @@ class Growtype_Form_General
         <script>
             $ = jQuery;
 
-            let allowSimplePassword = "<?php echo Growtype_Form_Crud::simple_password_is_allowed() ?>";
+            if (typeof $.validator !== 'undefined') {
+                let allowSimplePassword = "<?php echo Growtype_Form_Crud::simple_password_is_allowed() ?>";
 
-            $.validator.addMethod("containsNumber", function (value, element) {
-                return /[0-9]/.test(value);
-            }, "<?php echo $validation_message['password_contains_number'] ?>");
+                $.validator.addMethod("containsNumber", function (value, element) {
+                    return /[0-9]/.test(value);
+                }, "<?php echo $validation_message['password_contains_number'] ?>");
 
-            $.validator.addMethod("containsUppercase", function (value, element) {
-                return /[A-Z]/.test(value);
-            }, "<?php echo $validation_message['password_contains_uppercase'] ?>");
+                $.validator.addMethod("containsUppercase", function (value, element) {
+                    return /[A-Z]/.test(value);
+                }, "<?php echo $validation_message['password_contains_uppercase'] ?>");
 
-            $.validator.addMethod("containsLowercase", function (value, element) {
-                return /[a-z]/.test(value);
-            }, "<?php echo $validation_message['password_contains_lowercase'] ?>");
+                $.validator.addMethod("containsLowercase", function (value, element) {
+                    return /[a-z]/.test(value);
+                }, "<?php echo $validation_message['password_contains_lowercase'] ?>");
 
-            let validationParams = {
-                rules: {
-                    password: {
-                        required: true,
+                let validationParams = {
+                    rules: {
+                        password: {
+                            required: true,
+                        },
+                        repeat_password: {
+                            required: true,
+                            equalTo: "#password"
+                        }
                     },
-                    repeat_password: {
-                        required: true,
-                        equalTo: "#password"
+                    messages: {
+                        password: {
+                            required: "<?php echo $validation_message['password_required'] ?>",
+                            minlength: "<?php echo $validation_message['password_min_length'] ?>",
+                        },
+                        repeat_password: {
+                            required: "<?php echo $validation_message['repeat_password'] ?>",
+                            equalTo: "<?php echo $validation_message['passwords_not_match'] ?>"
+                        }
                     }
-                },
-                messages: {
-                    password: {
-                        required: "<?php echo $validation_message['password_required'] ?>",
-                        minlength: "<?php echo $validation_message['password_min_length'] ?>",
-                    },
-                    repeat_password: {
-                        required: "<?php echo $validation_message['repeat_password'] ?>",
-                        equalTo: "<?php echo $validation_message['passwords_not_match'] ?>"
-                    }
+                };
+
+                if (!allowSimplePassword) {
+                    validationParams.rules.password.minlength = "<?php echo Growtype_Form_Crud::password_min_length() ?>";
+                    validationParams.rules.password.containsNumber = true;
+                    validationParams.rules.password.containsUppercase = true;
+                    validationParams.rules.password.containsLowercase = true;
                 }
-            };
 
-            if (!allowSimplePassword) {
-                validationParams.rules.password.minlength = "<?php echo Growtype_Form_Crud::password_min_length() ?>";
-                validationParams.rules.password.containsNumber = true;
-                validationParams.rules.password.containsUppercase = true;
-                validationParams.rules.password.containsLowercase = true;
+                /**
+                 * Setup validation
+                 */
+                $('.growtype-form').validate(validationParams);
             }
-
-            /**
-             * Setup validation
-             */
-            $('.growtype-form').validate(validationParams);
 
             /**
              * Form submit
@@ -874,7 +880,11 @@ class Growtype_Form_General
                 if (action === 'delete') {
                     $(this).closest('.growtype-form').submit();
                 } else {
-                    let isValid = $(this).closest(".growtype-form").valid();
+                    let isValid = true;
+
+                    if (typeof $(this).closest(".growtype-form").valid === 'function') {
+                        isValid = $(this).closest(".growtype-form").valid();
+                    }
 
                     /**
                      * Check if form check group is valid

@@ -16,6 +16,7 @@ class Growtype_Form_Profile_Email extends Growtype_Form_Profile
             "name" => "newsletter_unsubscribed",
             "label" => "Newsletter Unsubscribed",
             "class" => "col-12",
+            "value" => true,
             "required" => false
         ],
     ];
@@ -75,10 +76,8 @@ class Growtype_Form_Profile_Email extends Growtype_Form_Profile
         $user_details = Growtype_Form_Profile::user_details();
 
         foreach ($profile_fields as $key => $profile_field) {
-            $profile_field_name = isset($profile_field['name']) && isset($user_details[$profile_field['name']][0]) ? $user_details[$profile_field['name']][0] : '';
-
-            if (!isset($profile_field) || empty($profile_field['value'])) {
-                $profile_fields[$key]['value'] = $profile_field_name;
+            if (isset($profile_field['name']) && isset($user_details[$profile_field['name']][0])) {
+                $profile_fields[$key]['value'] = $user_details[$profile_field['name']][0];
             }
         }
 
