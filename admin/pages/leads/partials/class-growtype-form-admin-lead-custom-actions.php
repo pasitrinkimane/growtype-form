@@ -159,7 +159,7 @@ class Growtype_Form_Admin_Lead_Custom_Actions
     {
         if (get_post_type() === 'gf_lead') {
             $meta_boxes[0]['fields'][] = [
-                'title' => 'Unsubscribed',
+                'title' => 'Newsletter Unsubscribed',
                 'key' => 'newsletter_unsubscribed',
                 'type' => 'checkbox',
             ];
@@ -172,7 +172,7 @@ class Growtype_Form_Admin_Lead_Custom_Actions
             $meta_boxes[0]['fields'][] = [
                 'title' => 'Events log',
                 'key' => 'events_log',
-                'type' => 'textarea',
+                'type' => 'events_log',
             ];
 
             $meta_boxes[0]['fields'][] = [

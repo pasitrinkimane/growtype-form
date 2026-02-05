@@ -137,12 +137,96 @@ class Growtype_Form_Admin_Lead
                         <?php echo esc_html($field['title']); ?>:
                     </label>
 
-                    <?php if ($type === 'textarea') { ?>
+                    <?php if ($type === 'events_log') {
+                        $log_data = json_decode($meta_value, true) ?? [];
+                        ?>
+                        <div style="width: 100%;overflow:scroll;">
+                            <div id="events-log-table-container">
+                                <table class="widefat striped" style="margin-bottom: 10px;">
+                                    <thead>
+                                    <tr>
+                                        <th style="width: 150px;">Date</th>
+                                        <th style="width: 200px;">Action</th>
+                                        <th style="width: 80px;">Status</th>
+                                        <th>Key Details</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php if (empty($log_data)): ?>
+                                        <tr>
+                                            <td colspan="4">No events logged yet.</td>
+                                        </tr>
+                                    <?php else: ?>
+                                        <?php foreach (array_reverse($log_data) as $entry):
+                                            $details = $entry['details'] ?? [];
+                                            $success = isset($entry['success']) && ($entry['success'] === 'true' || $entry['success'] === true);
+                                            ?>
+                                            <tr>
+                                                <td><?php echo esc_html($entry['date']); ?></td>
+                                                <td>
+                                                    <strong><?php echo esc_html($details['action'] ?? '-'); ?></strong>
+                                                </td>
+                                                <td>
+                                                        <span style="color: <?php echo $success ? '#2271b1' : '#d63638'; ?>; font-weight: bold;">
+                                                            <?php echo $success ? '✓' : '✗'; ?>
+                                                        </span>
+                                                </td>
+                                                <td>
+                                                    <div style="font-size: 11px; line-height: 1.4;">
+                                                        <?php
+                                                        foreach ($details as $k => $v):
+                                                            if ($k === 'action') continue;
+                                                            if (empty($v)) continue;
+                                                            ?>
+                                                            <span style="background: #f0f0f1; padding: 1px 4px; border-radius: 3px; margin-right: 5px; display: inline-block; margin-bottom: 2px;">
+                                                                    <strong><?php echo esc_html($k); ?>
+                                                                        :</strong> <?php echo esc_html(is_array($v) ? json_encode($v) : $v); ?>
+                                                                </span>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="events-log-raw-container" style="display: none;">
+                                <textarea
+                                        style="width: 100%;"
+                                        id="<?php echo esc_attr($field['key']); ?>"
+                                        name="<?php echo esc_attr($field['key']); ?>"
+                                        rows="5"
+                                ><?php echo esc_textarea($meta_value); ?></textarea>
+                            </div>
+                            <button type="button" class="button" id="toggle-events-log-view">Switch to Raw View</button>
+                            <script>
+                                jQuery(document).ready(function ($) {
+                                    $('#toggle-events-log-view').click(function () {
+                                        $('#events-log-table-container, #events-log-raw-container').toggle();
+                                        var isTableVisible = $('#events-log-table-container').is(':visible');
+                                        $(this).text(isTableVisible ? 'Switch to Raw View' : 'Switch to Table View');
+                                        
+                                        if (!isTableVisible) {
+                                            // Trigger resize for Ace editor when it becomes visible
+                                            var editorElement = $('#<?php echo esc_js($field['key']); ?>');
+                                            if (editorElement.data('ace')) {
+                                                var aceInstance = editorElement.data('ace').editor.ace;
+                                                $(aceInstance.container).css('width', '100%');
+                                                aceInstance.resize();
+                                                aceInstance.renderer.updateFull();
+                                            }
+                                        }
+                                    });
+                                });
+                            </script>
+                        </div>
+                    <?php } elseif ($type === 'textarea') { ?>
                         <textarea
-                            style="width: 100%;"
-                            id="<?php echo esc_attr($field['key']); ?>"
-                            name="<?php echo esc_attr($field['key']); ?>"
-                            rows="5"
+                                style="width: 100%;"
+                                id="<?php echo esc_attr($field['key']); ?>"
+                                name="<?php echo esc_attr($field['key']); ?>"
+                                rows="5"
                         ><?php echo esc_textarea($meta_value); ?></textarea>
 
                     <?php } elseif ($type === 'checkbox') { ?>
@@ -186,7 +270,13 @@ class Growtype_Form_Admin_Lead
                     update_post_meta($post_id, $key, $value);
                 } else {
                     if (isset($_POST[$key])) {
-                        update_post_meta($post_id, $key, sanitize_text_field($_POST[$key]));
+                        $value = $_POST[$key];
+                        if ($type === 'events_log' || $type === 'textarea') {
+                            $value = sanitize_textarea_field($value);
+                        } else {
+                            $value = sanitize_text_field($value);
+                        }
+                        update_post_meta($post_id, $key, $value);
                     }
                 }
             }
@@ -568,6 +658,8 @@ class Growtype_Form_Admin_Lead
             ]
         ];
 
+        $args = apply_filters('growtype_form_export_validated_emails_args', $args);
+
         $query = new WP_Query($args);
 
         if (!$query->have_posts()) {
@@ -674,7 +766,7 @@ class Growtype_Form_Admin_Lead
                         $value = get_user_meta($user->ID, $key, true);
                     }
 
-                    $row[] = $value;
+                    $row[] = apply_filters('growtype_form_export_leads_row_value', $value, $key, $lead_id, $user);
                 }
             }
             fputcsv($output, $row);
