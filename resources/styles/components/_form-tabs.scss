@@ -1,0 +1,75 @@
+// Form Tabs Styling
+.growtype-form-tabs {
+  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 2rem !important;
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+
+  .growtype-form-tabs-item {
+    margin-bottom: -2px;
+  }
+
+  .growtype-form-tabs-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: #6c757d;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+
+    &:hover {
+      color: #495057;
+      border-bottom-color: #dee2e6;
+    }
+
+    &.active {
+      color: #0d6efd;
+      border-bottom-color: #0d6efd;
+      background: transparent;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+  }
+}
+
+.growtype-form-tabs-content {
+  .growtype-form-tabs-pane {
+    display: none;
+    
+    &.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .growtype-form-tabs {
+    .nav-link {
+      padding: 0.5rem 1rem;
+      font-size: 14px;
+    }
+  }
+}

@@ -36,6 +36,15 @@ class Growtype_Form_General
         if (!is_admin()) {
             add_shortcode(self::SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
         }
+
+        add_filter('upload_mimes', array($this, 'growtype_form_allow_video_uploads'));
+    }
+
+    public function growtype_form_allow_video_uploads($mimes) {
+        $mimes['mp4'] = 'video/mp4';
+        $mimes['mov'] = 'video/quicktime';
+        $mimes['webm'] = 'video/webm';
+        return $mimes;
     }
 
     public static function get_date_time_data()
@@ -152,7 +161,7 @@ class Growtype_Form_General
          * Image uploader
          */
         if (!wp_script_is('image-uploader', 'enqueued')) {
-            wp_enqueue_script('image-uploader', GROWTYPE_FORM_URL_PUBLIC . 'plugins/image-uploader/image-uploader.js', array ('jquery'), '1.22', true);
+            wp_enqueue_script('image-uploader', GROWTYPE_FORM_URL_PUBLIC . 'plugins/image-uploader/image-uploader.js', array ('jquery'), '1.2.5', true);
         }
 
         /**
@@ -419,14 +428,8 @@ class Growtype_Form_General
                 <?php
                 foreach ($form_data as $key => $form_fields) { ?>
 
-                    <?php if (strpos('main_fields', $key) !== false) { ?>
-                        <div class="row g-3 main-fields">
-                            <?php
-                            foreach ($main_fields as $field) {
-                                self::render_growtype_form_field($field);
-                            }
-                            ?>
-                        </div>
+                    <?php if (strpos($key, 'main_fields') !== false) { ?>
+                        <?php self::render_main_fields_logic($main_fields); ?>
                     <?php } ?>
 
                     <?php if (strpos('confirmation_fields', $key) !== false) { ?>
@@ -565,13 +568,8 @@ class Growtype_Form_General
                     <div class="form-inner-wrapper">
                         <form id="growtype-form-<?php echo $form_name ?>" enctype="multipart/form-data" class="growtype-form form <?php echo $form_args['class'] ?>" action="<?php echo self::growtype_form_get_action_url(); ?>" method="post" data-name="<?php echo $form_name ?>" data-ajax="<?php echo $form_args['ajax'] ?>" data-ajax-action="<?php echo $form_args['ajax_action'] ?>">
                             <?php foreach ($form_data as $key => $form_fields) { ?>
-                                <?php if (isset($form_args['main_fields']) && !empty($form_args['main_fields']) && strpos('main_fields', $key) !== false) { ?>
-                                    <div class="row g-3 main-fields">
-                                        <?php foreach ($form_args['main_fields'] as $field) {
-                                            self::render_growtype_form_field($field);
-                                        }
-                                        ?>
-                                    </div>
+                                <?php if (isset($form_args['main_fields']) && !empty($form_args['main_fields']) && strpos($key, 'main_fields') !== false) { ?>
+                                    <?php self::render_main_fields_logic($form_args['main_fields'], $form_name); ?>
                                 <?php } ?>
 
                                 <?php if (strpos('confirmation_fields', $key) !== false) { ?>
@@ -728,6 +726,180 @@ class Growtype_Form_General
     }
 
     /**
+     * @param $main_fields
+     * @return void
+     */
+    public static function render_main_fields_logic($main_fields, $form_name = 'default')
+    {
+        // Separate fields into tabs and non-tabbed (hidden or uncategorized)
+        $has_tabs = false;
+        $tabs_data = [];
+        $untabbed_fields = [];
+
+        if (!empty($main_fields)) {
+            foreach ($main_fields as $field) {
+                if (isset($field['tab'])) {
+                    $has_tabs = true;
+                    $tab = $field['tab'];
+                    if (!isset($tabs_data[$tab])) {
+                        $tabs_data[$tab] = [];
+                    }
+                    $tabs_data[$tab][] = $field;
+                } else {
+                    $untabbed_fields[] = $field;
+                }
+            }
+        }
+
+        // Apply tab ordering if we have tabs
+        if (!empty($tabs_data)) {
+            $tab_order = ['profile', 'content', 'appearance', 'personality', 'actions', 'chat'];
+            $ordered_tabs = [];
+
+            foreach ($tab_order as $tab_key) {
+                if (isset($tabs_data[$tab_key])) {
+                    $ordered_tabs[$tab_key] = $tabs_data[$tab_key];
+                }
+            }
+
+            foreach ($tabs_data as $tab_key => $tab_fields) {
+                if (!isset($ordered_tabs[$tab_key])) {
+                    $ordered_tabs[$tab_key] = $tab_fields;
+                }
+            }
+            $tabs_data = $ordered_tabs;
+        }
+
+        if ($has_tabs && !empty($tabs_data)) { ?>
+            <!-- Tab Navigation -->
+            <ul class="growtype-form-tabs nav nav-tabs" role="tablist" id="growtype-form-tabs-<?php echo esc_attr($form_name); ?>">
+                <?php
+                $tab_index = 0;
+                $tab_labels = [
+                    'profile' => 'Profile',
+                    'content' => 'Media',
+                    'appearance' => 'Appearance',
+                    'personality' => 'Personality',
+                    'actions' => 'Actions',
+                    'chat' => 'Chat',
+                ];
+                foreach ($tabs_data as $tab_key => $tab_fields) {
+                    $tab_label = $tab_labels[$tab_key] ?? ucfirst($tab_key);
+                    $active_class = $tab_index === 0 ? 'active' : '';
+                    ?>
+                    <li class="growtype-form-tabs-item growtype-form-tabs-item-<?php echo esc_attr($tab_key); ?>" role="presentation">
+                        <button class="growtype-form-tabs-link <?php echo $active_class; ?>"
+                                id="tab-<?php echo esc_attr($tab_key); ?>-tab"
+                                data-bs-toggle="tab"
+                                data-toggle="tab"
+                                data-bs-target="#tab-<?php echo esc_attr($tab_key); ?>"
+                                data-target="#tab-<?php echo esc_attr($tab_key); ?>"
+                                type="button"
+                                role="tab"
+                                aria-controls="tab-<?php echo esc_attr($tab_key); ?>"
+                                aria-selected="<?php echo $tab_index === 0 ? 'true' : 'false'; ?>">
+                            <?php echo esc_html($tab_label); ?>
+                        </button>
+                    </li>
+                    <?php
+                    $tab_index++;
+                } ?>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="growtype-form-tabs-content tab-content">
+                <?php
+                $tab_index = 0;
+                foreach ($tabs_data as $tab_key => $tab_fields) {
+                    $active_class = $tab_index === 0 ? 'active show' : '';
+                    ?>
+                    <div class="growtype-form-tabs-pane tab-pane fade <?php echo $active_class; ?>"
+                         id="tab-<?php echo esc_attr($tab_key); ?>"
+                         role="tabpanel"
+                         aria-labelledby="tab-<?php echo esc_attr($tab_key); ?>-tab">
+                        <div class="row g-3 main-fields">
+                            <?php
+                            $current_group = null;
+                            foreach ($tab_fields as $field) {
+                                $field_group = $field['group'] ?? null;
+                                if ($field_group !== $current_group) {
+                                    if ($current_group !== null) {
+                                        echo '</div>'; // Close previous group
+                                    }
+                                    if ($field_group !== null) {
+                                        echo '<div class="' . esc_attr($field_group) . '-group col-12">';
+                                        if (isset($field['group_title'])) {
+                                            echo '<p class="group-title">' . esc_html($field['group_title']) . '</p>';
+                                        }
+                                    }
+                                    $current_group = $field_group;
+                                }
+                                self::render_growtype_form_field($field);
+                            }
+                            if ($current_group !== null) {
+                                echo '</div>'; // Close last group
+                            }
+                            
+                            // Render untabbed fields (hidden ones etc) in the first tab pane to ensure they are present in DOM
+                            if ($tab_index === 0 && !empty($untabbed_fields)) {
+                                $current_group = null;
+                                foreach ($untabbed_fields as $field) {
+                                    $field_group = $field['group'] ?? null;
+                                    if ($field_group !== $current_group) {
+                                        if ($current_group !== null) {
+                                            echo '</div>';
+                                        }
+                                        if ($field_group !== null) {
+                                            echo '<div class="' . esc_attr($field_group) . '-group col-12">';
+                                            if (isset($field['group_title'])) {
+                                                echo '<p class="group-title">' . esc_html($field['group_title']) . '</p>';
+                                            }
+                                        }
+                                        $current_group = $field_group;
+                                    }
+                                    self::render_growtype_form_field($field);
+                                }
+                                if ($current_group !== null) {
+                                    echo '</div>';
+                                }
+                                $untabbed_fields = []; // Mark as rendered
+                            }
+                            ?>
+                        </div>
+                    </div>
+                    <?php
+                    $tab_index++;
+                } ?>
+            </div>
+        <?php } else { ?>
+            <div class="row g-3 main-fields">
+                <?php
+                $current_group = null;
+                foreach ($main_fields as $field) {
+                    $field_group = $field['group'] ?? null;
+                    if ($field_group !== $current_group) {
+                        if ($current_group !== null) {
+                            echo '</div>';
+                        }
+                        if ($field_group !== null) {
+                            echo '<div class="' . esc_attr($field_group) . '-group col-12">';
+                            if (isset($field['group_title'])) {
+                                echo '<p class="group-title">' . esc_html($field['group_title']) . '</p>';
+                            }
+                        }
+                        $current_group = $field_group;
+                    }
+                    self::render_growtype_form_field($field);
+                }
+                if ($current_group !== null) {
+                    echo '</div>';
+                }
+                ?>
+            </div>
+        <?php }
+    }
+
+    /**
      * @param $field
      * @return null
      */
@@ -866,7 +1038,7 @@ class Growtype_Form_General
             /**
              * Form submit
              */
-            $('.growtype-form button[type="submit"]').click(function () {
+            $('.growtype-form button[type="submit"]').click(function (event) {
 
                 $(this).attr('disabled', false);
 
@@ -927,18 +1099,25 @@ class Growtype_Form_General
                         });
                     }
 
-                    /**
+                     /**
                      * Stop if is not valid
                      */
                     if (!isValid) {
+                        var $form = $(this).closest('.growtype-form');
+                        if (!$form.find('.form-validation-alert').length) {
+                            $form.prepend('<div class="alert alert-danger alert-dismissible fade show form-validation-alert mb-4" role="alert">Not all required fields are filled. Please check the form.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+                        }
+
                         if ($('.error:visible').length > 0) {
                             $([document.documentElement, document.body]).animate({
-                                scrollTop: $('.error:visible').last().offset().top - ($(window).height() / 2)
+                                scrollTop: $form.find('.form-validation-alert').length ? $form.find('.form-validation-alert').offset().top - 100 : $('.error:visible').last().offset().top - ($(window).height() / 2)
                             }, 100);
                         }
 
                         event.preventDefault();
                         return false;
+                    } else {
+                         $(this).closest('.growtype-form').find('.form-validation-alert').remove();
                     }
 
                     /**
@@ -950,6 +1129,13 @@ class Growtype_Form_General
                      * Submit form
                      */
                     $(this).closest('.growtype-form').submit();
+                }
+            });
+
+            $(document).on('keyup change', '.growtype-form input, .growtype-form textarea, .growtype-form select', function() {
+                var $form = $(this).closest('.growtype-form');
+                if ($form.find('.form-validation-alert').length && $form.find('.error:visible').length === 0) {
+                    $form.find('.form-validation-alert').remove();
                 }
             });
 
@@ -1091,9 +1277,44 @@ class Growtype_Form_General
             foreach ($image_uploader_ids as $key => $ids) {
                 if (!empty($ids)) {
                     foreach ($ids as $image_id) {
+                        if (is_array($image_id) && isset($image_id['src'])) {
+                            $image_uploaders_images[$key][] = $image_id;
+                            continue;
+                        }
+
+                        $src = wp_get_attachment_url($image_id);
+                        if (!$src && is_string($image_id) && class_exists('Growtype_Child_Growtype_Character_Image')) {
+                            $metadata = Growtype_Child_Growtype_Character_Image::get_user_generated_images_metadata();
+                            if (isset($metadata[$image_id])) {
+                                $m_data = $metadata[$image_id];
+                                $src = is_array($m_data) ? ($m_data['url'] ?? '') : (is_string($m_data) ? $m_data : '');
+                                if ($src) {
+                                    $image_uploaders_images[$key][] = [
+                                        'id' => $image_id,
+                                        'src' => $src,
+                                        'is_video' => false,
+                                        'size' => 0,
+                                        'name' => 'generated-' . $image_id . '.jpg',
+                                        'type' => 'image/jpeg'
+                                    ];
+                                    continue;
+                                }
+                            }
+                        }
+                        $mime = get_post_mime_type($image_id);
+                        $is_video = strpos($mime, 'video/') === 0;
+                        $metadata = wp_get_attachment_metadata($image_id);
+                        $file_path = get_attached_file($image_id);
+                        $size = $metadata['filesize'] ?? (file_exists($file_path) ? filesize($file_path) : 0);
+                        $name = basename($file_path);
+
                         $image_uploaders_images[$key][] = [
                             'id' => $image_id,
-                            'src' => wp_get_attachment_image_url($image_id),
+                            'src' => $src,
+                            'is_video' => $is_video,
+                            'size' => $size,
+                            'name' => $name,
+                            'type' => $mime
                         ];
                     }
                 }

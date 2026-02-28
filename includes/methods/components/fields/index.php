@@ -13,7 +13,7 @@ if ($field_type === 'hidden') {
 
 $field_value = isset($field['value']) ? $field['value'] : '';
 
-if ($field_type !== 'textarea') {
+if ($field_type !== 'textarea' && $field_type !== 'repeater') {
     $field_value = !empty($field_value) ? sanitize_text_field($field_value) : '';
 }
 

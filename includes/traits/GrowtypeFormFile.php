@@ -120,8 +120,9 @@ trait GrowtypeFormFile
             'post_status' => 'inherit'
         ), $upload_featured_image_path);
 
-        // wp_generate_attachment_metadata() won't work if you do not include this file
+        // wp_generate_attachment_metadata() won't work if you do not include these files
         require_once(ABSPATH . 'wp-admin/includes/image.php');
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
 
         // Generate and save the attachment metas into the database
         wp_update_attachment_metadata($upload_id, wp_generate_attachment_metadata($upload_id, $upload_featured_image_path));
@@ -145,7 +146,7 @@ trait GrowtypeFormFile
         $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
 
         // Validate file extension
-        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'webm', 'mov'];
         if (!in_array(strtolower($file_extension), $allowed_extensions)) {
             return [
                 'success' => false,
@@ -154,11 +155,21 @@ trait GrowtypeFormFile
         }
 
         // Download image file
-        $image_data = file_get_contents($image_url);
-        if ($image_data === false) {
+        $response = wp_remote_get($image_url, ['timeout' => 300, 'sslverify' => false]);
+        
+        if (is_wp_error($response)) {
             return [
                 'success' => false,
-                'message' => 'Failed to download image from URL.'
+                'message' => 'Failed to download image: ' . $response->get_error_message()
+            ];
+        }
+        
+        $image_data = wp_remote_retrieve_body($response);
+        
+        if (empty($image_data)) {
+            return [
+                'success' => false,
+                'message' => 'Failed to download image from URL (empty body).'
             ];
         }
 
@@ -195,8 +206,9 @@ trait GrowtypeFormFile
 
         $attach_id = wp_insert_attachment($attachment, $file_path);
 
-        // Include image.php for wp_generate_attachment_metadata()
+        // Include image.php and media.php for wp_generate_attachment_metadata()
         require_once(ABSPATH . 'wp-admin/includes/image.php');
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
 
         // Generate and save attachment metadata
         $attach_data = wp_generate_attachment_metadata($attach_id, $file_path);

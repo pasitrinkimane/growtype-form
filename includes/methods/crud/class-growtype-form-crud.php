@@ -62,6 +62,10 @@ class Growtype_Form_Crud
         self::GROWTYPE_FORM_PURPOSE,
         'preloaded',
         'upload_file_order',
+        'featured_images_order',
+        'images_order',
+        'image_uploader_old_featured_images',
+        'image_uploader_old_images',
     ];
 
     const INCLUDED_VALUES_AFTER_VALIDATION = [
@@ -69,7 +73,8 @@ class Growtype_Form_Crud
         self::GROWTYPE_FORM_NAME_IDENTIFICATOR,
         self::GROWTYPE_FORM_PURPOSE,
         self::GROWTYPE_FORM_POST_IDENTIFICATOR,
-        self::GROWTYPE_QUIZ_UNIQUE_HASH
+        self::GROWTYPE_QUIZ_UNIQUE_HASH,
+        'featured_images'
     ];
 
     const EXCLUDED_VALUES_FROM_RETURN = ['password', 'repeat_password'];
@@ -994,12 +999,7 @@ class Growtype_Form_Crud
                 }
             }
 
-            if ($passed_values !== $submitted_values_notsanitized) {
-                return [
-                    'success' => false,
-                    'message' => __("Please fill all required fields.", "growtype-form")
-                ];
-            }
+            $passed_values = array_values(array_unique($passed_values));
         }
 
         /**

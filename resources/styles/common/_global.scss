@@ -29,6 +29,7 @@
 
     .col-auto {
       width: 50%;
+
       @include bp-phone-xl() {
         width: 100%;
       }
@@ -50,7 +51,7 @@
     }
 
     .form-check-input[type=checkbox] {
-      + .form-label {
+      +.form-label {
         padding-left: 1px;
         margin: 0;
       }
@@ -68,7 +69,9 @@
     }
   }
 
-  .form-label, label[for="user_login"], label[for="user_pass"] {
+  .form-label,
+  label[for="user_login"],
+  label[for="user_pass"] {
     margin-bottom: 0.5rem;
 
     .required {
@@ -79,7 +82,7 @@
 
   .repeater-fields {
     position: relative;
-    margin-top: 40px;
+    margin-top: 20px;
 
     &:first-child {
       margin-top: 0;
@@ -93,6 +96,7 @@
       top: 0;
       z-index: 1;
       margin: 0;
+
       @include bp-phone-xl() {
         max-width: 80px;
       }
@@ -104,7 +108,7 @@
     margin-top: 0;
 
     .repeater-fields {
-      > * {
+      >* {
         display: none;
       }
 
@@ -116,7 +120,8 @@
   }
 }
 
-.login-template-default, .signup-template-default {
+.login-template-default,
+.signup-template-default {
   .form-wrapper {
     background: white;
     border: 1px solid #e7e7e7;
@@ -167,10 +172,12 @@
       padding: 1em 3.5em 1em 3.5em;
     }
 
-    &[data-name="signup"], &[data-name="login"] {
+    &[data-name="signup"],
+    &[data-name="login"] {
       .form-wrapper {
         padding: 10px 30px;
         padding-bottom: 5px;
+
         @include bp-phone-xl() {
           padding: 10px 15px;
         }
@@ -183,7 +190,9 @@
     }
 
     .form-wrapper {
-      .login-username, .login-password {
+
+      .login-username,
+      .login-password {
         margin-bottom: 15px;
         position: relative;
       }
@@ -213,12 +222,14 @@
       margin: auto;
       margin-bottom: 30px;
       text-align: center;
+
       @include bp-phone-xl() {
         margin-bottom: 20px;
       }
     }
 
-    .form-wrapper .b-actions, .login #nav {
+    .form-wrapper .b-actions,
+    .login #nav {
       text-align: center;
 
       a {
@@ -241,7 +252,8 @@
         display: inline-block;
       }
 
-      input[type="submit"], button[type="submit"] {
+      input[type="submit"],
+      button[type="submit"] {
         width: 100%;
       }
     }
@@ -283,7 +295,7 @@
 
     .growtype-form-header {
 
-      & + .form-inner-wrapper {
+      &+.form-inner-wrapper {
         form {
           padding-top: 0;
         }
@@ -304,6 +316,7 @@
           width: 60%;
           margin: 0;
           text-align: center;
+
           @include bp-phone-xl() {
             width: 100%;
           }
@@ -323,14 +336,15 @@
       }
 
       .growtype-form-header-top {
-        & + .nav {
+        &+.nav {
           padding-top: 10px;
           padding-left: 20px;
           padding-right: 20px;
         }
       }
 
-      .growtype-form-header-top, .growtype-form-header-bottom {
+      .growtype-form-header-top,
+      .growtype-form-header-bottom {
         width: 100%;
         display: flex;
         justify-content: center;
@@ -366,7 +380,7 @@
             content: none;
           }
 
-          & + .growtype-form-header-html {
+          &+.growtype-form-header-html {
             padding-top: 30px;
           }
         }
@@ -395,6 +409,7 @@
           margin: 0;
           text-align: center;
           padding: 20px;
+
           @include bp-phone-xl() {
             width: 100%;
           }
@@ -434,7 +449,8 @@
         border-top: 1px solid #efefef;
         margin-top: 25px;
 
-        p, a {
+        p,
+        a {
           font-size: 14px;
           margin: 0;
         }

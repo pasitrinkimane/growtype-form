@@ -2,7 +2,8 @@
  * Copyright (c) 2019 Christian Bayer; Licensed MIT */
 
 /* Icons class */
-[class^="iui-"], [class*="iui-"] {
+[class^="iui-"],
+[class*="iui-"] {
     font-family: 'Dashicons' !important;
     speak: none;
     font-style: normal;
@@ -122,6 +123,15 @@
     height: 100%;
     object-fit: cover;
     position: absolute;
+}
+
+.image-uploader .uploaded .uploaded-image.is-audio .uploaded-audio-preview {
+    width: 100%;
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
 }
 
 /* Delete image button */

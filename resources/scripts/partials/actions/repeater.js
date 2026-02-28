@@ -89,15 +89,15 @@ function repeater() {
                     newName = groupName + '_' + newFormNr;
                 }
 
-                let field = $(repeaterFormClone.find('div')[index + 1]);
+                let field = repeaterFormClone.find('.e-wrapper').eq(index);
+                if (!field.length) {
+                    return;
+                }
                 field.attr('data-name', newName);
-                field.find('label').attr('for', newName)
-                field.find('.form-control')
+                field.find('label').attr('for', newName);
+                field.find('input, textarea, select')
                     .attr('name', newName)
-                    .attr('id', newName)
-                field.find('select')
-                    .attr('name', newName)
-                    .attr('id', newName)
+                    .attr('id', newName);
             }
         });
     }
