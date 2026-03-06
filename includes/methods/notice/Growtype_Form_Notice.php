@@ -31,11 +31,7 @@ class Growtype_Form_Notice
 
         if (isset($_GET['action']) && !empty($_GET['action'])) {
             if ('failed' == $_GET['action']) {
-                $request_uri = $_SERVER['REQUEST_URI'] ?? null;
-
-                if (empty($request_uri) || strpos($request_uri, 'login') !== false) {
-                    $messages[] = __("Wrong login details. Please try again.", "growtype-form");
-                }
+                $messages[] = __("Wrong login details. Please try again.", "growtype-form");
             } elseif ('loggedout' == $_GET['action']) {
                 $messages[] = __("You are now logged out.", "growtype-form");
             } elseif ('recovered' == $_GET['action']) {
@@ -96,7 +92,12 @@ class Growtype_Form_Notice
 
                     ?>
                     <script>
-                        window.history.pushState({}, document.title, "<?php echo $sanitized_url ?>");
+                        // Delay clearing the URL to allow modal opening scripts to read it
+                        setTimeout(function() {
+                            const url = new URL(window.location.href);
+                            url.searchParams.delete('action');
+                            window.history.pushState({}, document.title, url.toString());
+                        }, 500);
                     </script>
                 <?php } ?>
             </div>
@@ -106,18 +107,16 @@ class Growtype_Form_Notice
 
         if (isset($_COOKIE['growtype_form_notice_messages'])) {
             unset($_COOKIE['growtype_form_notice_messages']);
-        }
-
-        if (!headers_sent()) {
-            setcookie('notice_message', '', time(), COOKIEPATH, COOKIE_DOMAIN);
+            if (!headers_sent()) {
+                setcookie('growtype_form_notice_messages', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN);
+            }
         }
 
         if (isset($_COOKIE['growtype_form_notice_status'])) {
             unset($_COOKIE['growtype_form_notice_status']);
-        }
-
-        if (!headers_sent()) {
-            setcookie('notice_status', '', time(), COOKIEPATH, COOKIE_DOMAIN);
+            if (!headers_sent()) {
+                setcookie('growtype_form_notice_status', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN);
+            }
         }
 
         return apply_filters('growtype_form_notice_content', $notices);

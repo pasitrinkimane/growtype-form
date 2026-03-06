@@ -566,7 +566,7 @@ class Growtype_Form_General
                     <?php echo growtype_form_include_view('components.forms.partials.header', ['form_args' => $form_args]) ?>
 
                     <div class="form-inner-wrapper">
-                        <form id="growtype-form-<?php echo $form_name ?>" enctype="multipart/form-data" class="growtype-form form <?php echo $form_args['class'] ?>" action="<?php echo self::growtype_form_get_action_url(); ?>" method="post" data-name="<?php echo $form_name ?>" data-ajax="<?php echo $form_args['ajax'] ?>" data-ajax-action="<?php echo $form_args['ajax_action'] ?>">
+                        <form id="growtype-form-<?php echo $form_name ?>" enctype="multipart/form-data" class="growtype-form form <?php echo $form_args['class'] ?>" action="<?php echo self::growtype_form_get_action_url($form_name); ?>" method="post" data-name="<?php echo $form_name ?>" data-ajax="<?php echo $form_args['ajax'] ?>" data-ajax-action="<?php echo $form_args['ajax_action'] ?>">
                             <?php foreach ($form_data as $key => $form_fields) { ?>
                                 <?php if (isset($form_args['main_fields']) && !empty($form_args['main_fields']) && strpos($key, 'main_fields') !== false) { ?>
                                     <?php self::render_main_fields_logic($form_args['main_fields'], $form_name); ?>
@@ -674,8 +674,12 @@ class Growtype_Form_General
 
     public static function growtype_form_modals_render()
     {
-        echo growtype_form_include_view('modals/privacy');
-        echo growtype_form_include_view('modals/terms');
+        echo growtype_form_include_view('modals.privacy');
+        echo growtype_form_include_view('modals.terms');
+
+        if (!is_user_logged_in() && !growtype_form_current_page_is_login_page() && !growtype_form_current_page_is_signup_page()) {
+            echo growtype_form_include_view('modals.auth');
+        }
     }
 
     /**
@@ -709,16 +713,32 @@ class Growtype_Form_General
             if ($page_slug === Growtype_Form_Signup::URL_PATH || $page_slug === Growtype_Form_Login::URL_PATH) {
                 return $page_slug;
             }
+
+            if (strpos($_SERVER['REQUEST_URI'], 'admin-ajax.php') !== false) {
+                return '';
+            }
         }
 
-        return $_SERVER['REQUEST_URI'] ?? home_url();
+        return $_SERVER['REQUEST_URI'] ?? '/';
     }
 
     /**
      * Form action url
      */
-    public static function growtype_form_get_action_url()
+    public static function growtype_form_get_action_url($form_name = '')
     {
+        $query_args = $_GET;
+        unset($query_args['lang']);
+        unset($query_args['action']);
+
+        if (strpos($form_name, 'signup') !== false) {
+            return growtype_form_signup_page_url($query_args);
+        }
+
+        if (strpos($form_name, 'login') !== false) {
+            return growtype_form_login_page_url($query_args);
+        }
+
         $current_post_slug = self::growtype_form_get_current_post_slug();
         $current_post_slug = str_replace('/login/', '/signup/', $current_post_slug);
 
@@ -969,7 +989,7 @@ class Growtype_Form_General
         ?>
         <script>
             if (typeof jQuery.fn.validate !== 'undefined') {
-                jQuery('form[name="loginform-custom"]').validate();
+                jQuery('form.growtype-form.login-form').validate();
             }
         </script>
         <?php
@@ -980,13 +1000,13 @@ class Growtype_Form_General
      */
     public static function growtype_form_submit_scripts_init()
     {
-        $validation_message = Growtype_Form_Crud::validation_messages();
+        $validation_message = Growtype_Form_Crud_Validation::validation_messages();
         ?>
         <script>
             $ = jQuery;
 
             if (typeof $.validator !== 'undefined') {
-                let allowSimplePassword = "<?php echo Growtype_Form_Crud::simple_password_is_allowed() ?>";
+                let allowSimplePassword = "<?php echo Growtype_Form_Crud_Validation::simple_password_is_allowed() ?>";
 
                 $.validator.addMethod("containsNumber", function (value, element) {
                     return /[0-9]/.test(value);
@@ -1023,7 +1043,7 @@ class Growtype_Form_General
                 };
 
                 if (!allowSimplePassword) {
-                    validationParams.rules.password.minlength = "<?php echo Growtype_Form_Crud::password_min_length() ?>";
+                    validationParams.rules.password.minlength = "<?php echo Growtype_Form_Crud_Validation::password_min_length() ?>";
                     validationParams.rules.password.containsNumber = true;
                     validationParams.rules.password.containsUppercase = true;
                     validationParams.rules.password.containsLowercase = true;

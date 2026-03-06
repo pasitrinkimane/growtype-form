@@ -12,17 +12,22 @@ trait GrowtypeFormAuth
             jQuery(document).ready(function () {
                 var open = 'fa-eye';
                 var close = 'fa-eye-slash';
-                var ele = jQuery('.growtype-form-wrapper input[type="password"]');
-                jQuery('<button class="far fa-eye-slash show-hide-pw" type="button">&nbsp;</button>').insertAfter(ele);
-                jQuery('.growtype-form-wrapper .show-hide-pw').click(function () {
-                    if (jQuery(this).hasClass(close)) {
-                        jQuery(this).parent().find('input[type="password"]').prop('type', 'text');
-                        jQuery(this).removeClass(close);
-                        jQuery(this).addClass(open);
+                jQuery('.growtype-form-wrapper input[type="password"]').each(function() {
+                    if (jQuery(this).next('.show-hide-pw').length === 0) {
+                        jQuery('<button class="far fa-eye-slash show-hide-pw" type="button">&nbsp;</button>').insertAfter(jQuery(this));
+                    }
+                });
+                
+                jQuery(document).off('click', '.growtype-form-wrapper .show-hide-pw').on('click', '.growtype-form-wrapper .show-hide-pw', function () {
+                    var $btn = jQuery(this);
+                    var $input = $btn.parent().find('input');
+                    
+                    if ($btn.hasClass(close)) {
+                        $input.prop('type', 'text');
+                        $btn.removeClass(close).addClass(open);
                     } else {
-                        jQuery(this).parent().find('input[type="text"]').prop('type', 'password');
-                        jQuery(this).removeClass(open);
-                        jQuery(this).addClass(close);
+                        $input.prop('type', 'password');
+                        $btn.removeClass(open).addClass(close);
                     }
                 });
             });

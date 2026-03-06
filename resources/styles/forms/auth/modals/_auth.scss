@@ -1,0 +1,44 @@
+.growtype-auth-modal-form {
+  min-height: 200px;
+
+  .growtype-form-auth {
+    max-width: 100%;
+    width: 100%;
+
+    .growtype-form-alert-wrapper {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .growtype-form-alert {
+      box-shadow: 0px 0px 5px 0px #dfdfdf;
+    }
+  }
+
+  .growtype-form-wrapper {
+    margin: 0 auto;
+    padding: 0 !important;
+    background: transparent !important;
+
+    .growtype-form-container {
+      padding: 0 !important;
+    }
+
+    .form-wrapper {
+      padding: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+  }
+}
+
+#growtypeFormAuthModal {
+  .modal-body {
+    padding: 5px 25px;
+
+    @include bp-phone-xl() {
+      padding: 5px 15px;
+    }
+  }
+}

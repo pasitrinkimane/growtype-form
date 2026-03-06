@@ -785,7 +785,7 @@ class Growtype_Form_Admin_Lead
                 continue;
             }
 
-            $email_validation = Growtype_Form_Crud::first_level_email_validation($email);
+            $email_validation = Growtype_Form_Crud_Validation::basic_email_validation($email);
             $isValid = $email_validation['success'];
 
             update_post_meta($lead_id, 'is_validated', true);

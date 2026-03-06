@@ -227,37 +227,43 @@ class Growtype_Form_Login
     function custom_login_failed($username)
     {
         $referrer = wp_get_referer();
+        if (!$referrer && isset($_SERVER['HTTP_REFERER'])) {
+            $referrer = $_SERVER['HTTP_REFERER'];
+        }
+
+        error_log('Growtype Auth - Login failed for user: ' . $username . '. Referrer: ' . $referrer);
 
         /**
          * Check if the referrer is the wp-admin login page
          */
-        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'wp/wp-admin') !== false) {
-            return wp_login_url();
+        if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'wp-admin') !== false && strpos($_SERVER['HTTP_REFERER'], 'admin-ajax') === false) {
+            wp_redirect(wp_login_url());
+            exit;
         }
 
         /**
-         * Check if the referrer is the custom login page
+         * Check if we have a referrer or a way to get back
          */
-        if (!empty($referrer) && !empty(growtype_form_login_page_ID())) {
-            $query_string = parse_url($referrer, PHP_URL_QUERY);
+        $redirect_url = $referrer ? $referrer : (isset($_SERVER['REQUEST_URI']) ? home_url($_SERVER['REQUEST_URI']) : home_url());
 
-            $query_args = [];
-            if (!empty($query_string)) {
-                parse_str($query_string, $query_args);
-            }
-
-            if (isset($_GET['loggedout']) && !empty($_GET['loggedout'])) {
-                $query_args['action'] = 'loggedout';
-            } else {
-                $query_args['action'] = 'failed';
-            }
-
-            $redirect_url = $referrer;
-
-            return wp_redirect(add_query_arg($query_args, $redirect_url));
+        $query_string = parse_url($redirect_url, PHP_URL_QUERY);
+        $query_args = [];
+        if (!empty($query_string)) {
+            parse_str($query_string, $query_args);
         }
 
-        return wp_redirect(growtype_form_login_page_url());
+        if (isset($_GET['loggedout']) && !empty($_GET['loggedout'])) {
+            $query_args['action'] = 'loggedout';
+        } else {
+            $query_args['action'] = 'failed';
+        }
+
+        // Clean up the URL to avoid double parameters
+        $redirect_url = strtok($redirect_url, '?');
+        $redirect_url = add_query_arg($query_args, $redirect_url);
+
+        wp_redirect($redirect_url);
+        exit;
     }
 
     /**
@@ -283,6 +289,16 @@ class Growtype_Form_Login
         $wp_login_form_args['redirect'] = growtype_form_add_domain_to_url_if_missing($redirect_url_after_login);
 
         /**
+         * Unique IDs to prevent conflicts in modals
+         */
+        $unique_suffix = substr(md5(serialize($form_data)), 0, 6);
+        $wp_login_form_args['form_id'] = 'loginform_' . $unique_suffix;
+        $wp_login_form_args['id_username'] = 'user_login_' . $unique_suffix;
+        $wp_login_form_args['id_password'] = 'user_pass_' . $unique_suffix;
+        $wp_login_form_args['id_remember'] = 'rememberme_' . $unique_suffix;
+        $wp_login_form_args['id_submit'] = 'wp-submit_' . $unique_suffix;
+
+        /**
          * Classes
          */
         $form_class = isset($form_data['args']['class']) ? $form_data['args']['class'] : '';
@@ -293,15 +309,19 @@ class Growtype_Form_Login
         ob_start();
         ?>
 
-        <div class="growtype-form-wrapper <?= $form_class ?>" data-name="login">
+        <div class="growtype-form-wrapper <?= $form_class ?>" data-name="login" data-suffix="<?= $unique_suffix ?>">
             <div class="growtype-form-container">
                 <?php if (isset($form_args['logo']) && isset($form_args['logo']['url']) && !empty($form_args['logo']['url'])) { ?>
                     <div class="logo-wrapper">
-                        <a href="<?php echo isset($form_args['logo']['external_url']) ? growtype_form_string_replace_custom_variable($form_args['logo']['external_url']) : '#' ?>" class="e-logo">
-                            <img src="<?php echo growtype_form_string_replace_custom_variable($form_args['logo']['url']) ?>" class="img-fluid" width="<?php echo $form_args['logo']['width'] ?? '' ?>" height="<?php echo $form_args['logo']['height'] ?? '' ?>"/>
+                        <a href="<?php echo isset($form_args['logo']['external_url']) ? growtype_form_string_replace_custom_variable($form_args['logo']['external_url']) : '#' ?>"
+                           class="e-logo">
+                            <img src="<?php echo growtype_form_string_replace_custom_variable($form_args['logo']['url']) ?>"
+                                 class="img-fluid" width="<?php echo $form_args['logo']['width'] ?? '' ?>"
+                                 height="<?php echo $form_args['logo']['height'] ?? '' ?>"/>
                         </a>
                     </div>
-                <?php } ?>
+                    <?php
+                } ?>
 
                 <div class="form-wrapper">
                     <?php echo growtype_form_include_view('components.forms.partials.header', ['form_args' => $form_args]) ?>
@@ -315,25 +335,39 @@ class Growtype_Form_Login
             </div>
         </div>
 
-        <?php
-        if (isset($form_args['username_placeholder'])) { ?>
-            <script>
-                var userLogin = document.getElementById("user_login");
-                userLogin.setAttribute("placeholder", "<?= __($form_args['username_placeholder'], 'growtype-form') ?>");
-            </script>
-        <?php } ?>
-
-        <?php
-        if (isset($form_args['password_placeholder'])) { ?>
-            <script>
-                var userPass = document.getElementById("user_pass");
-                userPass.setAttribute("placeholder", "<?= __($form_args['password_placeholder'], 'growtype-form') ?>");
-            </script>
-        <?php } ?>
-
         <script>
-            document.querySelector('#user_login').setAttribute('required', 'required');
-            document.querySelector('#user_pass').setAttribute('required', 'required');
+            (function ($) {
+                $(document).ready(function () {
+                    var suffix = '<?= $unique_suffix ?>';
+                    var $form = $('#loginform_' + suffix);
+
+                    if ($form.length) {
+                        $form.addClass('growtype-form login-form');
+                        $form.attr('name', 'login');
+                        $form.attr('autocomplete', 'on');
+                        $form.attr('role', 'form');
+                        $form.removeAttr('novalidate');
+
+                        if (typeof $.fn.validate !== 'undefined') {
+                            $form.validate();
+                        }
+
+                        var $usernameInput = $form.find('#user_login_' + suffix);
+                        var usernamePlaceholder = "<?= !empty($form_args['username_placeholder']) ? __($form_args['username_placeholder'], 'growtype-form') : '' ?>";
+                        if (!usernamePlaceholder) {
+                            usernamePlaceholder = $form.find('label[for="user_login_' + suffix + '"]').text();
+                        }
+                        $usernameInput.attr("placeholder", usernamePlaceholder).attr('required', 'required');
+
+                        var $passwordInput = $form.find('#user_pass_' + suffix);
+                        var passwordPlaceholder = "<?= !empty($form_args['password_placeholder']) ? __($form_args['password_placeholder'], 'growtype-form') : '' ?>";
+                        if (!passwordPlaceholder) {
+                            passwordPlaceholder = $form.find('label[for="user_pass_' + suffix + '"]').text();
+                        }
+                        $passwordInput.attr("placeholder", passwordPlaceholder).attr('required', 'required');
+                    }
+                });
+            })(jQuery);
         </script>
 
         <?php

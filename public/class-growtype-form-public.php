@@ -62,6 +62,7 @@ class Growtype_Form_Public
     public function enqueue_styles()
     {
         wp_enqueue_style($this->growtype_form, GROWTYPE_FORM_URL_PUBLIC . 'styles/growtype-form.css', array (), GROWTYPE_FORM_VERSION, 'all');
+        wp_enqueue_style($this->growtype_form . '-auth', GROWTYPE_FORM_URL_PUBLIC . 'styles/forms/auth/index.css', array ($this->growtype_form), GROWTYPE_FORM_VERSION, 'all');
     }
 
     /**
@@ -80,8 +81,17 @@ class Growtype_Form_Public
                 'date' => Growtype_Form_General::get_date_time_data(),
                 'currency' => Growtype_Form_General::get_currency_data(),
                 'public_url' => GROWTYPE_FORM_URL_PUBLIC,
+                'version' => GROWTYPE_FORM_VERSION,
             )
         );
+    }
+
+    /**
+     * Render modals in footer
+     */
+    public function render_modals()
+    {
+        Growtype_Form_General::growtype_form_modals_render();
     }
 
 }

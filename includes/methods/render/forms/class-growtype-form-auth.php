@@ -11,9 +11,7 @@ class Growtype_Form_Auth
 
     public function __construct()
     {
-        if (!is_admin()) {
-            add_shortcode(self::SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
-        }
+        add_shortcode(self::SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
     }
 
     /**

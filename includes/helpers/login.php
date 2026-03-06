@@ -115,3 +115,13 @@ if (!function_exists('growtype_form_current_page_is_login_page')) {
             && preg_match('#^/login/?$#', $path) === 1;
     }
 }
+
+/**
+ * Render auth modal
+ */
+if (!function_exists('growtype_form_render_auth_modal')) {
+    function growtype_form_render_auth_modal($variables = [])
+    {
+        return growtype_form_include_view('modals.auth', $variables);
+    }
+}
