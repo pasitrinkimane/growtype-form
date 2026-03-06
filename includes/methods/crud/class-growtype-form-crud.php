@@ -132,7 +132,7 @@ class Growtype_Form_Crud
         $this->load_partials();
 
         if (!is_admin()) {
-            add_filter('wp_loaded', array($this, 'growtype_form_process_posted_data'));
+            add_filter('wp_loaded', array ($this, 'growtype_form_process_posted_data'));
         }
     }
 
@@ -161,7 +161,7 @@ class Growtype_Form_Crud
          * Process posted values
          */
         if (isset($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]) &&
-        in_array(sanitize_text_field($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]), self::GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS)) {
+            in_array(sanitize_text_field($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]), self::GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS)) {
             // Verify the nonce
             if (!isset($_POST['growtype_form_nonce']) || !wp_verify_nonce($_POST['growtype_form_nonce'], 'growtype_form_general')) {
                 error_log('Growtype Form - Nonce verification failed');
@@ -177,8 +177,7 @@ class Growtype_Form_Crud
 
                 if (empty($post_id)) {
                     $redirect_url = home_url();
-                }
-                else {
+                } else {
 
                     if (class_exists('Growtype_Wc_Product')) {
                         $user_has_created_product = Growtype_Wc_Product::user_has_created_product($post_id);
@@ -200,8 +199,7 @@ class Growtype_Form_Crud
                                 if (!empty($product)) {
                                     $product->delete();
                                 }
-                            }
-                            else {
+                            } else {
                                 wp_delete_post($post_id);
                             }
                         }
@@ -209,9 +207,8 @@ class Growtype_Form_Crud
 
                     $redirect_url = growtype_form_redirect_url_after_product_creation();
                 }
-            }
-            else {
-                $form_name = isset($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]) ? 
+            } else {
+                $form_name = isset($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]) ?
                     sanitize_text_field($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]) : null;
 
                 /**
@@ -240,9 +237,9 @@ class Growtype_Form_Crud
 
                 if ($throttle_passed === false) {
                     Growtype_Form_Notice::growtype_form_set_notice(
-                    [
-                        growtype_form_message('submission_throttled')
-                    ],
+                        [
+                            growtype_form_message('submission_throttled')
+                        ],
                         'error'
                     );
 
@@ -259,9 +256,9 @@ class Growtype_Form_Crud
 
                 if (empty($redirect_url)) {
                     Growtype_Form_Notice::growtype_form_set_notice(
-                    [
-                        growtype_form_message()
-                    ],
+                        [
+                            growtype_form_message()
+                        ],
                         'error'
                     );
 
@@ -298,13 +295,11 @@ class Growtype_Form_Crud
         $redirect_url = null;
 
         if (isset($submitted_values['data']['growtype_form_redirect_after']) &&
-        !empty($submitted_values['data']['growtype_form_redirect_after'])) {
+            !empty($submitted_values['data']['growtype_form_redirect_after'])) {
             $redirect_url = $submitted_values['data']['growtype_form_redirect_after'];
-        }
-        elseif (isset($_COOKIE['growtype_form_redirect_after'])) {
+        } elseif (isset($_COOKIE['growtype_form_redirect_after'])) {
             $redirect_url = $_COOKIE['growtype_form_redirect_after'];
-        }
-        elseif (isset($_GET['redirect_after']) && !empty($_GET['redirect_after'])) {
+        } elseif (isset($_GET['redirect_after']) && !empty($_GET['redirect_after'])) {
             $redirect_url = $_GET['redirect_after'];
         }
 
@@ -329,8 +324,7 @@ class Growtype_Form_Crud
             $form_data = json_decode(base64_decode($_POST[self::GROWTYPE_FORM_FORM_DATA]), true);
 
             unset($submitted_values['data'][self::GROWTYPE_FORM_FORM_DATA]);
-        }
-        else {
+        } else {
             $form_data = self::get_growtype_form_data($form_name);
         }
 
@@ -356,7 +350,7 @@ class Growtype_Form_Crud
 
         if ($submitted_data_is_valid && !empty($submitted_data)) {
             $success_message = isset($form_data['success_message']) ? $form_data['success_message'] : '';
-            $submit_action = isset($submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION]) ? 
+            $submit_action = isset($submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION]) ?
                 $submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION] : 'submit';
 
             if (strpos($form_name, 'signup') !== false) {
@@ -385,8 +379,7 @@ class Growtype_Form_Crud
                         }
                     }
                 }
-            }
-            elseif (class_exists('Growtype_Wc') && strpos($form_name, 'wc_product') !== false) {
+            } elseif (class_exists('Growtype_Wc') && strpos($form_name, 'wc_product') !== false) {
                 $product_data = $submitted_values;
 
                 /**
@@ -437,12 +430,10 @@ class Growtype_Form_Crud
                         return $redirect_url;
                     }
                 }
-            }
-            else {
+            } else {
                 if (isset($form_data['type']) && $form_data['type'] === 'custom') {
                     $submit_data = apply_filters('growtype_form_upload_post_custom', $form_data, $submitted_values, $form_name);
-                }
-                else {
+                } else {
                     $submit_data = growtype_form_save_submission($form_data, $submitted_values);
 
                     /**
@@ -454,8 +445,7 @@ class Growtype_Form_Crud
                          */
                         if (isset($submitted_values['files']['featured_image'])) {
                             self::post_attach_featured_image($submit_data['post_id'], $submitted_values['files']['featured_image']);
-                        }
-                        else {
+                        } else {
                             self::post_attach_files($submit_data['post_id'], $submitted_values['files']);
                         }
                     }
@@ -482,14 +472,12 @@ class Growtype_Form_Crud
 
                     $submit_data['success'] = true;
                     $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : growtype_form_message('success');
-                }
-                else {
+                } else {
                     $submit_data['success'] = false;
                     $submit_data['message'] = isset($submit_data['message']) ? $submit_data['message'] : growtype_form_message();
                 }
             }
-        }
-        else {
+        } else {
             error_log(sprintf("Growtype Form - VALIDATION FAILED. Data: %s", print_r($validated_form_submitted_values, true)));
 
             $submit_data['success'] = false;
@@ -521,8 +509,7 @@ class Growtype_Form_Crud
             if (!empty($return_values) && strpos($form_name, 'signup') !== false) {
                 setcookie('signup_data', json_encode($return_values), time() + 3, COOKIEPATH, COOKIE_DOMAIN);
             }
-        }
-        else {
+        } else {
             if ($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION] === 'preview' && class_exists('Growtype_Product')) {
                 $redirect_url = Growtype_Wc_Product::edit_permalink($post_id);
             }
@@ -569,7 +556,7 @@ class Growtype_Form_Crud
 
         $to = $growtype_form_post_default_email_to;
         $subject = $growtype_form_post_default_email_to_subject;
-        $headers = array('Content-Type: text/html; charset=UTF-8');
+        $headers = array ('Content-Type: text/html; charset=UTF-8');
         $admin_email = get_option('admin_email');
 
         $email_body = str_replace('{form_submission_details}', $submitted_content,
@@ -591,20 +578,19 @@ class Growtype_Form_Crud
 
     /** * @param $form_name * @return mixed|null */
     public static function
-        get_growtype_form_data(
+    get_growtype_form_data(
         $form_name
-        )
-    {
+    ) {
         if (empty($form_name)) {
             return null;
         }
         /** * Check forms */
         $forms = get_posts(
-        [
-            'posts_per_page' => -1,
-            'post_type' => Growtype_Form_Admin_Form::POST_TYPE_NAME,
-            'post_status' => 'publish'
-        ]
+            [
+                'posts_per_page' => -1,
+                'post_type' => Growtype_Form_Admin_Form::POST_TYPE_NAME,
+                'post_status' => 'publish'
+            ]
         );
 
         if (!empty($forms)) {
@@ -631,14 +617,11 @@ class Growtype_Form_Crud
              */
             if (strpos($form_name, 'wc_product') !== false) {
                 $form_json_content = get_option('growtype_form_wc_product_json_content');
-            }
-            elseif (strpos($form_name, 'signup') !== false) {
+            } elseif (strpos($form_name, 'signup') !== false) {
                 $form_json_content = get_option('growtype_form_signup_json_content');
-            }
-            elseif (strpos($form_name, 'login') !== false) {
+            } elseif (strpos($form_name, 'login') !== false) {
                 $form_json_content = get_option('growtype_form_login_json_content');
-            }
-            else {
+            } else {
                 $form_json_content = get_option('growtype_form_post_json_content');
             }
         }
@@ -740,8 +723,7 @@ class Growtype_Form_Crud
 
         if ($submit_action === 'submit') {
             $create_user = Growtype_Form_Signup::create_user($username, $password, $email);
-        }
-        elseif ($submit_action === 'update') {
+        } elseif ($submit_action === 'update') {
             $user_id = get_current_user_id();
 
             if (empty($user_id)) {
@@ -764,8 +746,7 @@ class Growtype_Form_Crud
 
                     if (isset($update_user->errors['existing_user_email'])) {
                         $response['message'] = __("Please use another email.", "growtype-form");
-                    }
-                    else {
+                    } else {
                         $response['message'] = growtype_form_message();
                     }
 
@@ -791,14 +772,13 @@ class Growtype_Form_Crud
                         $response['message'] = __("Unfortunately, you cannot use this username.", "growtype-form");
                         return $response;
                     }
-                }
-                else {
+                } else {
                     global $wpdb;
 
                     $update_user_name = $wpdb->update(
                         $wpdb->users,
-                    ['user_login' => $username],
-                    ['ID' => $user_id]
+                        ['user_login' => $username],
+                        ['ID' => $user_id]
                     );
 
                     clean_user_cache($user_id);
@@ -808,8 +788,7 @@ class Growtype_Form_Crud
 
                         if (isset($update_user_name->errors['existing_user_email'])) {
                             $response['message'] = __("Please use another email.", "growtype-form");
-                        }
-                        else {
+                        } else {
                             $response['message'] = growtype_form_message();
                         }
 
@@ -830,8 +809,7 @@ class Growtype_Form_Crud
         if (empty($create_user) || $create_user['success'] === false) {
             $response['success'] = false;
             $response['message'] = $create_user['message'] ?? growtype_form_message();
-        }
-        else {
+        } else {
             $user_id = $create_user['user_id'];
 
             if (isset($use_alternative_email) && $use_alternative_email) {
@@ -849,8 +827,7 @@ class Growtype_Form_Crud
 
                 if (empty($parent_user_ids)) {
                     $parent_user_ids = [get_current_user_id()];
-                }
-                else {
+                } else {
                     array_push($parent_user_ids, get_current_user_id());
                 }
 
@@ -863,8 +840,7 @@ class Growtype_Form_Crud
 
                 if (empty($child_user_ids)) {
                     $child_user_ids = [$user_id];
-                }
-                else {
+                } else {
                     array_push($child_user_ids, $user_id);
                 }
 
@@ -881,8 +857,7 @@ class Growtype_Form_Crud
                 if ($submit_action === 'update') {
                     $response['message'] = __("The information was successfully updated.", "growtype-form");
                 }
-            }
-            else {
+            } else {
                 $response['message'] = growtype_form_message();
             }
         }
@@ -925,8 +900,7 @@ class Growtype_Form_Crud
                 if (empty($middle_name)) {
                     update_user_meta($user_id, 'first_name', sanitize_text_field($first_name));
                     update_user_meta($user_id, 'last_name', sanitize_text_field($last_name));
-                }
-                else {
+                } else {
                     update_user_meta($user_id, 'first_name', sanitize_text_field((string)$value));
                 }
             }
@@ -939,8 +913,7 @@ class Growtype_Form_Crud
                 foreach ($value as $value_key => $single_value) {
                     $sanitized_value[sanitize_text_field($value_key)] = sanitize_text_field($single_value);
                 }
-            }
-            else {
+            } else {
                 $sanitized_value = sanitize_text_field($value);
             }
 

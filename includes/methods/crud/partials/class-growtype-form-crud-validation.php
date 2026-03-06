@@ -144,8 +144,7 @@ class Growtype_Form_Crud_Validation
                 'failed_validation' => false,
                 'success' => true,
             ];
-        }
-        else {
+        } else {
             return [
                 'failed_validation' => false,
                 'success' => false,
@@ -178,21 +177,17 @@ class Growtype_Form_Crud_Validation
             if (strlen($password) < self::password_min_length()) {
                 $status['success'] = false;
                 $status['message'] = $validation_messages['password_min_length'];
-            }
-            elseif (!preg_match("#[0-9]+#", $password)) {
+            } elseif (!preg_match("#[0-9]+#", $password)) {
                 $status['success'] = false;
                 $status['message'] = $validation_messages['password_contains_number'];
-            }
-            elseif (!preg_match("#[A-Z]+#", $password)) {
+            } elseif (!preg_match("#[A-Z]+#", $password)) {
                 $status['success'] = false;
                 $status['message'] = $validation_messages['password_contains_uppercase'];
-            }
-            elseif (!preg_match("#[a-z]+#", $password)) {
+            } elseif (!preg_match("#[a-z]+#", $password)) {
                 $status['success'] = false;
                 $status['message'] = $validation_messages['password_contains_lowercase'];
             }
-        }
-        else {
+        } else {
             $status['success'] = false;
             $status['message'] = $validation_messages['password_required'];
         }
@@ -363,8 +358,7 @@ class Growtype_Form_Crud_Validation
                     if ($field['type'] === 'checkbox') {
                         $submitted_values_sanitized[$field['name']] = 'true';
                     }
-                }
-                else {
+                } else {
                     if ($field['type'] === 'checkbox') {
                         $submitted_values_sanitized[$field['name']] = 'false';
                     }
@@ -425,7 +419,7 @@ class Growtype_Form_Crud_Validation
          * Reset growtype quiz unique hash
          */
         if (isset($submitted_values_sanitized[Growtype_Form_Crud::GROWTYPE_QUIZ_UNIQUE_HASH]) &&
-        !empty($submitted_values_sanitized[Growtype_Form_Crud::GROWTYPE_QUIZ_UNIQUE_HASH])) {
+            !empty($submitted_values_sanitized[Growtype_Form_Crud::GROWTYPE_QUIZ_UNIQUE_HASH])) {
             $quiz_result =
                 Growtype_Quiz_Result_Crud::get_quiz_single_result_data_by_unique_hash($submitted_values_sanitized[Growtype_Form_Crud::GROWTYPE_QUIZ_UNIQUE_HASH]);
 
