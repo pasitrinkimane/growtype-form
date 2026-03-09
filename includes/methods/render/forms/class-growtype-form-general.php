@@ -37,10 +37,11 @@ class Growtype_Form_General
             add_shortcode(self::SHORTCODE_NAME, array ($this, 'growtype_form_shortcode_function'));
         }
 
-        add_filter('upload_mimes', array($this, 'growtype_form_allow_video_uploads'));
+        add_filter('upload_mimes', array ($this, 'growtype_form_allow_video_uploads'));
     }
 
-    public function growtype_form_allow_video_uploads($mimes) {
+    public function growtype_form_allow_video_uploads($mimes)
+    {
         $mimes['mp4'] = 'video/mp4';
         $mimes['mov'] = 'video/quicktime';
         $mimes['webm'] = 'video/webm';
@@ -859,7 +860,7 @@ class Growtype_Form_General
                             if ($current_group !== null) {
                                 echo '</div>'; // Close last group
                             }
-                            
+
                             // Render untabbed fields (hidden ones etc) in the first tab pane to ensure they are present in DOM
                             if ($tab_index === 0 && !empty($untabbed_fields)) {
                                 $current_group = null;
@@ -1119,7 +1120,7 @@ class Growtype_Form_General
                         });
                     }
 
-                     /**
+                    /**
                      * Stop if is not valid
                      */
                     if (!isValid) {
@@ -1137,7 +1138,7 @@ class Growtype_Form_General
                         event.preventDefault();
                         return false;
                     } else {
-                         $(this).closest('.growtype-form').find('.form-validation-alert').remove();
+                        $(this).closest('.growtype-form').find('.form-validation-alert').remove();
                     }
 
                     /**
@@ -1152,7 +1153,7 @@ class Growtype_Form_General
                 }
             });
 
-            $(document).on('keyup change', '.growtype-form input, .growtype-form textarea, .growtype-form select', function() {
+            $(document).on('keyup change', '.growtype-form input, .growtype-form textarea, .growtype-form select', function () {
                 var $form = $(this).closest('.growtype-form');
                 if ($form.find('.form-validation-alert').length && $form.find('.error:visible').length === 0) {
                     $form.find('.form-validation-alert').remove();
