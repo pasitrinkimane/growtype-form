@@ -79,6 +79,11 @@ class Growtype_Form_Admin_Lead
         add_action('admin_post_growtype_form_admin_export_leads', array ($this, 'export_leads_callback'));
 
         /**
+         * User row actions
+         */
+        add_filter('user_row_actions', array ($this, 'add_lead_action_link'), 10, 2);
+
+        /**
          * Load extra methods
          */
         $this->load_methods();
@@ -156,7 +161,8 @@ class Growtype_Form_Admin_Lead
                                         <tr>
                                             <td colspan="4">No events logged yet.</td>
                                         </tr>
-                                    <?php else: ?>
+                                    <?php
+                                    else: ?>
                                         <?php foreach (array_reverse($log_data) as $entry):
                                             $details = $entry['details'] ?? [];
                                             $success = isset($entry['success']) && ($entry['success'] === 'true' || $entry['success'] === true);
@@ -175,28 +181,35 @@ class Growtype_Form_Admin_Lead
                                                     <div style="font-size: 11px; line-height: 1.4;">
                                                         <?php
                                                         foreach ($details as $k => $v):
-                                                            if ($k === 'action') continue;
-                                                            if (empty($v)) continue;
+                                                            if ($k === 'action') {
+                                                                continue;
+                                                            }
+                                                            if (empty($v)) {
+                                                                continue;
+                                                            }
                                                             ?>
                                                             <span style="background: #f0f0f1; padding: 1px 4px; border-radius: 3px; margin-right: 5px; display: inline-block; margin-bottom: 2px;">
                                                                     <strong><?php echo esc_html($k); ?>
                                                                         :</strong> <?php echo esc_html(is_array($v) ? json_encode($v) : $v); ?>
                                                                 </span>
-                                                        <?php endforeach; ?>
+                                                        <?php
+                                                        endforeach; ?>
                                                     </div>
                                                 </td>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
+                                        <?php
+                                        endforeach; ?>
+                                    <?php
+                                    endif; ?>
                                     </tbody>
                                 </table>
                             </div>
                             <div id="events-log-raw-container" style="display: none;">
                                 <textarea
-                                        style="width: 100%;"
-                                        id="<?php echo esc_attr($field['key']); ?>"
-                                        name="<?php echo esc_attr($field['key']); ?>"
-                                        rows="5"
+                                    style="width: 100%;"
+                                    id="<?php echo esc_attr($field['key']); ?>"
+                                    name="<?php echo esc_attr($field['key']); ?>"
+                                    rows="5"
                                 ><?php echo esc_textarea($meta_value); ?></textarea>
                             </div>
                             <button type="button" class="button" id="toggle-events-log-view">Switch to Raw View</button>
@@ -206,7 +219,7 @@ class Growtype_Form_Admin_Lead
                                         $('#events-log-table-container, #events-log-raw-container').toggle();
                                         var isTableVisible = $('#events-log-table-container').is(':visible');
                                         $(this).text(isTableVisible ? 'Switch to Raw View' : 'Switch to Table View');
-                                        
+
                                         if (!isTableVisible) {
                                             // Trigger resize for Ace editor when it becomes visible
                                             var editorElement = $('#<?php echo esc_js($field['key']); ?>');
@@ -221,15 +234,17 @@ class Growtype_Form_Admin_Lead
                                 });
                             </script>
                         </div>
-                    <?php } elseif ($type === 'textarea') { ?>
+                        <?php
+                    } elseif ($type === 'textarea') { ?>
                         <textarea
-                                style="width: 100%;"
-                                id="<?php echo esc_attr($field['key']); ?>"
-                                name="<?php echo esc_attr($field['key']); ?>"
-                                rows="5"
+                            style="width: 100%;"
+                            id="<?php echo esc_attr($field['key']); ?>"
+                            name="<?php echo esc_attr($field['key']); ?>"
+                            rows="5"
                         ><?php echo esc_textarea($meta_value); ?></textarea>
 
-                    <?php } elseif ($type === 'checkbox') { ?>
+                        <?php
+                    } elseif ($type === 'checkbox') { ?>
                         <input
                             type="checkbox"
                             id="<?php echo esc_attr($field['key']); ?>"
@@ -238,7 +253,8 @@ class Growtype_Form_Admin_Lead
                             <?php checked($meta_value, '1'); ?>
                         />
 
-                    <?php } else { ?>
+                        <?php
+                    } else { ?>
                         <input
                             style="width: 100%;"
                             type="text"
@@ -246,9 +262,11 @@ class Growtype_Form_Admin_Lead
                             name="<?php echo esc_attr($field['key']); ?>"
                             value="<?php echo esc_attr($meta_value); ?>"
                         />
-                    <?php } ?>
+                        <?php
+                    } ?>
                 </div>
-            <?php } ?>
+                <?php
+            } ?>
         </div>
         <?php
     }
@@ -326,7 +344,7 @@ class Growtype_Form_Admin_Lead
             'capability_type' => 'post',
             'has_archive' => false,
             'hierarchical' => false,
-//            'menu_position' => 902,
+            //            'menu_position' => 902,
 //            'supports' => array ('title', 'editor'),
             'supports' => array ('title'),
             'menu_icon' => 'dashicons-forms',
@@ -573,7 +591,7 @@ class Growtype_Form_Admin_Lead
             'fields' => 'ids',
             'meta_query' => [
                 'relation' => 'AND',
-//                [
+                //                [
 //                    'key' => 'is_validated',
 //                    'value' => '1',
 //                    'compare' => '='
@@ -624,7 +642,7 @@ class Growtype_Form_Admin_Lead
         fclose($output);
         exit;
     }
-    
+
     function export_validated_emails_callback()
     {
         if (!current_user_can('manage_options')) {
@@ -1059,5 +1077,22 @@ class Growtype_Form_Admin_Lead
             </script>
             <?php
         }
+    }
+
+    public function add_lead_action_link($actions, $user)
+    {
+        $lead = self::get_by_title($user->user_email);
+
+        if (!empty($lead)) {
+            $lead_url = admin_url('post.php?post=' . $lead->ID . '&action=edit');
+
+            $actions['lead'] = sprintf(
+                '<a href="%s">%s</a>',
+                esc_url($lead_url),
+                __('Lead', 'growtype-form')
+            );
+        }
+
+        return $actions;
     }
 }

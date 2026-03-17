@@ -177,6 +177,7 @@ class Growtype_Form_General
          */
         if (!wp_script_is('jquery-ui', 'enqueued') && !wp_script_is('jquery-ui-core', 'enqueued')) {
             wp_enqueue_script('jquery-ui', 'https://code.jquery.com/ui/1.13.1/jquery-ui.js', array ('jquery'), '1.1', true);
+            wp_enqueue_script('jquery-ui-touch-punch', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js', array ('jquery-ui'), '0.2.3', true);
 
             if (!wp_script_is('jquery-ui-timepicker-addon.min.js', 'enqueued')) {
                 wp_enqueue_script('jquery-ui-timepicker-addon.min.js', GROWTYPE_FORM_URL_PUBLIC . 'plugins/jquery-ui-timepicker-addon/jquery-ui-timepicker-addon.min.js', array ('jquery'), '1.1', true);
