@@ -243,7 +243,12 @@ class Growtype_Form_Crud
                         'error'
                     );
 
-                    wp_redirect(home_url(growtype_form_get_url_path()));
+                    $redirect_back_url = home_url(growtype_form_get_url_path());
+                    if (!empty($_GET)) {
+                        $redirect_back_url = add_query_arg($_GET, $redirect_back_url);
+                    }
+
+                    wp_redirect($redirect_back_url);
                     exit();
                 }
 
@@ -262,7 +267,12 @@ class Growtype_Form_Crud
                         'error'
                     );
 
-                    wp_redirect(growtype_form_get_url_path());
+                    $redirect_back_url = home_url(growtype_form_get_url_path());
+                    if (!empty($_GET)) {
+                        $redirect_back_url = add_query_arg($_GET, $redirect_back_url);
+                    }
+
+                    wp_redirect($redirect_back_url);
                     exit();
                 }
             }
