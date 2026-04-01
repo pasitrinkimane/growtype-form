@@ -91,7 +91,7 @@ if (!empty($repeater_values)) {
 
             <?php
             if (isset($field['duplicate_text'])) { ?>
-                <div class="col-12 mt-3 pt-2 btn-wrapper" style="<?= $index !== $amount ? 'display: none;' : '' ?>">
+                <div class="col-12 mt-1 pt-2 btn-wrapper" style="<?= $index !== $amount ? 'display: none;' : '' ?>">
                     <a href="javascript:void(0);" class="btn btn-secondary btn-add"><?= $field['duplicate_text'] ?></a>
                 </div>
             <?php } ?>
@@ -114,7 +114,7 @@ if (!empty($repeater_values)) {
 
         <?php
         if (isset($field['duplicate_text'])) { ?>
-            <div class="col-12 mt-3 pt-2 btn-wrapper">
+            <div class="col-12 mt-1 pt-2 btn-wrapper">
                 <a href="javascript:void(0);" class="btn btn-secondary btn-add"><?= $field['duplicate_text'] ?></a>
             </div>
         <?php } ?>
