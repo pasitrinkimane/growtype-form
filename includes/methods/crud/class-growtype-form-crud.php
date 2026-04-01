@@ -164,7 +164,20 @@ class Growtype_Form_Crud
             in_array(sanitize_text_field($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]), self::GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS)) {
             // Verify the nonce
             if (!isset($_POST['growtype_form_nonce']) || !wp_verify_nonce($_POST['growtype_form_nonce'], 'growtype_form_general')) {
-                error_log('Growtype Form - Nonce verification failed');
+
+                $http_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+                $http_x_forwarded_for = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
+                $remote_addr = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+                $current_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+                error_log(sprintf(
+                    'Growtype Form - Nonce verification failed! Date: %s, Url: %s, User agent: %s, Remote addr: %s',
+                    date('Y-m-d H:i:s'),
+                    $current_url,
+                    $http_user_agent,
+                    $remote_addr
+                ));
+
                 wp_redirect(home_url());
                 exit;
             }
