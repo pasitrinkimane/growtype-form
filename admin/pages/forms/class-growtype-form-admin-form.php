@@ -87,9 +87,9 @@ class Growtype_Form_Admin_Form
     function register_post_type()
     {
         $labels = array (
-            'name' => _x('Forms', 'Post type general name', 'textdomain'),
+            'name' => _x('GA - Forms', 'Post type general name', 'textdomain'),
             'singular_name' => _x('Submission', 'Post type singular name', 'textdomain'),
-            'menu_name' => _x('Forms', 'Admin Menu text', 'textdomain'),
+            'menu_name' => _x('GA - Forms', 'Admin Menu text', 'textdomain'),
             'name_admin_bar' => _x('Submission', 'Add New on Toolbar', 'textdomain'),
             'add_new' => __('Add New', 'textdomain'),
             'add_new_item' => __('Add New Submission', 'textdomain'),

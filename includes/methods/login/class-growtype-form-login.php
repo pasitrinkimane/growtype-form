@@ -231,7 +231,12 @@ class Growtype_Form_Login
             $referrer = $_SERVER['HTTP_REFERER'];
         }
 
-        error_log('Growtype Auth - Login failed for user: ' . $username . '. Referrer: ' . $referrer);
+        /**
+         * Log only if WP_DEBUG is enabled to avoid spamming production logs during brute-force attacks
+         */
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Growtype Auth - Login failed for user: ' . $username . '. Referrer: ' . $referrer);
+        }
 
         /**
          * Check if the referrer is the wp-admin login page
