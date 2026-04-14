@@ -28,7 +28,7 @@ class Growtype_Form_Newsletter_Job
                 $response = apply_filters('growtype_form_growtype_cron_newsletter_send', $data);
 
                 if (isset($response['status'])) {
-                    Growtype_Form_Admin_Lead::update_events_log($lead->ID, [
+                    Growtype_Form_Admin_Lead_Events::update_events_log($lead->ID, [
                         'data' => $data,
                         'success' => $response['status'] ? true : false,
                     ]);

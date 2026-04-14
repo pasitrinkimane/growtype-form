@@ -250,7 +250,7 @@ Please review your username and make the necessary corrections to meet these req
          */
         $userdata = get_userdata($user_id);
 
-        Growtype_Form_Admin_Lead::insert([
+        Growtype_Form_Admin_Lead_Crud::insert([
             'title' => $userdata->user_email
         ]);
 

@@ -230,7 +230,7 @@ function growtype_form_save_submission($form_data, $submitted_values)
         $email = Growtype_Form_Admin_Submission::get_email($post_id);
 
         if (!empty($email)) {
-            Growtype_Form_Admin_Lead::insert([
+            Growtype_Form_Admin_Lead_Crud::insert([
                 'title' => $email
             ]);
         }

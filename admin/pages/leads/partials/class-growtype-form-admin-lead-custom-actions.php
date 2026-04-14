@@ -30,6 +30,11 @@ class Growtype_Form_Admin_Lead_Custom_Actions
         add_filter('post_row_actions', array ($this, 'user_row_actions_add_custom_actions'), 10, 2);
 
         /**
+         * Add Lead link to user row
+         */
+        add_filter('user_row_actions', array ($this, 'add_lead_action_link'), 10, 2);
+
+        /**
          * Meta boxes
          */
         add_filter('growtype_form_lead_meta_boxes', array ($this, 'get_meta_boxes'));
@@ -201,6 +206,23 @@ class Growtype_Form_Admin_Lead_Custom_Actions
             ), admin_url('edit.php?post_type=' . self::POST_TYPE_NAME));
 
             $actions['send_newsletter'] = '<a href="' . $url . '">Send newsletter</a>';
+        }
+
+        return $actions;
+    }
+
+    public function add_lead_action_link($actions, $user)
+    {
+        $lead = Growtype_Form_Admin_Lead_Crud::get_by_title($user->user_email);
+
+        if (!empty($lead)) {
+            $lead_url = admin_url('post.php?post=' . $lead->ID . '&action=edit');
+
+            $actions['lead'] = sprintf(
+                '<a href="%s">%s</a>',
+                esc_url($lead_url),
+                __('Lead', 'growtype-form')
+            );
         }
 
         return $actions;
