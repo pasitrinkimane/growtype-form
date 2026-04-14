@@ -77,6 +77,8 @@ class Growtype_Form_Admin_Lead
         add_action('admin_post_growtype_form_admin_export_emails', array ($this, 'export_emails_callback'));
         add_action('admin_post_growtype_form_admin_export_validated_emails', array ($this, 'export_validated_emails_callback'));
         add_action('admin_post_growtype_form_admin_export_leads', array ($this, 'export_leads_callback'));
+        add_action('admin_post_growtype_form_admin_export_purchased_emails', array ($this, 'export_purchased_emails_callback'));
+
 
         /**
          * User row actions
@@ -794,6 +796,81 @@ class Growtype_Form_Admin_Lead
         exit;
     }
 
+    function export_purchased_emails_callback()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized', 'Error', ['response' => 403]);
+        }
+
+        global $wpdb;
+
+        // Get unique billing emails from WooCommerce orders (shop_order)
+        $purchased_emails = $wpdb->get_col("
+            SELECT DISTINCT pm.meta_value 
+            FROM {$wpdb->postmeta} pm
+            INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+            WHERE pm.meta_key = '_billing_email' 
+            AND p.post_type = 'shop_order'
+            AND p.post_status IN ('wc-completed', 'wc-processing', 'wc-active')
+        ");
+
+        if (empty($purchased_emails)) {
+            wp_die('No purchasers found.');
+        }
+
+        $purchased_emails_map = array_flip($purchased_emails);
+
+        // Get all gf_lead posts
+        $args = [
+            'post_type' => 'gf_lead',
+            'posts_per_page' => -1,
+            'fields' => 'ids'
+        ];
+
+        $query = new WP_Query($args);
+
+        if (!$query->have_posts()) {
+            wp_die('No leads found.');
+        }
+
+        // Prepare CSV headers
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=gf_leads_exported_purchased_emails_' . date('Y-m-d_H-i-s') . '.csv');
+
+        $output = fopen('php://output', 'w');
+
+        // Define CSV column headers
+        fputcsv($output, ['Nr', 'ID', 'Email', 'Date']);
+
+        $count = 0;
+        // Loop through posts
+        foreach ($query->posts as $lead_id) {
+            $email = get_the_title($lead_id);
+
+            $ignore_email = apply_filters('growtype_form_admin_export_leads_ignore_email', false, $email, $lead_id);
+
+            if ($ignore_email) {
+                continue;
+            }
+
+            if (isset($purchased_emails_map[$email])) {
+                $count++;
+                $date = get_the_date('Y-m-d H:i:s', $lead_id);
+
+                fputcsv($output, [
+                    $count,
+                    $lead_id,
+                    $email,
+                    $date,
+                ]);
+            }
+        }
+
+        fclose($output);
+        exit;
+    }
+
+
     public static function validate_emails($emails)
     {
         $countValidated = 0;
@@ -1041,6 +1118,7 @@ class Growtype_Form_Admin_Lead
                         '<ul style="display:none; position:absolute; top:100%; left:0; background:#fff; border:1px solid #ccc; list-style:none; padding:0; margin:0; min-width:170px; z-index:9999;">' +
                         '<li data-action="emails" style="padding:8px; cursor:pointer; border-bottom: 1px solid #eee;">Export all emails</li>' +
                         '<li data-action="validated" style="padding:8px; cursor:pointer; border-bottom: 1px solid #eee;">Export validated emails</li>' +
+                        '<li data-action="purchased" style="padding:8px; cursor:pointer; border-bottom: 1px solid #eee;">Export purchased emails</li>' +
                         '<li data-action="full" style="padding:8px; cursor:pointer;">Export all data</li>' +
                         '</ul>' +
                         '</div>').insertBefore($('.wp-header-end'));
@@ -1064,6 +1142,11 @@ class Growtype_Form_Admin_Lead
                         // Export full
                         $('.export-dropdown ul li[data-action="full"]').on('click', function () {
                             window.location.href = '<?php echo admin_url("admin-post.php?action=growtype_form_admin_export_leads"); ?>';
+                        });
+
+                        // Export purchased
+                        $('.export-dropdown ul li[data-action="purchased"]').on('click', function () {
+                            window.location.href = '<?php echo admin_url("admin-post.php?action=growtype_form_admin_export_purchased_emails"); ?>';
                         });
 
                         // Hide dropdown on click outside
