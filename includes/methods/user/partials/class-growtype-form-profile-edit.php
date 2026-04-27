@@ -418,11 +418,12 @@ class Growtype_Form_Profile_Edit extends Growtype_Form_Profile
         }
 
         if (file_exists($file)) {
-            $country_names = json_decode(file_get_contents($file), true);
+            $file_content = file_get_contents($file);
+            $country_names = !empty($file_content) ? json_decode($file_content, true) : [];
         } else {
             // SECURITY: Use wp_remote_get instead of file_get_contents for external API calls
             $response = wp_remote_get('https://restcountries.com/v3.1/all?fields=name,languages,cca2', [
-                'timeout' => 10,
+                'timeout' => 15,
                 'sslverify' => true,
                 'headers' => [
                     'Accept' => 'application/json'
@@ -431,7 +432,7 @@ class Growtype_Form_Profile_Edit extends Growtype_Form_Profile
 
             if (is_wp_error($response)) {
                 error_log('Growtype Form - Failed to fetch countries: ' . $response->get_error_message());
-                return []; // Return empty array on failure
+                return [];
             }
 
             $response_code = wp_remote_retrieve_response_code($response);
@@ -462,7 +463,15 @@ class Growtype_Form_Profile_Edit extends Growtype_Form_Profile
 
             // Cache the results
             if (!empty($country_names)) {
-                file_put_contents($file, json_encode($country_names, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                if (!file_exists($dir)) {
+                    wp_mkdir_p($dir);
+                }
+                
+                if (is_writable($dir) || (!file_exists($file) && is_writable(dirname($dir)))) {
+                    file_put_contents($file, json_encode($country_names, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                } else {
+                    error_log('Growtype Form - Cannot write countries.json: Directory not writable: ' . $dir);
+                }
             }
         }
 

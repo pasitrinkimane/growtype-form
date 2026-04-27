@@ -154,41 +154,7 @@ class Growtype_Form_Profile_Security extends Growtype_Form_Profile
                 </div>
                 ';
             } elseif ($profile_name === 'country') {
-                $upload_dir = wp_upload_dir();
-                $dir = $upload_dir['basedir'] . '/growtype-form';
-                $file = $dir . '/countries.json';
-
-                if (!file_exists($dir)) {
-                    wp_mkdir_p($dir); // recursively creates the folder
-                }
-
-                if (file_exists($file)) {
-                    $country_names = json_decode(file_get_contents($file), true);
-                } else {
-                    // Fetch countries from RestCountries API
-                    $response = file_get_contents('https://restcountries.com/v3.1/all?fields=name,languages,cca2');
-
-                    if ($response !== false) {
-                        $countries = json_decode($response, true);
-
-                        $country_names = [];
-                        foreach ($countries as $country) {
-                            $country_names[$country['cca2']] = $country['name']['common'];
-                        }
-
-                        file_put_contents($file, json_encode($country_names, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-                    }
-                }
-
-                $countries_collected = [];
-                foreach ($country_names as $country_code => $country_name) {
-                    $countries_collected[] = [
-                        'value' => $country_code,
-                        'label' => $country_name
-                    ];
-                }
-
-                $profile_fields[$key]['options'] = $countries_collected;
+                $profile_fields[$key]['options'] = Growtype_Form_Profile_Edit::get_countries();
                 $profile_fields[$key]['value'] = $profile_field_name;
             } else {
                 if (!isset($profile_field) || empty($profile_field['value'])) {

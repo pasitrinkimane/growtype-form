@@ -29,5 +29,11 @@ class Growtype_Form_Render
          */
         include_once GROWTYPE_FORM_PATH . 'includes/methods/render/forms/class-growtype-form-newsletter.php';
         new Growtype_Form_Newsletter();
+
+        /**
+         * Feedback form
+         */
+        include_once GROWTYPE_FORM_PATH . 'includes/methods/render/forms/class-growtype-form-feedback.php';
+        new Growtype_Form_Feedback();
     }
 }
