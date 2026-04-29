@@ -284,13 +284,25 @@ class Growtype_Form_General
     public function form_init($args)
     {
         /**
-         * Set redirect to cookie
+         * Set redirect via JS cookie (not PHP setcookie).
+         *
+         * PHP setcookie() adds Set-Cookie to the HTTP response header, which
+         * prevents LiteSpeed Cache (and Cloudflare) from caching public pages
+         * that render a login/signup form. By writing the cookie via JavaScript
+         * instead, the HTTP response stays clean and cacheable while the browser
+         * still gets the cookie it needs for the post-login redirect flow.
          */
         $redirect_after = isset($_GET['redirect_after']) && !empty($_GET['redirect_after']) ? wp_validate_redirect($_GET['redirect_after'], home_url()) : null;
         $redirect_after = empty($redirect_after) && isset($args['redirect_after']) && !empty($args['redirect_after']) ? $args['redirect_after'] : $redirect_after;
 
         if (!empty($redirect_after)) {
-            setcookie('growtype_form_redirect_after', $redirect_after, time() + 120, COOKIEPATH, COOKIE_DOMAIN);
+            // rawurlencode() makes the URL safe as a cookie value (no semicolons/commas)
+            // and safe inside the JS double-quoted string (no double-quotes in %-encoded output).
+            // PHP $_COOKIE auto-decodes URL-encoded values, so consumers get the plain URL back.
+            $encoded = rawurlencode($redirect_after);
+            add_action('wp_footer', function () use ($encoded) {
+                echo '<script>document.cookie="growtype_form_redirect_after=' . $encoded . ';max-age=120;path=/";</script>' . "\n";
+            }, 5);
         }
 
         /**
