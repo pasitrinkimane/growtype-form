@@ -377,7 +377,11 @@ class Growtype_Form_Crud
                 $submitted_values['data'][self::GROWTYPE_FORM_SUBMIT_ACTION] : 'submit';
 
             if (strpos($form_name, 'signup') !== false) {
-                $redirect_url = growtype_form_redirect_url_after_signup();
+                // Preserve redirect_after from POST hidden field or cookie if already captured above.
+                // Only fall back to the configured signup destination when no specific redirect was passed.
+                if (empty($redirect_url)) {
+                    $redirect_url = growtype_form_redirect_url_after_signup();
+                }
 
                 $child_user = isset($form_data['child_user']) && $form_data['child_user'] ? true : false;
 

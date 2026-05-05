@@ -42,7 +42,13 @@ class Growtype_Form_Signup
 
     function growtype_auth_success_redirect_url_extend($redirect_url)
     {
-        return growtype_form_redirect_url_after_signup();
+        // Only fall back to the configured signup redirect when no specific URL was already resolved
+        // (e.g. from the growtype_form_redirect_after POST field or cookie).
+        if (empty($redirect_url)) {
+            return growtype_form_redirect_url_after_signup();
+        }
+
+        return $redirect_url;
     }
 
     /**
