@@ -97,8 +97,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const authModalElement = document.getElementById('growtypeFormAuthModal');
         const hasVisibleError = authModalElement && authModalElement.querySelector('.growtype-form-alert.alert-danger');
 
-        console.log('[GrowtypeAuth] Autoload check - hasError:', hasError, 'hasVisibleError:', !!hasVisibleError);
-
         if (hasError || hasVisibleError) {
             if (authModalElement) {
                 console.log('[GrowtypeAuth] Auto-opening modal...');
