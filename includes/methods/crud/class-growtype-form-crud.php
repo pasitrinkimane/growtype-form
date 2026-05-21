@@ -162,8 +162,15 @@ class Growtype_Form_Crud
          */
         if (isset($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]) &&
             in_array(sanitize_text_field($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]), self::GROWTYPE_FORM_ALLOWED_SUBMIT_ACTIONS)) {
+            $form_name = isset($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]) ? sanitize_text_field($_POST[self::GROWTYPE_FORM_NAME_IDENTIFICATOR]) : null;
+            $submit_action = isset($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]) ? sanitize_text_field($_POST[self::GROWTYPE_FORM_SUBMIT_ACTION]) : 'submit';
+            
+            // SECURITY: Only bypass nonce for GUESTS submitting a brand new signup/login.
+            // Logged-in users (who can update profiles) are not cached, so they must pass the strict nonce check to prevent CSRF attacks!
+            $is_guest_auth = in_array($form_name, ['signup', 'login']) && !is_user_logged_in() && $submit_action === 'submit';
+
             // Verify the nonce
-            if (!isset($_POST['growtype_form_nonce']) || !wp_verify_nonce($_POST['growtype_form_nonce'], 'growtype_form_general')) {
+            if (!$is_guest_auth && (!isset($_POST['growtype_form_nonce']) || !wp_verify_nonce($_POST['growtype_form_nonce'], 'growtype_form_general'))) {
 
                 $http_user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
                 $http_x_forwarded_for = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
