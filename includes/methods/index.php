@@ -54,5 +54,11 @@ class Growtype_Form_Methods
          * Plugins
          */
         require_once GROWTYPE_FORM_PATH . 'includes/methods/plugins/index.php';
+
+        /**
+         * Testing
+         */
+        require_once GROWTYPE_FORM_PATH . 'includes/methods/testing/class-growtype-form-testing-auto-fill-forms.php';
+        new Growtype_Form_Testing_Auto_Fill_Forms();
     }
 }

@@ -38,6 +38,8 @@ class Growtype_Form_General
         }
 
         add_filter('upload_mimes', array ($this, 'growtype_form_allow_video_uploads'));
+
+        add_filter('growtype_modal_map', array($this, 'growtype_form_modal_map'));
     }
 
     public function growtype_form_allow_video_uploads($mimes)
@@ -688,9 +690,6 @@ class Growtype_Form_General
 
     public static function growtype_form_modals_render()
     {
-        echo growtype_form_include_view('modals.privacy');
-        echo growtype_form_include_view('modals.terms');
-
         if (!is_user_logged_in() && !growtype_form_current_page_is_login_page() && !growtype_form_current_page_is_signup_page()) {
             echo growtype_form_include_view('modals.auth');
         }
@@ -1387,5 +1386,15 @@ class Growtype_Form_General
     public static function render_custom_form($form_name, $form_data)
     {
         return do_shortcode('[growtype_form name="' . $form_name . '" form_data="' . base64_encode(json_encode($form_data)) . '"]');
+    }
+
+    /**
+     * Map terms and privacy modals to their Blade views inside the plugin
+     */
+    public function growtype_form_modal_map($modal_map)
+    {
+        $modal_map['termsModal'] = GROWTYPE_FORM_PATH . 'resources/views/modals/terms.blade.php';
+        $modal_map['privacyModal'] = GROWTYPE_FORM_PATH . 'resources/views/modals/privacy.blade.php';
+        return $modal_map;
     }
 }
