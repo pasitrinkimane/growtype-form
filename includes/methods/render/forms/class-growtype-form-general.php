@@ -1302,21 +1302,23 @@ class Growtype_Form_General
      */
     function growtype_form_enqueue_validation_scripts()
     {
+        // Self-hosted — was loaded from ajax.aspnetcdn.com (external DNS + render-blocking).
+        // BUG-035: moved to local vendor and added defer to stop blocking page render.
         wp_enqueue_script(
             "jquery.validate.js",
-            "https://ajax.aspnetcdn.com/ajax/jquery.validate/1.16.0/jquery.validate.min.js",
-            "",
-            "",
-            true,
+            GROWTYPE_FORM_URL . "resources/scripts/vendor/jquery.validate.min.js",
+            ["jquery"],
+            "1.16.0",
+            ["strategy" => "defer", "in_footer" => true],
         );
 
         if (get_locale() === "lt_LT") {
             wp_enqueue_script(
                 "jquery.validate.js.localization",
-                "https://ajax.aspnetcdn.com/ajax/jquery.validate/1.16.0/localization/messages_lt.js",
-                "",
-                "",
-                true,
+                GROWTYPE_FORM_URL . "resources/scripts/vendor/messages_lt.js",
+                ["jquery.validate.js"],
+                "1.16.0",
+                ["strategy" => "defer", "in_footer" => true],
             );
         }
     }
