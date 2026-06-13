@@ -84,6 +84,11 @@ class Growtype_Form_Public
                 'version' => GROWTYPE_FORM_VERSION,
             )
         );
+
+        // Enqueue early (here, on wp_enqueue_scripts) so wp_print_footer_scripts
+        // (wp_footer priority 20) outputs the library before auth.php's inline init
+        // scripts run at wp_footer priority 100.
+        Growtype_Form_General::growtype_form_enqueue_validation_scripts();
     }
 
     /**

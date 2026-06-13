@@ -537,7 +537,7 @@ class Growtype_Form_General
         /**
          * Enqueue validation scripts
          */
-        $this->growtype_form_enqueue_validation_scripts();
+        self::growtype_form_enqueue_validation_scripts();
 
         /**
          * Initiate scripts
@@ -1298,18 +1298,20 @@ class Growtype_Form_General
     }
 
     /**
-     * Required scripts
+     * Required scripts — enqueued early (via wp_enqueue_scripts hook in public class)
+     * so wp_print_footer_scripts (priority 20) outputs the library before auth.php's
+     * inline init scripts run at wp_footer priority 100.
+     * NOTE: do NOT add strategy:defer — the library must be synchronously available
+     * before those inline <script> blocks execute.
      */
-    function growtype_form_enqueue_validation_scripts()
+    public static function growtype_form_enqueue_validation_scripts()
     {
-        // Self-hosted — was loaded from ajax.aspnetcdn.com (external DNS + render-blocking).
-        // BUG-035: moved to local vendor and added defer to stop blocking page render.
         wp_enqueue_script(
             "jquery.validate.js",
             GROWTYPE_FORM_URL . "resources/scripts/vendor/jquery.validate.min.js",
             ["jquery"],
             "1.16.0",
-            ["strategy" => "defer", "in_footer" => true],
+            ["in_footer" => true],
         );
 
         if (get_locale() === "lt_LT") {
@@ -1318,7 +1320,7 @@ class Growtype_Form_General
                 GROWTYPE_FORM_URL . "resources/scripts/vendor/messages_lt.js",
                 ["jquery.validate.js"],
                 "1.16.0",
-                ["strategy" => "defer", "in_footer" => true],
+                ["in_footer" => true],
             );
         }
     }

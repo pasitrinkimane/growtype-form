@@ -134,33 +134,16 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <?php
-// Reuse existing auth form validation and features
-$general = new Growtype_Form_General();
-$general->growtype_form_enqueue_validation_scripts();
-
 /**
- * Force print validation scripts because we are already in the footer
- * and enqueued scripts might not have been printed yet.
+ * jquery.validate.js is now enqueued early via Growtype_Form_Public::enqueue_scripts()
+ * (hooked to wp_enqueue_scripts), so it is always printed by wp_print_footer_scripts
+ * (wp_footer priority 20) — well before these inline init scripts run at priority 100.
+ * Do NOT call wp_enqueue_script or wp_print_scripts here.
  */
-wp_print_scripts(['jquery.validate.js']);
-
 Growtype_Form_General::growtype_form_validation_scripts_init();
 Growtype_Form_General::growtype_form_login_validation_scripts();
 Growtype_Form_General::growtype_form_submit_scripts_init();
 
-// Specifically target the login form inside the modal
-?>
-<script>
-    jQuery(document).ready(function($) {
-        if (typeof $.fn.validate === 'function') {
-            // Find any form inside the modal and ensure it's validated
-            // This will catch the new loginform_XXXXXX IDs
-            $('#growtypeFormAuthModal form').each(function() {
-                $(this).validate();
-            });
-        }
-    });
-</script>
-<?php
+$general = new Growtype_Form_General();
 $general->growtype_form_show_hide_password_button();
 ?>
