@@ -102,13 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('[GrowtypeAuth] Auto-opening modal...');
                 
                 setTimeout(function() {
-                    // Use Bootstrap 5 if available
-                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                        const modalInstance = bootstrap.Modal.getOrCreateInstance(authModalElement);
-                        modalInstance.show();
-                    } else if ($.fn.modal) {
-                        $(authModalElement).modal('show');
-                    }
+                    window.growtypeModal?.show(authModalElement);
                     
                     // Ensure login form is visible
                     const formAuthContainer = authModalElement.querySelector('.growtype-form-auth');
