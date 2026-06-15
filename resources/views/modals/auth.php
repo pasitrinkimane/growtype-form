@@ -135,11 +135,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <?php
 /**
- * jquery.validate.js is now enqueued early via Growtype_Form_Public::enqueue_scripts()
- * (hooked to wp_enqueue_scripts), so it is always printed by wp_print_footer_scripts
- * (wp_footer priority 20) — well before these inline init scripts run at priority 100.
- * Do NOT call wp_enqueue_script or wp_print_scripts here.
+ * Ensure jquery.validate.js is loaded before the inline init scripts below.
+ *
+ * On normal WP pages: the library is already enqueued via Growtype_Form_Public::enqueue_scripts()
+ * (wp_enqueue_scripts hook) and printed by wp_print_footer_scripts (wp_footer priority 20).
+ * wp_script_is('done') will be true → wp_print_scripts() is skipped. No double-load.
+ *
+ * On the chat shell page: Blade/Illuminate renders wp_footer during wp_loaded, BEFORE
+ * wp_enqueue_scripts fires. The library is never enqueued early. wp_script_is('done') is
+ * false → we register + force-print it here so the inline init scripts below can use it.
  */
+Growtype_Form_General::growtype_form_enqueue_validation_scripts();
+if (!wp_script_is('jquery.validate.js', 'done')) {
+    wp_print_scripts(['jquery.validate.js']);
+}
+
 Growtype_Form_General::growtype_form_validation_scripts_init();
 Growtype_Form_General::growtype_form_login_validation_scripts();
 Growtype_Form_General::growtype_form_submit_scripts_init();
@@ -147,3 +157,4 @@ Growtype_Form_General::growtype_form_submit_scripts_init();
 $general = new Growtype_Form_General();
 $general->growtype_form_show_hide_password_button();
 ?>
+

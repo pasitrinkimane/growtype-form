@@ -1335,7 +1335,7 @@ class Growtype_Form_General
             if (typeof jQuery.validator !== 'undefined') {
                 jQuery.validator.setDefaults({
                     errorClass: "error error-label",
-                    ignore: ":hidden:not(.e-wrapper:visible select),.chosen-search-input",
+                    ignore: ":hidden:not(.e-wrapper:visible select, .growtype-form-tabs-pane :input),.chosen-search-input",
                     errorPlacement: function (error, element) {
                         if (element.is(".growtype-form select")) {
                             element.parent().append(error);
@@ -1505,6 +1505,26 @@ class Growtype_Form_General
                      */
                     if (!isValid) {
                         var $form = $(this).closest('.growtype-form');
+
+                        /**
+                         * Switch to the first tab that contains a validation error.
+                         * Without this, fields on inactive (hidden) tabs fail silently.
+                         */
+                        var $tabsContent = $form.find('.growtype-form-tabs-content');
+                        if ($tabsContent.length) {
+                            var $firstErrorPane = null;
+                            $tabsContent.find('.growtype-form-tabs-pane').each(function () {
+                                if ($(this).find('.error').length > 0) {
+                                    $firstErrorPane = $(this);
+                                    return false; // break
+                                }
+                            });
+                            if ($firstErrorPane) {
+                                var paneId = $firstErrorPane.attr('id');
+                                $form.find('button[data-bs-target="#' + paneId + '"], button[data-target="#' + paneId + '"]').first().trigger('click');
+                            }
+                        }
+
                         if (!$form.find('.form-validation-alert').length) {
                             $form.prepend('<div class="alert alert-danger alert-dismissible fade show form-validation-alert mb-4" role="alert">Not all required fields are filled. Please check the form.<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
                         }
