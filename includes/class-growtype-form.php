@@ -204,6 +204,11 @@ class Growtype_Form
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/submission.php';
         require_once GROWTYPE_FORM_PATH . 'includes/helpers/lead.php';
 
+        /**
+         * Virtual pages
+         */
+        require_once GROWTYPE_FORM_PATH . 'includes/pages/email.php';
+
         $this->loader = new Growtype_Form_Loader();
 
     }

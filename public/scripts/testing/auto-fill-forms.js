@@ -48,18 +48,33 @@
         const rememberField = loginForm.querySelector('[id^="rememberme_"], #rememberme, input[name="rememberme"]');
 
         if (userField && passField) {
-            userField.value = TEST_CREDENTIALS.login.email;
-            passField.value = TEST_CREDENTIALS.login.password;
+            let userFieldChanged = false;
+            let passFieldChanged = false;
 
-            if (rememberField && TEST_CREDENTIALS.login.remember) {
+            if (!userField.value) {
+                userField.value = TEST_CREDENTIALS.login.email;
+                userFieldChanged = true;
+            }
+
+            if (!passField.value) {
+                passField.value = TEST_CREDENTIALS.login.password;
+                passFieldChanged = true;
+            }
+
+            if (rememberField && TEST_CREDENTIALS.login.remember && !rememberField.checked) {
                 rememberField.checked = true;
             }
 
             // Trigger change events for any validation
-            userField.dispatchEvent(new Event('input', { bubbles: true }));
-            userField.dispatchEvent(new Event('change', { bubbles: true }));
-            passField.dispatchEvent(new Event('input', { bubbles: true }));
-            passField.dispatchEvent(new Event('change', { bubbles: true }));
+            if (userFieldChanged) {
+                userField.dispatchEvent(new Event('input', { bubbles: true }));
+                userField.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            if (passFieldChanged) {
+                passField.dispatchEvent(new Event('input', { bubbles: true }));
+                passField.dispatchEvent(new Event('change', { bubbles: true }));
+            }
 
             // Mark as filled
             filledForms.add(loginForm);
@@ -115,35 +130,35 @@
 
         let filled = false;
 
-        if (emailField) {
+        if (emailField && !emailField.value) {
             emailField.value = TEST_CREDENTIALS.signup.email;
             emailField.dispatchEvent(new Event('input', { bubbles: true }));
             emailField.dispatchEvent(new Event('change', { bubbles: true }));
             filled = true;
         }
 
-        if (usernameField) {
+        if (usernameField && !usernameField.value) {
             usernameField.value = TEST_CREDENTIALS.signup.username;
             usernameField.dispatchEvent(new Event('input', { bubbles: true }));
             usernameField.dispatchEvent(new Event('change', { bubbles: true }));
             filled = true;
         }
 
-        if (passwordField) {
+        if (passwordField && !passwordField.value) {
             passwordField.value = TEST_CREDENTIALS.signup.password;
             passwordField.dispatchEvent(new Event('input', { bubbles: true }));
             passwordField.dispatchEvent(new Event('change', { bubbles: true }));
             filled = true;
         }
 
-        if (confirmPasswordField) {
+        if (confirmPasswordField && !confirmPasswordField.value) {
             confirmPasswordField.value = TEST_CREDENTIALS.signup.confirmPassword;
             confirmPasswordField.dispatchEvent(new Event('input', { bubbles: true }));
             confirmPasswordField.dispatchEvent(new Event('change', { bubbles: true }));
             filled = true;
         }
 
-        if (termsCheckbox) {
+        if (termsCheckbox && !termsCheckbox.checked) {
             termsCheckbox.checked = true;
             termsCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
             filled = true;
