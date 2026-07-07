@@ -320,6 +320,19 @@ class Growtype_Form_Email_Page
                     data: formData,
                     success: function(response) {
                         if (response.success && response.data && response.data.redirect_url) {
+                            if (typeof window.growtypeAnalyticsCapture === 'function') {
+                                window.growtypeAnalyticsCapture('growtype_analytics_complete_registration_submit', {
+                                    event: 'complete_registration',
+                                    source: 'gfemail'
+                                });
+                            } else {
+                                window.dataLayer = window.dataLayer || [];
+                                window.dataLayer.push({
+                                    event: 'growtype_analytics_complete_registration_submit',
+                                    source: 'gfemail'
+                                });
+                            }
+
                             $status.addClass('alert alert-success').text('Success! Redirecting to results...').show();
                             window.location.href = response.data.redirect_url;
                         } else {
@@ -461,6 +474,14 @@ class Growtype_Form_Email_Page
                     );
                 }
             }
+
+            do_action("growtype_form_email_page_submitted", $email, [
+                "gqtoken" => $gqtoken,
+                "event_source_url" =>
+                    !empty($_SERVER["REQUEST_URI"])
+                        ? home_url(wp_unslash($_SERVER["REQUEST_URI"]))
+                        : home_url(self::get_slug()),
+            ]);
         }
 
         // Build the redirect URL (gqtoken was sent from the form).
