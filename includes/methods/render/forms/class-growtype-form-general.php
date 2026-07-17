@@ -1073,7 +1073,7 @@ class Growtype_Form_General
      */
     public static function render_main_fields_logic(
         $main_fields,
-        $form_name = "default",
+        $form_name = "default"
     ) {
         // Separate fields into tabs and non-tabbed (hidden or uncategorized)
         $has_tabs = false;

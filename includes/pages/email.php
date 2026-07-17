@@ -161,29 +161,66 @@ class Growtype_Form_Email_Page
         $nonce = wp_create_nonce(self::AJAX_ACTION);
 
         // Reuse the existing newsletter component view
-        $submit_label_text = __("See My Results", "growtype-form");
+        $submit_label_text = __("See Results", "growtype-form");
         $form_html = growtype_form_include_view("components.forms.newsletter", [
             "submit_label" => $submit_label_text,
             "email_placeholder" => __("Your email", "growtype-form"),
-            "email_label" => __(
-                "Where should we send your results?",
-                "growtype-form",
-            ),
+            "email_label" => "",
             "terms" => false,
         ]);
 
-        // Add info label after the input (right before the submit button)
         $info_label =
-            '<div class="gfemail-privacy-info">' .
+            '<div class="gfemail-privacy-info" style="line-height:150%;">' .
+            '<span style="color:rgb(30,31,33);">' .
             esc_html__(
-                "🔒 Your results are private. No spam, ever.",
+                "By continuing, you indicate that you've read and agree to our ",
+            ) .
+            "</span>" .
+            '<a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" data-privacy-type="terms" style="color:var(--ps-color-primary,#4db8a0);text-decoration:underline;">' .
+            esc_html__("terms & conditions", "growtype-form") .
+            "</a>" .
+            '<span style="color:rgb(30,31,33);"> ' .
+            esc_html__("and", "growtype-form") .
+            " </span>" .
+            '<a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" data-privacy-type="privacy" style="color:var(--ps-color-primary,#4db8a0);text-decoration:underline;">' .
+            esc_html__("privacy policy", "growtype-form") .
+            "</a>" .
+            "</div>";
+
+        $email_explanation =
+            '<div class="gfemail-privacy-notice flex w-full flex-nowrap items-start gap-2">' .
+            '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.01198 22H16.988C18.3398 22 19 21.3439 19 19.9088V12.3844C19 11.0928 18.4551 10.4264 17.3338 10.3137V7.73039C17.3338 3.86571 14.7455 2 12 2C9.25449 2 6.66617 3.86571 6.66617 7.73039V10.3649C5.63922 10.5187 5 11.1748 5 12.3844V19.9088C5 21.3439 5.66018 22 7.01198 22ZM8.35329 7.51512C8.35329 4.94208 10.0404 3.57868 12 3.57868C13.9596 3.57868 15.6467 4.94208 15.6467 7.51512V10.3034L8.35329 10.3137V7.51512Z" fill="#BBBBBB"></path></svg>' .
+            '<span class="max-w-[calc(100%-60px)] text-xs text-token-neutral-800"><p style="text-align: start;"><span style="color: rgb(187,187,187);">' .
+            esc_html__(
+                "We respect your privacy and are committed to protecting your personal data. We'll email you a copy of your results for convenient access. You can unsubscribe anytime.",
                 "growtype-form",
             ) .
-            "</div>";
+            '</span></p></span>' .
+            '</div>';
+
+        $show_social_proof = apply_filters('growtype_form_email_page_show_social_proof', true);
+
+        $social_proof = '';
+        if ($show_social_proof && class_exists('Growtype_Wc_Happy_Customers')) {
+            $social_proof = Growtype_Wc_Happy_Customers::render([
+                'gender' => 'mix',
+                'amount' => 5,
+                'label' => '<b>100k+</b> users have joined us!',
+                'shuffle' => 'false',
+            ]);
+        }
+
+        $show_info_label = apply_filters('growtype_form_email_page_show_info_label', false);
+
+        $pre_submit = $social_proof . $email_explanation;
+        if ($show_info_label) {
+            $pre_submit = $info_label . $social_proof . $email_explanation;
+        }
+
         $form_html = str_replace(
             '<button type="submit" class="btn btn-primary">' .
                 $submit_label_text,
-            $info_label .
+            $pre_submit .
                 '<button type="submit" class="btn btn-primary">' .
                 $submit_label_text,
             $form_html,
@@ -196,7 +233,7 @@ class Growtype_Form_Email_Page
 <div class="card gfemail-container">
             <h2><?php _e("Your results are ready", "growtype-form"); ?></h2>
             <p><?php _e(
-                "Please enter your email to view your personalized results.",
+                "Enter your email to get your personalized Communication plan",
                 "growtype-form",
             ); ?></p>
 
@@ -216,16 +253,17 @@ class Growtype_Form_Email_Page
             font-weight: 700;
         }
         .gfemail-container p {
-            font-size: 15px;
+            font-size: 14px;
             margin-bottom: 10px;
             line-height: 1.6;
         }
         .gfemail-privacy-info {
-            font-size: 13px;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            display: flex;
-            gap: 6px;
+            font-size: 12px;
+            text-align: left;
+            padding-top:10px;
+        }
+        .gfemail-privacy-info a{
+            font-size: 12px;
         }
         .gfemail-container .status-message {
             font-size: 14px;
@@ -243,6 +281,25 @@ class Growtype_Form_Email_Page
             width: 100%;
         }
 
+        /* Email input icon */
+        .gfemail-container .input-wrapper-inner {
+            position: relative;
+        }
+        .gfemail-container .input-wrapper-inner input[type="email"] {
+            padding-left: 40px!important;
+        }
+        .gfemail-container .input-wrapper-inner .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: rgb(187, 187, 187);
+            pointer-events: none;
+            z-index: 1;
+        }
+
         .gfemail-container button[type="submit"] {
             width: 100%;
             margin-top: 20px;
@@ -257,8 +314,8 @@ class Growtype_Form_Email_Page
         /* Mobile responsive adjustments */
         @media (max-width: 576px) {
             .gfemail-container {
-                padding: 28px 20px;
-                margin: 30px auto;
+                padding: 28px 15px;
+                margin: 0 auto;
                 border-radius: 16px;
             }
             .gfemail-container h2 {
@@ -270,6 +327,46 @@ class Growtype_Form_Email_Page
             .gfemail-privacy-info {
                 font-size: 12px;
             }
+        }
+
+        /* Override happy customers banner inside email page */
+        .gfemail-container .gt-happy-customers {
+            background: none;
+                margin-top: 10px;
+                margin-left: auto;
+                margin-right: auto;
+        }
+
+        /* Privacy notice */
+        .gfemail-privacy-notice {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            padding: 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            width: 100%;
+            text-align: left;
+            color: rgb(187, 187, 187);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .gfemail-privacy-notice svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+            width: 24px;
+            height: 24px;
+            color: rgb(187, 187, 187);
+        }
+        .gfemail-privacy-notice > span {
+            flex: 1;
+            min-width: 0;
+        }
+        .gfemail-privacy-notice p {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.5;
+            color: rgb(187, 187, 187);
         }
         </style>
 
@@ -477,10 +574,9 @@ class Growtype_Form_Email_Page
 
             do_action("growtype_form_email_page_submitted", $email, [
                 "gqtoken" => $gqtoken,
-                "event_source_url" =>
-                    !empty($_SERVER["REQUEST_URI"])
-                        ? home_url(wp_unslash($_SERVER["REQUEST_URI"]))
-                        : home_url(self::get_slug()),
+                "event_source_url" => !empty($_SERVER["REQUEST_URI"])
+                    ? home_url(wp_unslash($_SERVER["REQUEST_URI"]))
+                    : home_url(self::get_slug()),
             ]);
         }
 

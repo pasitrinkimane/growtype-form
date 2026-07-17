@@ -78,6 +78,7 @@ class Growtype_Form_Public
             array (
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('growtype_form_newsletter_nonce'), // SECURITY: Added nonce for CSRF protection
+                'field_update_nonce' => wp_create_nonce('growtype_form_field_update'),
                 'date' => Growtype_Form_General::get_date_time_data(),
                 'currency' => Growtype_Form_General::get_currency_data(),
                 'public_url' => GROWTYPE_FORM_URL_PUBLIC,

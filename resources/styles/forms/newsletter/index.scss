@@ -36,6 +36,24 @@ Newsletter
   }
 
   .input-wrapper-inner {
+    position: relative;
+
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: rgb(187, 187, 187);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    input[type="email"] {
+      padding-left: 40px;
+    }
+
     button {
       &[type="submit"] {
         display: none;

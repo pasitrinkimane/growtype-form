@@ -273,7 +273,7 @@
         // Validations
         // -------------------------------
         let validateExtension = file => {
-            if (plugin.settings.extensions.indexOf(file.name.replace(/^.*\./, '.')) < 0) {
+            if (plugin.settings.extensions.indexOf(file.name.replace(/^.*\./, '.').toLowerCase()) < 0) {
                 alert(`File "${file.name}" does not match accepted extensions: ${plugin.settings.extensions.join(', ')}`);
                 return false;
             }

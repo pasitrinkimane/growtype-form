@@ -57,6 +57,7 @@ $field_cta_text = isset($field['cta_text']) ? __($field['cta_text'], 'growtype-f
 $field_min_value = isset($field['min']) ? $field['min'] : null;
 $field_min_date_value = isset($field['min_date']) ? $field['min_date'] : null;
 $field_max_value = isset($field['max']) ? $field['max'] : null;
+$field_step_value = isset($field['step']) ? $field['step'] : null;
 $field_col_class = isset($field['class']) ? $field['class'] : 'col-auto';
 $field_fields = isset($field['fields']) ? $field['fields'] : null;
 $field_date = isset($field['date']) ? $field['date'] : false;
