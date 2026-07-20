@@ -64,7 +64,7 @@ function growtype_form_signup_page_url($query_vars = [])
 function _growtype_form_get_signup_legal_page_content(
     $option_name,
     $template_path,
-    $fallback_slug,
+    $fallback_slug
 ) {
     $option = get_option($option_name);
 
