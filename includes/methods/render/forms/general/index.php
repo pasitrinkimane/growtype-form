@@ -32,23 +32,31 @@ class Growtype_Form_General
     ];
 
     public function __construct()
-    {
-        if (!is_admin()) {
-            add_shortcode(self::SHORTCODE_NAME, [
+        {
+            if (!is_admin()) {
+                add_shortcode(self::SHORTCODE_NAME, [
+                    $this,
+                    "growtype_form_shortcode_function",
+                ]);
+            }
+
+            add_filter("upload_mimes", [
                 $this,
-                "growtype_form_shortcode_function",
+                "growtype_form_allow_video_uploads",
             ]);
+
+            add_filter("growtype_modal_map", [$this, "growtype_form_modal_map"]);
+
+            $this->load_partials();
         }
 
-        add_filter("upload_mimes", [
-            $this,
-            "growtype_form_allow_video_uploads",
-        ]);
+        private function load_partials(): void
+        {
+            require_once __DIR__ . '/partials/class-growtype-form-general-submission.php';
+            new Growtype_Form_General_Submission();
+        }
 
-        add_filter("growtype_modal_map", [$this, "growtype_form_modal_map"]);
-    }
-
-    public function growtype_form_allow_video_uploads($mimes)
+        public function growtype_form_allow_video_uploads($mimes)
     {
         $mimes["mp4"] = "video/mp4";
         $mimes["mov"] = "video/quicktime";
@@ -796,7 +804,7 @@ class Growtype_Form_General
                     ); ?>
 
                     <div class="form-inner-wrapper">
-                        <form id="growtype-form-<?php echo $form_name; ?>" enctype="multipart/form-data" class="growtype-form form <?php echo $form_args["class"]; ?>" action="<?php echo self::growtype_form_get_action_url($form_name); ?>" method="post" data-name="<?php echo $form_name; ?>" data-ajax="<?php echo $form_args["ajax"]; ?>" data-ajax-action="<?php echo $form_args["ajax_action"]; ?>">
+                        <form id="growtype-form-<?php echo $form_name; ?>" enctype="multipart/form-data" class="growtype-form form <?php echo $form_args["class"]; ?>" action="<?php echo self::growtype_form_get_action_url($form_name); ?>" method="post" data-name="<?php echo $form_name; ?>" data-ajax="<?php echo filter_var($form_args["ajax"], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false'; ?>" data-ajax-action="<?php echo $form_args["ajax_action"]; ?>">
                             <?php foreach (
                                 $form_data
                                 as $key => $form_fields
@@ -1352,7 +1360,7 @@ class Growtype_Form_General
                 if ($(".growtype-form select:visible").length > 0) {
                     $(".growtype-form select:visible").each(function () {
                         if ($(this).attr('required') !== undefined) {
-                            $(this).on("change", function () {
+                            $(this).off("change.growtype_val").on("change.growtype_val", function () {
                                 $(this).valid();
                             });
                         }
@@ -1439,7 +1447,7 @@ class Growtype_Form_General
             /**
              * Form submit
              */
-            $('.growtype-form button[type="submit"]').click(function (event) {
+            $(document).off('click.growtype_submit', '.growtype-form button[type="submit"]').on('click.growtype_submit', '.growtype-form button[type="submit"]', function (event) {
 
                 $(this).attr('disabled', false);
 
@@ -1451,6 +1459,7 @@ class Growtype_Form_General
                 $('input[name="growtype_form_submit_action"]').val(action);
 
                 if (action === 'delete') {
+                    event.preventDefault();
                     $(this).closest('.growtype-form').submit();
                 } else {
                     let isValid = true;
@@ -1549,11 +1558,12 @@ class Growtype_Form_General
                     /**
                      * Submit form
                      */
+                    event.preventDefault();
                     $(this).closest('.growtype-form').submit();
                 }
             });
 
-            $(document).on('keyup change', '.growtype-form input, .growtype-form textarea, .growtype-form select', function () {
+            $(document).off('keyup.growtype_form_alert change.growtype_form_alert', '.growtype-form input, .growtype-form textarea, .growtype-form select').on('keyup.growtype_form_alert change.growtype_form_alert', '.growtype-form input, .growtype-form textarea, .growtype-form select', function () {
                 var $form = $(this).closest('.growtype-form');
                 if ($form.find('.form-validation-alert').length && $form.find('.error:visible').length === 0) {
                     $form.find('.form-validation-alert').remove();

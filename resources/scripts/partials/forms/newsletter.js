@@ -1,7 +1,7 @@
 import {newsletterFormSuccessEvent} from "../events/newsletterForm";
 
 function formNewsletter() {
-    $('.growtype-form-newsletter').submit(function () {
+    $('.growtype-form-newsletter').off('submit.growtype_newsletter').on('submit.growtype_newsletter', function (event) {
         event.preventDefault();
 
         let form = $(this);
@@ -9,6 +9,7 @@ function formNewsletter() {
         let submitBtn = $(this).find('button[type="submit"]');
 
         formData.push({name: "action", value: 'growtype_form_newsletter_submission'});
+        formData.push({name: "nonce", value: window.growtype_form.nonce});
 
         form.find('.status-message').fadeOut().promise().done(function () {
             $(this).removeClass('alert-danger alert-success');

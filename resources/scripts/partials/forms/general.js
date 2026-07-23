@@ -1,4 +1,4 @@
-import {ajaxFormSuccessEvent} from "../events/ajaxForm";
+import { ajaxFormSuccessEvent } from "../events/ajaxForm";
 
 function parseAjaxParamsFromDataset($element) {
     const params = {};
@@ -110,16 +110,16 @@ function triggerAjaxFieldUpdate($trigger) {
 }
 
 function bindAjaxFieldUpdates() {
-    $(document).on(
-        'change',
+    $(document).off('change.growtype_gf_ajax_update').on(
+        'change.growtype_gf_ajax_update',
         '[data-gf-ajax-update="true"]',
         function () {
             triggerAjaxFieldUpdate($(this));
         }
     );
 
-    $(document).on(
-        'click',
+    $(document).off('click.growtype_gf_ajax_update').on(
+        'click.growtype_gf_ajax_update',
         '[data-gf-ajax-update="true"][data-gf-ajax-trigger="click"]',
         function () {
             triggerAjaxFieldUpdate($(this));
@@ -127,17 +127,25 @@ function bindAjaxFieldUpdates() {
     );
 }
 
+function displayFormAlert($form, message, type = 'danger') {
+    $form.find('.form-response-alert').remove();
+    if (message) {
+        $form.prepend('<div class="alert alert-' + type + ' alert-dismissible fade show form-response-alert mb-4" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+    }
+}
+
 function formGeneral() {
     window.growtype_form.postdata = {};
 
     bindAjaxFieldUpdates();
 
-    $('.growtype-form[data-ajax="true"]').submit(function (event) {
+    $(document).off('submit.growtype_gf_ajax_submit').on('submit.growtype_gf_ajax_submit', '.growtype-form[data-ajax="true"], .growtype-form[data-ajax="1"]', function (event) {
         event.preventDefault();
 
-        let action = $(this).attr('data-ajax-action');
+        let $form = $(this);
+        let action = $form.attr('data-ajax-action') || 'growtype_form_submission';
 
-        window.growtype_form.postdata['form'] = $(this).serialize()
+        window.growtype_form.postdata['form'] = $form.serialize()
 
         $.ajax({
             url: growtype_form.ajax_url,
@@ -147,11 +155,66 @@ function formGeneral() {
                 postdata: window.growtype_form.postdata
             }
         }).done(function (data) {
+            $form.find('.form-response-alert').remove();
+
             if (data.success) {
                 document.dispatchEvent(ajaxFormSuccessEvent());
+
+                let $wrapper = $form.closest('.growtype-form-wrapper');
+                let $success = $wrapper.siblings('.growtype-form-success');
+                if (!$success.length) {
+                    displayFormAlert($form, data.message, 'success');
+                }
+            } else {
+                displayFormAlert($form, data.message, 'danger');
             }
+        }).fail(function (xhr) {
+            let message = 'Something went wrong. Please try again.';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                message = xhr.responseJSON.message;
+            }
+            displayFormAlert($form, message, 'danger');
+        }).always(function () {
+            $form.find('button[type="submit"], button[data-action="submit"]').attr('disabled', false);
         });
     })
 }
 
-export {formGeneral};
+// ── Generic success handler for AJAX form submissions ───────────────
+// Detects the submitted form (button disabled during submit) and swaps
+// the form wrapper with a .growtype-form-success sibling, then auto-closes
+// any Bootstrap modal after 2.5 s.
+(function () {
+    document.addEventListener('growtypeFormAjaxFormSuccess', function () {
+        $('.growtype-form-wrapper').each(function () {
+            var $wrapper = $(this);
+            var $form = $wrapper.find('form[data-ajax="true"], form[data-ajax="1"]');
+            if (!$form.length) return;
+
+            var $submitBtn = $form.find('button[type="submit"]:disabled, button[data-action="submit"]:disabled');
+            if (!$submitBtn.length) return;
+
+            // Hide form, re-enable button
+            $submitBtn.prop('disabled', false);
+
+            // Show success sibling if present
+            var $success = $wrapper.siblings('.growtype-form-success');
+            if ($success.length) {
+                $success.show();
+            }
+
+            // Auto-close Bootstrap modal
+            var $modal = $wrapper.closest('.modal');
+            if ($modal.length && typeof bootstrap !== 'undefined') {
+                setTimeout(function () {
+                    var bsModal = bootstrap.Modal.getInstance($modal[0]);
+                    if (bsModal) bsModal.hide();
+                }, 2500);
+            }
+
+            return false; // stop after first match
+        });
+    });
+})();
+
+export { formGeneral };

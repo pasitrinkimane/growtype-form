@@ -1,5 +1,5 @@
 export function formAuth() {
-    $('.growtype-form-auth .btn-link').click(function (e) {
+    $(document).off('click.growtype_auth_toggle', '.growtype-form-auth .btn-link').on('click.growtype_auth_toggle', '.growtype-form-auth .btn-link', function (e) {
         const type = $(this).attr('data-type');
         if (type) {
             e.preventDefault();
