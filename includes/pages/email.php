@@ -56,7 +56,7 @@ class Growtype_Form_Email_Page
      */
     public static function get_slug(): string
     {
-        return (string) apply_filters(
+        return (string)apply_filters(
             "growtype_form_email_page_slug",
             self::PAGE_SLUG,
         );
@@ -76,7 +76,7 @@ class Growtype_Form_Email_Page
      */
     public static function marketing_keys(): array
     {
-        return (array) apply_filters("growtype_form_email_marketing_keys", [
+        return (array)apply_filters("growtype_form_email_marketing_keys", [
             "utm_source",
             "utm_medium",
             "utm_campaign",
@@ -219,10 +219,10 @@ class Growtype_Form_Email_Page
 
         $form_html = str_replace(
             '<button type="submit" class="btn btn-primary">' .
-                $submit_label_text,
+            $submit_label_text,
             $pre_submit .
-                '<button type="submit" class="btn btn-primary">' .
-                $submit_label_text,
+            '<button type="submit" class="btn btn-primary">' .
+            $submit_label_text,
             $form_html,
         );
 
@@ -230,225 +230,250 @@ class Growtype_Form_Email_Page
         ob_start();
         ?>
         <div class="container">
-<div class="card gfemail-container">
-            <h2><?php _e("Your results are ready", "growtype-form"); ?></h2>
-            <p><?php _e(
-                "Enter your email to get your personalized Communication plan",
-                "growtype-form",
-            ); ?></p>
+            <div class="card gfemail-container">
+                <h2><?php _e("Your results are ready", "growtype-form"); ?></h2>
+                <p><?php _e(
+                        "Enter your email to get your personalized Communication plan",
+                        "growtype-form",
+                    ); ?></p>
 
-            <?php echo $form_html; ?>
-        </div>
+                <?php echo $form_html; ?>
+            </div>
         </div>
 
         <style>
-        .gfemail-container {
-            width: 100%;
-            max-width: 500px;
-            margin: 60px auto;
-            text-align: center;
-        }
-        .gfemail-container h2 {
-            font-size: 28px;
-            font-weight: 700;
-        }
-        .gfemail-container p {
-            font-size: 14px;
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-        .gfemail-privacy-info {
-            font-size: 12px;
-            text-align: left;
-            padding-top:10px;
-        }
-        .gfemail-privacy-info a{
-            font-size: 12px;
-        }
-        .gfemail-container .status-message {
-            font-size: 14px;
-            text-align: left;
-        }
-        .growtype-form-newsletter {
-            padding-top: 20px;
-        }
-        /* Hide the extra submit button inside input wrapper */
-        .gfemail-container .input-wrapper-inner button[type="submit"] {
-            display: none !important;
-        }
+            .page-gfemail .site-footer {
+                display: none;
+            }
 
-        .gfemail-container input[type="email"] {
-            width: 100%;
-        }
-
-        /* Email input icon */
-        .gfemail-container .input-wrapper-inner {
-            position: relative;
-        }
-        .gfemail-container .input-wrapper-inner input[type="email"] {
-            padding-left: 40px!important;
-        }
-        .gfemail-container .input-wrapper-inner .input-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 18px;
-            height: 18px;
-            color: rgb(187, 187, 187);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .gfemail-container button[type="submit"] {
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .gfemail-container label {
-            display: block;
-            font-size: 13px;
-            text-align: left;
-        }
-
-        /* Mobile responsive adjustments */
-        @media (max-width: 576px) {
             .gfemail-container {
-                padding: 28px 15px;
-                margin: 0 auto;
-                border-radius: 16px;
+                width: 100%;
+                max-width: 500px;
+                margin: 60px auto;
+                text-align: center;
             }
+
             .gfemail-container h2 {
-                font-size: 24px;
+                font-size: 28px;
+                font-weight: 700;
             }
+
             .gfemail-container p {
                 font-size: 14px;
+                margin-bottom: 10px;
+                line-height: 1.6;
             }
+
             .gfemail-privacy-info {
                 font-size: 12px;
+                text-align: left;
+                padding-top: 10px;
             }
-        }
 
-        /* Override happy customers banner inside email page */
-        .gfemail-container .gt-happy-customers {
-            background: none;
+            .gfemail-privacy-info a {
+                font-size: 12px;
+            }
+
+            .gfemail-container .status-message {
+                font-size: 14px;
+                text-align: left;
+            }
+
+            .growtype-form-newsletter {
+                padding-top: 20px;
+            }
+
+            /* Hide the extra submit button inside input wrapper */
+            .gfemail-container .input-wrapper-inner button[type="submit"] {
+                display: none !important;
+            }
+
+            .gfemail-container input[type="email"] {
+                width: 100%;
+            }
+
+            /* Email input icon */
+            .gfemail-container .input-wrapper-inner {
+                position: relative;
+            }
+
+            .gfemail-container .input-wrapper-inner input[type="email"] {
+                padding-left: 40px !important;
+            }
+
+            .gfemail-container .input-wrapper-inner .input-icon {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 18px;
+                height: 18px;
+                color: rgb(187, 187, 187);
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            .gfemail-container button[type="submit"] {
+                width: 100%;
+                margin-top: 20px;
+            }
+
+            .gfemail-container label {
+                display: block;
+                font-size: 13px;
+                text-align: left;
+            }
+
+            /* Mobile responsive adjustments */
+            @media (max-width: 576px) {
+                .gfemail-container {
+                    padding: 28px 15px;
+                    margin: 0 auto;
+                    border-radius: 16px;
+                }
+
+                .gfemail-container h2 {
+                    font-size: 24px;
+                }
+
+                .gfemail-container p {
+                    font-size: 14px;
+                }
+
+                .gfemail-privacy-info {
+                    font-size: 12px;
+                }
+            }
+
+            /* Override happy customers banner inside email page */
+            .gfemail-container .gt-happy-customers {
+                background: none;
                 margin-top: 10px;
                 margin-left: auto;
                 margin-right: auto;
-        }
+            }
 
-        /* Privacy notice */
-        .gfemail-privacy-notice {
-            margin-top: 15px;
-            margin-bottom: 15px;
-            padding: 0;
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            width: 100%;
-            text-align: left;
-            color: rgb(187, 187, 187);
-            font-size: 12px;
-            line-height: 1.5;
-        }
-        .gfemail-privacy-notice svg {
-            flex-shrink: 0;
-            margin-top: 2px;
-            width: 24px;
-            height: 24px;
-            color: rgb(187, 187, 187);
-        }
-        .gfemail-privacy-notice > span {
-            flex: 1;
-            min-width: 0;
-        }
-        .gfemail-privacy-notice p {
-            margin: 0;
-            font-size: 12px;
-            line-height: 1.5;
-            color: rgb(187, 187, 187);
-        }
+            /* Privacy notice */
+            .gfemail-privacy-notice {
+                margin-top: 15px;
+                margin-bottom: 15px;
+                padding: 0;
+                display: flex;
+                align-items: flex-start;
+                gap: 8px;
+                width: 100%;
+                text-align: left;
+                color: rgb(187, 187, 187);
+                font-size: 12px;
+                line-height: 1.5;
+            }
+
+            .gfemail-privacy-notice svg {
+                flex-shrink: 0;
+                margin-top: 2px;
+                width: 24px;
+                height: 24px;
+                color: rgb(187, 187, 187);
+            }
+
+            .gfemail-privacy-notice > span {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .gfemail-privacy-notice p {
+                margin: 0;
+                font-size: 12px;
+                line-height: 1.5;
+                color: rgb(187, 187, 187);
+            }
         </style>
 
         <script>
-        jQuery(document).ready(function($) {
-            // Remove the default newsletter handler — it sends without our nonce
-            $('.growtype-form-newsletter').off('submit');
+            jQuery(document).ready(function ($) {
+                // Remove the default newsletter handler — it sends without our nonce
+                $('.growtype-form-newsletter').off('submit');
 
-            // Target the reused newsletter component form and override its standard submit action
-            $('.growtype-form-newsletter').on('submit', function(e) {
-                e.stopImmediatePropagation();
-                e.preventDefault();
+                // Target the reused newsletter component form and override its standard submit action
+                $('.growtype-form-newsletter').on('submit', function (e) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
 
-                var $form = $(this);
-                var $submitBtn = $form.find('button[type="submit"]');
-                var $status = $form.find('.status-message');
+                    var $form = $(this);
+                    var $submitBtn = $form.find('button[type="submit"]');
+                    var $status = $form.find('.status-message');
 
-                $submitBtn.prop('disabled', true);
-                $status.hide().removeClass('alert alert-danger alert-success').text('');
+                    $submitBtn.prop('disabled', true);
+                    $status.hide().removeClass('alert alert-danger alert-success').text('');
 
-                var formData = $form.serializeArray();
-                formData.push({name: "action", value: "<?php echo esc_js(
-                    $ajax_action,
-                ); ?>"});
-                formData.push({name: "nonce", value: "<?php echo esc_js(
-                    $nonce,
-                ); ?>"});
-                formData.push({name: "gqtoken", value: "<?php echo esc_js(
-                    $gqtoken,
-                ); ?>"});
-                <?php
-                $marketing_keys = self::marketing_keys();
-                foreach ($marketing_keys as $key) {
-                    $val = sanitize_text_field($_GET[$key] ?? "");
-                    if ($val !== "") {
-                        echo 'formData.push({name: "' .
-                            esc_js($key) .
-                            '", value: "' .
-                            esc_js($val) .
-                            '"});';
+                    var formData = $form.serializeArray();
+                    formData.push({
+                        name: "action", value: "<?php echo esc_js(
+                            $ajax_action,
+                        ); ?>"
+                    });
+                    formData.push({
+                        name: "nonce", value: "<?php echo esc_js(
+                            $nonce,
+                        ); ?>"
+                    });
+                    formData.push({
+                        name: "gqtoken", value: "<?php echo esc_js(
+                            $gqtoken,
+                        ); ?>"
+                    });
+                    <?php
+                    $marketing_keys = self::marketing_keys();
+                    foreach ($marketing_keys as $key) {
+                        $val = sanitize_text_field($_GET[$key] ?? "");
+                        if ($val !== "") {
+                            echo 'formData.push({name: "' .
+                                esc_js($key) .
+                                '", value: "' .
+                                esc_js($val) .
+                                '"});';
+                        }
                     }
-                }
-                ?>
+                    ?>
 
-                $.ajax({
-                    url: '<?php echo esc_url($ajax_url); ?>',
-                    method: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        if (response.success && response.data && response.data.redirect_url) {
-                            if (typeof window.growtypeAnalyticsCapture === 'function') {
-                                window.growtypeAnalyticsCapture('growtype_analytics_complete_registration_submit', {
-                                    event: 'complete_registration',
-                                    source: 'gfemail'
-                                });
+                    $.ajax({
+                        url: '<?php echo esc_url($ajax_url); ?>',
+                        method: 'POST',
+                        data: formData,
+                        success: function (response) {
+                            if (response.success && response.data && response.data.redirect_url) {
+                                if (typeof window.growtypeAnalyticsCapture === 'function') {
+                                    window.growtypeAnalyticsCapture('growtype_analytics_complete_registration_submit', {
+                                        event: 'complete_registration',
+                                        source: 'gfemail'
+                                    });
+                                } else {
+                                    window.dataLayer = window.dataLayer || [];
+                                    window.dataLayer.push({
+                                        event: 'growtype_analytics_complete_registration_submit',
+                                        source: 'gfemail'
+                                    });
+                                }
+
+                                $status.addClass('alert alert-success').text('Success! Redirecting to results...').show();
+                                window.location.href = response.data.redirect_url;
                             } else {
-                                window.dataLayer = window.dataLayer || [];
-                                window.dataLayer.push({
-                                    event: 'growtype_analytics_complete_registration_submit',
-                                    source: 'gfemail'
-                                });
+                                var msg = (response.data && response.data.message) ? response.data.message : 'An error occurred. Please try again.';
+                                $status.addClass('alert alert-danger').text(msg).show();
+                                $submitBtn.prop('disabled', false);
                             }
-
-                            $status.addClass('alert alert-success').text('Success! Redirecting to results...').show();
-                            window.location.href = response.data.redirect_url;
-                        } else {
-                            var msg = (response.data && response.data.message) ? response.data.message : 'An error occurred. Please try again.';
-                            $status.addClass('alert alert-danger').text(msg).show();
+                        },
+                        error: function (xhr) {
+                            var message = 'An error occurred. Please try again.';
+                            if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+                                message = xhr.responseJSON.data.message;
+                            }
+                            $status.addClass('alert alert-danger').text(message).show();
                             $submitBtn.prop('disabled', false);
                         }
-                    },
-                    error: function(xhr) {
-                        var message = 'An error occurred. Please try again.';
-                        if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
-                            message = xhr.responseJSON.data.message;
-                        }
-                        $status.addClass('alert alert-danger').text(message).show();
-                        $submitBtn.prop('disabled', false);
-                    }
+                    });
                 });
             });
-        });
         </script>
         <?php
         $content = ob_get_clean();
