@@ -53,11 +53,16 @@ class Growtype_Form_Login
          * Redirect after login or signup
          */
         add_action('wp_loaded', function () {
-            if (is_user_logged_in() && !is_admin() && !isset($_GET['action']) && !empty(growtype_form_redirect_url_after_login())) {
-                if (growtype_form_current_page_is_login_page() || growtype_form_current_page_is_signup_page()) {
-                    wp_redirect(growtype_form_redirect_url_after_login());
-                    exit();
-                }
+            if (!is_user_logged_in() || is_admin() || isset($_GET['action'])) {
+                return;
+            }
+            if (!growtype_form_current_page_is_login_page() && !growtype_form_current_page_is_signup_page()) {
+                return;
+            }
+            $redirect_url = growtype_form_redirect_url_after_login();
+            if (!empty($redirect_url)) {
+                wp_redirect($redirect_url);
+                exit();
             }
         });
     }
