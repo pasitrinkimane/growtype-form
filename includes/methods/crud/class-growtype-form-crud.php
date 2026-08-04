@@ -603,9 +603,11 @@ class Growtype_Form_Crud
         $email_body .= '<br><strong>Submitter IP:</strong> ' . esc_html($_SERVER['REMOTE_ADDR'] ?? 'Unknown');
 
         $headers[] = 'From: Admin <' . $admin_email . '>';
+
         /** * Debug */
-        error_log(sprintf("Growtype Form - Sending email to
-    admin. Details: %s", print_r([$to, $subject, $email_body, $headers], true)));
+//        error_log(sprintf("Growtype Form - Sending email to
+//    admin. Details: %s", print_r([$to, $subject, $email_body, $headers], true)));
+
         wp_mail($to, $subject, $email_body,
             $headers);
     }
