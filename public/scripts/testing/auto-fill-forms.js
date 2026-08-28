@@ -5,6 +5,16 @@
 (function () {
     'use strict';
 
+    if (window.GROWTYPE_DISABLE_AUTOFILL === true || window.growtypeDisableAutoFill === true) {
+        return;
+    }
+
+    function logAutoFill(...args) {
+        if (window.growtypeChatDebug || window.growtypeAutoFillDebug || window.GROWTYPE_AUTOFILL_DEBUG) {
+            console.log(...args);
+        }
+    }
+
     // Configuration for test credentials (passed from backend)
     const backendCredentials = window.GROWTYPE_TEST_CREDENTIALS || {};
     const timestamp = Date.now();
@@ -34,7 +44,7 @@
         const loginForm = document.querySelector('[id^="loginform_"], #loginform-custom, form[name="loginform-custom"], .growtype-form-wrapper[data-name="login"] form');
 
         if (!loginForm) {
-            console.log('[AutoFill] Login form not found');
+            logAutoFill('[AutoFill] Login form not found');
             return false;
         }
 
@@ -79,11 +89,11 @@
             // Mark as filled
             filledForms.add(loginForm);
 
-            console.log('[AutoFill] ✓ Login form filled');
+            logAutoFill('[AutoFill] ✓ Login form filled');
             return true;
         }
 
-        console.log('[AutoFill] Login form fields not found');
+        logAutoFill('[AutoFill] Login form fields not found');
         return false;
     }
 
@@ -94,7 +104,7 @@
         const signupForm = document.querySelector('#signupform-custom, form[name="signupform-custom"], .growtype-form-wrapper[data-name="signup"] form');
 
         if (!signupForm) {
-            console.log('[AutoFill] Signup form not found');
+            logAutoFill('[AutoFill] Signup form not found');
             return false;
         }
 
@@ -168,9 +178,9 @@
             // Mark as filled
             filledForms.add(signupForm);
 
-            console.log('[AutoFill] ✓ Signup form filled');
+            logAutoFill('[AutoFill] ✓ Signup form filled');
         } else {
-            console.log('[AutoFill] Signup form fields not found');
+            logAutoFill('[AutoFill] Signup form fields not found');
         }
 
         return filled;
@@ -250,14 +260,14 @@
 
             // Specific check for the new auth modal
             jQuery(document).on('shown.bs.modal', '#growtypeFormAuthModal', function () {
-                console.log('[AutoFill] Auth modal specifically shown');
+                logAutoFill('[AutoFill] Auth modal specifically shown');
                 setTimeout(attemptAutoFill, 300);
             });
         }
 
         // Listen for custom events that might indicate form display
         document.addEventListener('growtypeFormOpened', function (e) {
-            console.log('[AutoFill] Form opened event detected:', e.detail);
+            logAutoFill('[AutoFill] Form opened event detected:', e.detail);
             setTimeout(attemptAutoFill, 200);
         });
 
@@ -265,7 +275,7 @@
         document.addEventListener('keydown', function (e) {
             if (e.altKey && e.shiftKey && e.key === 'F') {
                 e.preventDefault();
-                console.log('[AutoFill] Manual trigger via keyboard shortcut');
+                logAutoFill('[AutoFill] Manual trigger via keyboard shortcut');
                 attemptAutoFill();
             }
         });

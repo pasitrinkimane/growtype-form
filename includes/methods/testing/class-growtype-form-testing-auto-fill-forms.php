@@ -9,7 +9,9 @@ class Growtype_Form_Testing_Auto_Fill_Forms
     public function __construct()
     {
         if (defined('WP_ENV') && WP_ENV === 'development') {
-            add_action('wp_footer', [$this, 'inject_auto_fill_script'], 999);
+            if (!apply_filters('growtype_form_auto_fill_disabled', false)) {
+                add_action('wp_footer', [$this, 'inject_auto_fill_script'], 999);
+            }
         }
     }
 

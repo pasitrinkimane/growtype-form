@@ -233,6 +233,66 @@ document.addEventListener('growtypeQuizValidateQuestion', function (event) {
  * Image uploaded setup
  */
 function setupImageUploader() {
+    function readPreloadedImagesFromDataAttribute($uploader) {
+        if (!$uploader || !$uploader.length) {
+            return [];
+        }
+
+        let raw = $uploader.attr('data-preloaded');
+        if (!raw || raw === '[]') {
+            return [];
+        }
+
+        try {
+            let parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function syncPreloadedImageState($uploader, preloadedImages, preloadedInputName) {
+        if (!$uploader || !$uploader.length || !Array.isArray(preloadedImages) || preloadedImages.length === 0) {
+            return;
+        }
+
+        let $inner = $uploader.find('.image-uploader-inner');
+        let $uploadedImages = $inner.find('.uploaded .uploaded-image[data-preloaded]');
+
+        if ($uploadedImages.length === 0) {
+            return;
+        }
+
+        let order = [];
+
+        $uploadedImages.each(function (index, element) {
+            let image = preloadedImages[index];
+            if (!image || image.id === undefined || image.id === null || image.id === '') {
+                return;
+            }
+
+            let imageId = String(image.id);
+            let $image = $(element);
+            let $hiddenInput = $image.find('input[type="hidden"]').first();
+
+            if ($hiddenInput.length === 0) {
+                $hiddenInput = $('<input>', {type: 'hidden'}).appendTo($image);
+            }
+
+            $hiddenInput.attr('name', preloadedInputName + '[]');
+            $hiddenInput.val(imageId);
+
+            order.push({
+                type: 'preloaded',
+                id: imageId
+            });
+        });
+
+        if (order.length > 0) {
+            $inner.find('.image-order-input').val(JSON.stringify(order));
+        }
+    }
+
     /**
      * Image uploader setup
      */
@@ -269,6 +329,7 @@ function setupImageUploader() {
 
                 let imageUploaders = typeof (window.growtype_form_image_uploaders) !== 'undefined' && imageUploaderPreload ? window.growtype_form_image_uploaders : [];
                 let preloaded = [];
+                let preloadedInputName = 'image_uploader_old_' + imageUploaderInitialName;
 
                 let uploaderSettings = {
                     imagesInputName: imageUploaderInitialName,
@@ -286,8 +347,17 @@ function setupImageUploader() {
                     }
 
                     uploaderSettings['preloaded'] = preloaded;
-                    uploaderSettings['preloadedInputName'] = imageUploaders['old_images_prefix'] + '_' + imageUploaderInitialName;
+                    preloadedInputName = imageUploaders['old_images_prefix'] + '_' + imageUploaderInitialName;
                 }
+
+                if (preloaded.length === 0 && imageUploaderPreload) {
+                    preloaded = readPreloadedImagesFromDataAttribute(formInput);
+                    if (preloaded.length > 0) {
+                        uploaderSettings['preloaded'] = preloaded;
+                    }
+                }
+
+                uploaderSettings['preloadedInputName'] = preloadedInputName;
 
                 if (imageCapture) {
                     uploaderSettings.capture = imageCapture;
@@ -298,6 +368,7 @@ function setupImageUploader() {
                 }
 
                 formInput.imageUploader(uploaderSettings);
+                syncPreloadedImageState(formInput, preloaded, preloadedInputName);
 
                 /**
                  * Format label

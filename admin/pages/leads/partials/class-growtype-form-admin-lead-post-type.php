@@ -22,11 +22,21 @@ class Growtype_Form_Admin_Lead_Post_Type
 
     function delete_lead($user_id)
     {
-        $user_data = get_userdata($user_id);
-        $lead = Growtype_Form_Admin_Lead_Crud::get_by_title($user_data->user_email);
+        global $wpdb;
 
-        if (!empty($lead)) {
-            wp_delete_post($lead->ID, true);
+        $user_data = get_userdata($user_id);
+        if (!$user_data || empty($user_data->user_email)) {
+            return;
+        }
+
+        $lead_ids = $wpdb->get_col($wpdb->prepare(
+            "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s AND post_title = %s",
+            'gf_lead',
+            $user_data->user_email
+        ));
+
+        foreach ($lead_ids as $lead_id) {
+            wp_delete_post((int) $lead_id, true);
         }
     }
 
