@@ -229,7 +229,7 @@ class Growtype_Form_Login
     /**
      * Updates login failed to send user back to the custom form with a query var
      */
-    function custom_login_failed($username)
+    function custom_login_failed($username, $error = null)
     {
         $referrer = wp_get_referer();
         if (!$referrer && isset($_SERVER['HTTP_REFERER'])) {
@@ -240,7 +240,34 @@ class Growtype_Form_Login
          * Log only if WP_DEBUG is enabled to avoid spamming production logs during brute-force attacks
          */
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Growtype Auth - Login failed for user: ' . $username . '. Referrer: ' . $referrer);
+            $error_codes = [];
+            $error_messages = [];
+
+            if (is_wp_error($error)) {
+                $error_codes = $error->get_error_codes();
+                $error_messages = array_map(
+                    static function ($message) {
+                        return sanitize_text_field(wp_strip_all_tags($message));
+                    },
+                    $error->get_error_messages()
+                );
+            }
+
+            $request_uri = isset($_SERVER['REQUEST_URI'])
+                ? esc_url_raw(wp_unslash($_SERVER['REQUEST_URI']))
+                : '';
+
+            growtype_log(
+                sprintf(
+                    'Growtype Auth - Login failed for user: %s. Error codes: %s. Error messages: %s. Referrer: %s. Request URI: %s.',
+                    $username,
+                    wp_json_encode($error_codes),
+                    wp_json_encode($error_messages),
+                    $referrer ?: 'none',
+                    $request_uri ?: 'unknown'
+                ),
+                'growtype-auth-login-failed'
+            );
         }
 
         /**
