@@ -234,12 +234,14 @@ class Growtype_Form_Crud_Validation
             $value = $data[$rule['key']] ?? '';
 
             if (!empty($value)) {
-                $ip_address = growtype_form_get_user_ip_address();
-
-                error_log(sprintf('Growtype Form - SPAM submission. Data %s', json_encode([
-                    $ip_address,
-                    $data
-                ])));
+                $rule_key = preg_replace('/[^a-z0-9_-]/i', '', (string) ($rule['key'] ?? ''));
+                growtype_log(
+                    sprintf(
+                        'Growtype Form: Spam submission rejected; rule=%s.',
+                        $rule_key !== '' ? $rule_key : 'unknown'
+                    ),
+                    'growtype-form-spam'
+                );
 
                 return false;
             }
