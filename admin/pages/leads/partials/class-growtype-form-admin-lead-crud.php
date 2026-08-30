@@ -46,6 +46,29 @@ class Growtype_Form_Admin_Lead_Crud
         );
     }
 
+    public static function get_all_by_titles($titles)
+    {
+        global $wpdb;
+
+        $titles = array_values(array_unique(array_filter($titles, static function ($title) {
+            return is_string($title) && $title !== '';
+        })));
+
+        if (empty($titles)) {
+            return [];
+        }
+
+        $title_placeholders = implode(', ', array_fill(0, count($titles), '%s'));
+        $query_args = array_merge([Growtype_Form_Admin_Lead::POST_TYPE_NAME], $titles);
+
+        return $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT ID, post_title FROM $wpdb->posts WHERE post_type = %s AND post_title IN ($title_placeholders)",
+                $query_args,
+            ),
+        );
+    }
+
     public static function get_by_title($title)
     {
         $all = self::get_all_by_title($title);

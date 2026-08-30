@@ -7,6 +7,8 @@ class Growtype_Form_Admin_Lead_Custom_Actions
 {
     const POST_TYPE_NAME = Growtype_Form_Admin_Lead::POST_TYPE_NAME;
 
+    private $user_table_leads_by_email = null;
+
     public function __construct()
     {
 //        add_action('manage_posts_extra_tablenav', array ($this, 'bulk_actions_html'));
@@ -213,7 +215,7 @@ class Growtype_Form_Admin_Lead_Custom_Actions
 
     public function add_lead_action_link($actions, $user)
     {
-        $lead = Growtype_Form_Admin_Lead_Crud::get_by_title($user->user_email);
+        $lead = $this->get_user_table_lead($user);
 
         if (!empty($lead)) {
             $lead_url = admin_url('post.php?post=' . $lead->ID . '&action=edit');
@@ -226,5 +228,43 @@ class Growtype_Form_Admin_Lead_Custom_Actions
         }
 
         return $actions;
+    }
+
+    private function get_user_table_lead($user)
+    {
+        if ($this->user_table_leads_by_email === null) {
+            global $wp_list_table;
+
+            $users = [];
+            if (is_object($wp_list_table) && is_array($wp_list_table->items ?? null)) {
+                $users = $wp_list_table->items;
+            }
+
+            if (empty($users)) {
+                return Growtype_Form_Admin_Lead_Crud::get_by_title($user->user_email);
+            }
+
+            $emails = [];
+            foreach ($users as $listed_user) {
+                if ($listed_user instanceof WP_User && $listed_user->user_email !== '') {
+                    $emails[] = $listed_user->user_email;
+                }
+            }
+
+            $this->user_table_leads_by_email = [];
+            $leads = Growtype_Form_Admin_Lead_Crud::get_all_by_titles($emails);
+
+            foreach ($leads as $listed_lead) {
+                $email = $listed_lead->post_title;
+                if (array_key_exists($email, $this->user_table_leads_by_email)) {
+                    $this->user_table_leads_by_email[$email] = null;
+                    continue;
+                }
+
+                $this->user_table_leads_by_email[$email] = $listed_lead;
+            }
+        }
+
+        return $this->user_table_leads_by_email[$user->user_email] ?? null;
     }
 }
