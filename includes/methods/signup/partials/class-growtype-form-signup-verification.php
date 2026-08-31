@@ -268,7 +268,7 @@ class Growtype_Form_Signup_Verification
 
             self::send_verification_email($user->user_email, $activation_key);
 
-            error_log(sprintf('Growtype Form - Initial verification email was sent to: %s', $user->user_email));
+            error_log('Growtype Form - Initial verification email was sent.');
         }
     }
 
@@ -309,7 +309,7 @@ class Growtype_Form_Signup_Verification
             return 'text/html';
         });
 
-        error_log(sprintf('Growtype Form - Verification link %s was sent to %s.', $verification_link, $email));
+        error_log('Growtype Form - Verification email was sent.');
     }
 
     function handle_email_verification()
@@ -328,7 +328,7 @@ class Growtype_Form_Signup_Verification
                 $user_info = get_userdata($user_id);
 
                 if (empty($user_info)) {
-                    error_log(sprintf('Growtype Form - User not found for activation key %s.', $activation_key));
+                    error_log('Growtype Form - User not found for supplied activation key.');
                     wp_die(__('User not found for activation key.', 'growtype-form'));
                 }
 
@@ -342,7 +342,7 @@ class Growtype_Form_Signup_Verification
 
                 do_action('growtype_form_successful_user_verification', $user_id);
 
-                error_log(sprintf('Growtype Form - User Email %s verification is successful!', $user_email));
+                error_log('Growtype Form - User email verification succeeded.');
 
                 $redirect_url = apply_filters('growtype_form_successful_user_verification_redirect_url', home_url());
 
@@ -378,7 +378,7 @@ class Growtype_Form_Signup_Verification
 
             update_user_meta($user_id, 'last_verification_resent_time', $current_time);
 
-            error_log(sprintf('Growtype Form - Verification email was resent to: %s', $user->user_email));
+            error_log('Growtype Form - Verification email was resent.');
 
             $redirect_url = add_query_arg(['resend' => 'true'], home_url(self::verification_page_slug()));
             wp_redirect($redirect_url);

@@ -96,7 +96,7 @@ class Growtype_Form_Crud_Validation
         if (!$isValid) {
             $message = $emailValidator->getErrorReason();
 
-            error_log(sprintf('Growtype Form - Email validation failed. Email: %s. Reason: %s', $email, $message));
+            error_log(sprintf('Growtype Form - Email validation failed. Reason: %s', $message));
 
             return [
                 'failed_validation' => false,

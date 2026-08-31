@@ -512,7 +512,11 @@ class Growtype_Form_Crud
                 }
             }
         } else {
-            error_log(sprintf("Growtype Form - VALIDATION FAILED. Data: %s", print_r($validated_form_submitted_values, true)));
+            error_log(sprintf(
+                'Growtype Form - Validation failed; form=%s; field_count=%d.',
+                sanitize_key((string) $form_name),
+                count((array) $validated_form_submitted_values)
+            ));
 
             $submit_data['success'] = false;
             $submit_data['message'] = $submitted_data_message;
