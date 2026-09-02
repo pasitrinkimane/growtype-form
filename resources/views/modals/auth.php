@@ -9,6 +9,13 @@ $title_key = $title_key ?? array_rand($modal_titles);
 $selected_title = $modal_titles[$title_key] ?? $modal_titles['default'];
 $variation_id = $title_key;
 $redirect_after = $redirect_after ?? '';
+$default_auth_type = sanitize_key((string)apply_filters(
+    'growtype_form_auth_modal_default',
+    $default_auth_type ?? 'login'
+));
+if (!in_array($default_auth_type, ['login', 'signup'], true)) {
+    $default_auth_type = 'login';
+}
 
 if (empty($redirect_after)) {
     $redirect_after = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
@@ -26,7 +33,7 @@ if (empty($redirect_after)) {
             </div>
             <div class="modal-body">
                 <div class="growtype-auth-modal-form">
-                    <?php echo do_shortcode('[growtype_form_auth redirect_after="' . esc_url($redirect_after) . '"]'); ?>
+                    <?php echo do_shortcode('[growtype_form_auth default="' . esc_attr($default_auth_type) . '" redirect_after="' . esc_url($redirect_after) . '"]'); ?>
                 </div>
             </div>
         </div>
@@ -157,4 +164,3 @@ Growtype_Form_General::growtype_form_submit_scripts_init();
 $general = new Growtype_Form_General();
 $general->growtype_form_show_hide_password_button();
 ?>
-
